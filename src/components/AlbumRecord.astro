@@ -1,0 +1,38 @@
+---
+/* The album sleeve with the record half out of it, spinning at 33⅓. */
+import { Image } from 'astro:assets';
+import cover from '../assets/photos/album-waiting-on-the-sun.jpg';
+---
+
+<div class="album-art" data-album-art>
+  <div class="record" aria-hidden="true">
+    <div class="record-disc">
+      <svg class="record-label" viewBox="0 0 100 100">
+        <defs>
+          <path id="label-ring" d="M50,50 m-35,0 a35,35 0 1,1 70,0 a35,35 0 1,1 -70,0"></path>
+        </defs>
+        <circle cx="50" cy="50" r="49" fill="#c02e28"></circle>
+        <circle cx="50" cy="50" r="44.5" fill="none" stroke="#efe6d3" stroke-opacity=".4" stroke-width=".5"></circle>
+        <circle cx="50" cy="50" r="25" fill="none" stroke="#efe6d3" stroke-opacity=".4" stroke-width=".5"></circle>
+        <text class="record-label-text" textLength="218" lengthAdjust="spacing">
+          <textPath href="#label-ring">JOHNNY RHOADES ✦ WAITING ON THE SUN ✦</textPath>
+        </text>
+        <text class="record-label-side" x="50" y="44" text-anchor="middle">SIDE A</text>
+        <text class="record-label-side" x="50" y="62" text-anchor="middle">33⅓</text>
+        <circle cx="50" cy="50" r="3" fill="#0d0b0a"></circle>
+      </svg>
+    </div>
+    <div class="record-sheen"></div>
+  </div>
+  <Image
+    src={cover}
+    width={900}
+    height={900}
+    quality={82}
+    alt="Waiting on the Sun album cover: Johnny seated by a window with a hollow-body guitar"
+  />
+</div>
+
+<script>
+  import '../scripts/album-record';
+</script>

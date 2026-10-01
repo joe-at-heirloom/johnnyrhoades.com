@@ -1,0 +1,14 @@
+/* ---------- Footer ---------- */
+
+.site-footer { padding: 64px 0 48px; }
+.footer-inner { display: grid; grid-template-columns: auto 1fr; gap: 28px 40px; align-items: center; }
+.brand--footer { opacity: 1; transform: none; width: 150px; }
+.socials { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 10px 26px; }
+.socials a { font-size: .85rem; text-decoration: none; color: var(--bone-2); transition: color .2s; }
+.socials a:hover { color: var(--red-hi); }
+.fine { grid-column: 1 / -1; color: var(--muted); font-size: .9rem; padding-top: 24px; border-top: 1px solid var(--line); }
+
+@media (max-width: 700px) {
+  .footer-inner { grid-template-columns: 1fr; }
+  .socials { justify-content: flex-start; }
+}

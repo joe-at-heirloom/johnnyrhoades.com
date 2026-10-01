@@ -1,0 +1,42 @@
+/*
+  Design tokens. The v1 visual language is the brand: black, bone and blues red,
+  one type family (Archivo). New colors, typefaces or motion need a decision
+  record in docs/decisions/ (CLAUDE.md, non-negotiable 6).
+*/
+
+:root {
+  /* Ground */
+  --ink: #0d0b0a;
+  --ink-2: #151210;
+  --ink-3: #1d1916;
+  --line: rgba(239, 230, 211, 0.14);
+  --line-strong: rgba(239, 230, 211, 0.3);
+
+  /* Text */
+  --bone: #efe6d3;
+  --bone-2: #c9bfad;
+  --muted: #978d7c;
+
+  /* Accent */
+  --red: #c02e28;      /* fills, with bone text on top (4.6:1) */
+  --red-deep: #a52520; /* hover and pressed fills (5.9:1 with bone) */
+  --red-hi: #e8503f;   /* red text on black; never behind bone text */
+
+  /* Type */
+  --font: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --stretch-display: 62%;  /* headlines, dates, venue names */
+  --stretch-label: 78%;    /* nav, buttons, small caps labels */
+  --text-body: 1.0625rem;
+  --text-lede: 1.125rem;
+  --text-display: clamp(2.9rem, 6.5vw, 5.5rem);
+
+  /* Space and shape */
+  --wrap: 1200px;
+  --gutter: clamp(16px, 4vw, 40px);
+  --section-y: clamp(80px, 11vw, 150px);
+  --radius: 3px;
+  --header-h: 72px;
+
+  /* Motion */
+  --ease: cubic-bezier(.2, .7, .2, 1);
+}

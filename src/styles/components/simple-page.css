@@ -1,0 +1,8 @@
+/* ---------- Standalone pages (thanks, 404) ---------- */
+
+.simple-page {
+  min-height: 100svh;
+  display: flex; flex-direction: column; justify-content: center;
+  max-width: 760px; margin: 0 auto; padding: 64px var(--gutter);
+}
+.brand--simple { opacity: 1; transform: none; width: 150px; margin-bottom: 56px; }

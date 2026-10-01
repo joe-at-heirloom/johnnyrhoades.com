@@ -1,0 +1,51 @@
+/* ---------- Hero ---------- */
+
+.hero {
+  position: relative;
+  min-height: max(640px, 100svh);
+  display: flex; align-items: flex-end;
+  background: #000;
+  overflow: hidden;
+  isolation: isolate;
+}
+.hero-media { position: absolute; inset: 0 0 0 16%; z-index: -2; }
+.hero-media img {
+  width: 100%; height: 100%;
+  object-fit: cover; object-position: 60% 100%;
+  animation: hero-in 1.6s var(--ease) both;
+}
+@keyframes hero-in { from { opacity: 0; transform: scale(1.04); } to { opacity: 1; transform: none; } }
+
+.hero-shade {
+  position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background:
+    linear-gradient(to right, #000 0%, rgba(0, 0, 0, .8) 22%, transparent 50%),
+    linear-gradient(to top, var(--ink) 0%, transparent 24%);
+}
+
+.hero-content { padding-top: calc(var(--header-h) + 40px); padding-bottom: clamp(72px, 12vh, 132px); position: relative; }
+.eyebrow {
+  font-size: .82rem; letter-spacing: .3em; color: var(--bone-2);
+  margin-bottom: 26px;
+  animation: rise .9s .25s var(--ease) both;
+}
+.hero-title { width: min(640px, 58vw); animation: rise 1s .35s var(--ease) both; }
+.hero-actions { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 44px; animation: rise 1s .65s var(--ease) both; }
+@keyframes rise { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
+
+.scroll-cue {
+  position: absolute; right: var(--gutter); bottom: 40px;
+  width: 26px; height: 44px; border: 2px solid var(--line-strong); border-radius: 20px;
+  display: grid; justify-items: center; padding-top: 8px;
+}
+.scroll-cue span { width: 3px; height: 8px; border-radius: 2px; background: var(--red-hi); animation: cue 2s var(--ease) infinite; }
+@keyframes cue { 0% { transform: translateY(0); opacity: 1; } 70% { transform: translateY(14px); opacity: 0; } 100% { opacity: 0; } }
+
+@media (max-width: 860px) {
+  .hero { align-items: flex-end; min-height: max(620px, 100svh); }
+  .hero-media { inset: 0 0 32% 0; }
+  .hero-media img { object-position: 64% 100%; }
+  .hero-shade { background: linear-gradient(to top, var(--ink) 30%, rgba(13, 11, 10, .85) 42%, transparent 62%); }
+  .hero-title { width: min(520px, 88vw); }
+  .scroll-cue { display: none; }
+}

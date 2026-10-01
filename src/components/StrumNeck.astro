@@ -1,0 +1,58 @@
+---
+/*
+  A guitar neck you can strum. The strings are drawn by src/scripts/strum.ts,
+  which only downloads when the neck gets near the viewport.
+*/
+---
+
+<div class="strum" data-strum>
+  <div
+    class="neck"
+    data-neck
+    tabindex="0"
+    role="button"
+    aria-label="Guitar strings. Press Enter to strum an E7 chord, or drag across them."
+  >
+    <svg class="neck-svg" aria-hidden="true" data-neck-svg></svg>
+  </div>
+  <div class="wrap strum-foot">
+    <button class="speaker" type="button" role="switch" aria-checked="false" aria-label="Sound" data-speaker>
+      <svg class="speaker-icon" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M3 9.5h4l5-4.5v14l-5-4.5H3z" fill="currentColor"></path>
+        <path
+          class="speaker-waves"
+          d="M15.5 8.8a4.5 4.5 0 0 1 0 6.4M18 6.3a8 8 0 0 1 0 11.4"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.8"
+          stroke-linecap="round"></path>
+      </svg>
+      <span class="speaker-track" aria-hidden="true"><span class="speaker-knob"></span></span>
+    </button>
+  </div>
+</div>
+
+<script>
+  const root = document.querySelector<HTMLElement>('[data-strum]');
+  if (root) {
+    let started = false;
+    const start = () => {
+      if (started) return;
+      started = true;
+      void import('../scripts/strum').then((m) => m.initStrum(root));
+    };
+    if ('IntersectionObserver' in window) {
+      const io = new IntersectionObserver(
+        (entries) => {
+          if (!entries.some((e) => e.isIntersecting)) return;
+          io.disconnect();
+          start();
+        },
+        { rootMargin: '600px 0px' },
+      );
+      io.observe(root);
+    } else {
+      start();
+    }
+  }
+</script>

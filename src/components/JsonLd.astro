@@ -1,0 +1,10 @@
+---
+/** Renders structured data. `data` is serialized as-is, with "<" escaped so it can't close the script tag. */
+interface Props {
+  data: Record<string, unknown>;
+}
+const { data } = Astro.props;
+const json = JSON.stringify(data, null, 2).replace(/</g, '\\u003c');
+---
+
+<script type="application/ld+json" set:html={json} />

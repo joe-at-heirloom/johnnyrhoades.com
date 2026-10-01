@@ -1,0 +1,42 @@
+# Build and deploy to GitHub Pages.
+#
+# Phase 0 version: deploys on push to main and on demand. Phase 1 adds the
+# Bandsintown sync job, the three-hourly and nightly schedules, and IndexNow
+# (PLAN.md section 12). Not yet run: the repo isn't on GitHub until Johnny
+# OKs making it public (PLAN.md section 17).
+name: Site
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: site
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Build with Astro
+        uses: withastro/action@v6
+        with:
+          node-version: 24 # ships npm 11; npm 10.9 can't install this dependency tree (ADR 0004)
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5

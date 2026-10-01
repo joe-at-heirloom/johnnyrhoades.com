@@ -1,0 +1,25 @@
+---
+import { Image } from 'astro:assets';
+import portrait from '../assets/photos/portrait.jpg';
+---
+
+<section class="section about" id="about" aria-labelledby="about-title">
+  <div class="wrap about-grid">
+    <figure class="about-photo">
+      <Image
+        src={portrait}
+        widths={[700, 1100]}
+        sizes="(min-width: 900px) 40vw, 90vw"
+        quality={80}
+        alt="Sepia portrait of Johnny Rhoades standing by a vine-covered fence, guitar at his side"
+      />
+    </figure>
+
+    <div class="about-copy">
+      <h2 class="display" id="about-title">Why I Sing the Blues</h2>
+      <p>I’m a guitar player and singer from Detroit. I started out at 19 playing with Motor City Josh, and I’ve been on and off the road ever since, around the US and over to Europe, Mexico and the Caribbean.</p>
+      <p>I grew up on B.B. King, Albert King, Albert Collins and Ray Charles. I got to play B.B. King’s memorial celebration in Memphis, and I’ve played with Thornetta Davis, RJ Spangler, Brett Lucas, John Németh and Paul Carey, among others. I was also nominated for a Detroit Music Award.</p>
+      <p>I play a mix of blues covers and my own songs. My album <cite>Waiting on the Sun</cite> came out in 2014.</p>
+    </div>
+  </div>
+</section>

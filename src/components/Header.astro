@@ -1,0 +1,31 @@
+---
+const links = [
+  { href: '#shows', label: 'Shows' },
+  { href: '#music', label: 'Music' },
+  { href: '#videos', label: 'Videos' },
+  { href: '#about', label: 'About' },
+  { href: '#photos', label: 'Photos' },
+];
+---
+
+<header class="site-header" data-header>
+  <div class="wrap header-inner">
+    <a class="brand" href="#top" aria-label="Johnny Rhoades, back to top">
+      <span class="logo-mark" aria-hidden="true"></span>
+    </a>
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav" data-nav-toggle>
+      <span class="sr-only">Menu</span>
+      <span class="nav-toggle-bars" aria-hidden="true"></span>
+    </button>
+    <nav class="site-nav" id="site-nav" aria-label="Main" data-nav>
+      <ul>
+        {links.map((l) => <li><a href={l.href}>{l.label}</a></li>)}
+      </ul>
+      <a class="btn btn-outline btn-sm" href="#book">Booking</a>
+    </nav>
+  </div>
+</header>
+
+<script>
+  import '../scripts/header';
+</script>

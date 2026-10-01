@@ -1,0 +1,4 @@
+# Plain static site, no build step. Redirects and headers live in
+# public/_redirects and public/_headers so they also work with drag-and-drop deploys.
+[build]
+  publish = "public"

@@ -1,0 +1,17 @@
+# dependencies and build output
+node_modules/
+dist/
+.astro/
+
+# test output
+test-results/
+playwright-report/
+blob-report/
+.lighthouseci/
+
+# local
+.DS_Store
+.env
+.env.*
+.playwright-mcp/
+.netlify/

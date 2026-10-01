@@ -1,0 +1,68 @@
+---
+/*
+  Booking request form. Still posts to Netlify Forms as in v1;
+  Phase 5 moves delivery off Netlify (PLAN.md section 11).
+*/
+const FACEBOOK_URL = 'https://www.facebook.com/profile.php?id=100085365311010';
+const eventTypes = ['Bar / club', 'Festival', 'Private party', 'Wedding', 'Corporate', 'Something else'];
+---
+
+<section class="section book" id="book" aria-labelledby="book-title">
+  <div class="wrap split">
+    <div class="book-copy">
+      <h2 class="display" id="book-title">Booking</h2>
+      <p class="lede">Bars, festivals, private parties, you name it. Send me the date and where it is and I’ll get back to you.</p>
+      <p class="book-alt">Or message me on <a href={FACEBOOK_URL} target="_blank" rel="noopener">Facebook</a>.</p>
+    </div>
+
+    <form class="form card" name="booking" method="POST" action="/thanks/" data-netlify="true" netlify-honeypot="company-url" data-ajax-form>
+      <input type="hidden" name="form-name" value="booking" />
+      <p class="hp" aria-hidden="true"><label>Leave this empty <input name="company-url" tabindex="-1" autocomplete="off" /></label></p>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="b-name">Name</label>
+          <input id="b-name" name="name" type="text" autocomplete="name" required />
+        </div>
+        <div class="field">
+          <label for="b-email">Email</label>
+          <input id="b-email" name="email" type="email" autocomplete="email" required />
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label for="b-phone">Phone <span class="opt">optional</span></label>
+          <input id="b-phone" name="phone" type="tel" autocomplete="tel" />
+        </div>
+        <div class="field">
+          <label for="b-date">Date</label>
+          <input id="b-date" name="event-date" type="date" />
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label for="b-venue">Where</label>
+          <input id="b-venue" name="venue" type="text" placeholder="Venue and city" />
+        </div>
+        <div class="field">
+          <label for="b-type">What kind of gig</label>
+          <select id="b-type" name="event-type">
+            {eventTypes.map((t) => <option>{t}</option>)}
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label for="b-msg">Details</label>
+        <textarea id="b-msg" name="message" rows="4" placeholder="How long a set, full band or acoustic, budget, anything else"></textarea>
+      </div>
+      <div class="form-foot">
+        <button class="btn btn-red" type="submit">Send</button>
+        <p class="form-status" role="status" aria-live="polite" data-form-status></p>
+      </div>
+    </form>
+  </div>
+</section>
+
+<script>
+  import '../scripts/forms';
+</script>

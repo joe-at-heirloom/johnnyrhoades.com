@@ -1,0 +1,16 @@
+/* ---------- About ---------- */
+
+.about-grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: clamp(48px, 8vw, 120px); align-items: start; }
+.about-photo { position: sticky; top: calc(var(--header-h) + 40px); }
+.about-photo::before {
+  content: ""; position: absolute; inset: 22px -22px -22px 22px; z-index: 0;
+  border: 2px solid var(--red);
+}
+.about-photo img { position: relative; z-index: 1; width: 100%; box-shadow: 0 40px 80px -30px #000; }
+.about-copy .display { margin-bottom: 32px; }
+.about-copy p { color: var(--bone-2); font-size: 1.125rem; max-width: 38rem; margin-bottom: 20px; }
+
+@media (max-width: 900px) {
+  .about-grid { grid-template-columns: 1fr; }
+  .about-photo { position: relative; top: 0; max-width: 420px; width: calc(100% - 22px); }
+}

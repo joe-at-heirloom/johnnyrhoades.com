@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "site",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev", "--", "--host", "127.0.0.1", "--port", "4321"],
+      "port": 4321
+    },
+    {
+      "name": "v1",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["scripts/serve-static.mjs", "reference/v1", "4322"],
+      "port": 4322
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+---
+import { Image } from 'astro:assets';
+import hero from '../assets/photos/hero.jpg';
+---
+
+<section class="hero" id="top" aria-label="Introduction">
+  <div class="hero-media">
+    <Image
+      src={hero}
+      widths={[900, 1600, 2400]}
+      sizes="100vw"
+      quality={78}
+      alt="Johnny Rhoades onstage in a blue suit and sunglasses, playing a cream Stratocaster"
+      priority
+    />
+  </div>
+  <div class="hero-shade" aria-hidden="true"></div>
+  <div class="wrap hero-content">
+    <p class="eyebrow">Blues <span aria-hidden="true">·</span> Detroit, MI</p>
+    <h1 class="hero-title">
+      <span class="logo-mark" aria-hidden="true"></span>
+      <span class="sr-only">Johnny Rhoades</span>
+    </h1>
+    <div class="hero-actions">
+      <a class="btn btn-red" href="#shows">Shows</a>
+      <a class="btn btn-ghost" href="#book">Booking</a>
+    </div>
+  </div>
+  <a class="scroll-cue" href="#shows" aria-label="Scroll to shows">
+    <span aria-hidden="true"></span>
+  </a>
+</section>

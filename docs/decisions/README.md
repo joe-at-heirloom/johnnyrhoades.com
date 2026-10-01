@@ -1,0 +1,11 @@
+# Decision records
+
+Short notes on choices that shape the code, so the reasoning survives. One file per decision, numbered in order. Each record has the context, the decision, and what it costs. Change a decision by adding a new record that supersedes the old one, not by editing history.
+
+| # | Decision | Status |
+|---|---|---|
+| [0001](0001-astro-port-structure.md) | How the v1 prototype was ported into Astro | Accepted |
+| [0002](0002-self-hosted-archivo.md) | Self-host Archivo instead of loading Google Fonts | Accepted |
+| [0003](0003-button-red-contrast.md) | Darken the button red to pass WCAG AA | Accepted |
+| [0004](0004-toolchain-pins.md) | Require npm 11 and pin TypeScript 6 | Accepted |
+| [0005](0005-visual-parity-testing.md) | How visual parity with v1 is measured | Accepted |

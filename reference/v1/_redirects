@@ -1,0 +1,4 @@
+# Old Bandzoogle URLs → the new one-page site
+/home        /          301
+/track/*     /#music    301
+/tracks/*    /#music    301
