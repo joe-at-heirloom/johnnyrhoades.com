@@ -1,11 +1,8 @@
 import type { Page } from '@playwright/test';
 
-/**
- * Third-party scripts that make screenshots nondeterministic or need the network.
- * The Bandsintown widget renders live data; YouTube only loads after a click anyway.
- */
+/** YouTube only loads after a click; block it so tests never depend on the network. */
 export async function blockThirdParties(page: Page): Promise<void> {
-  await page.route(/widgetv3\.bandsintown\.com|youtube(-nocookie)?\.com|ytimg\.com/, (route) => route.abort());
+  await page.route(/youtube(-nocookie)?\.com|ytimg\.com/, (route) => route.abort());
 }
 
 /** Scroll through the page so lazy images and the strum load, then return to the top and settle. */

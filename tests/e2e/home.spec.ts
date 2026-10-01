@@ -20,10 +20,7 @@ test('home renders with no console errors', async ({ page }) => {
 test('home has no serious or critical accessibility violations', async ({ page }) => {
   await page.goto('/');
   await loadEverything(page);
-  const results = await new AxeBuilder({ page })
-    // The Bandsintown widget is third-party markup, blocked in tests and replaced in Phase 2.
-    .exclude('[data-shows]')
-    .analyze();
+  const results = await new AxeBuilder({ page }).analyze();
   const serious = results.violations.filter((v) => v.impact === 'serious' || v.impact === 'critical');
   expect(serious.map((v) => `${v.id}: ${v.help} (${v.nodes.length})`)).toEqual([]);
 });
