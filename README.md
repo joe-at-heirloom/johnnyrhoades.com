@@ -15,7 +15,8 @@ The website for Johnny Rhoades, a blues guitarist and singer from Detroit.
 | 4. Press kit and facts ledger | Done: `/epk/`, ledger rules enforced in `npm run check` and on built pages. Some sections wait on Johnny's answers |
 | 5. Forms, list and analytics | Done in code: Web3Forms booking with a triage subject, Buttondown signup with region tags, cookieless Umami with the custom events. Needs the three accounts (ADR 0011) |
 | 6. Hardening | Done: sitemap, robots.txt, llms.txt, IndexNow, a tested CSP draft for Cloudflare, Lighthouse CI budgets, html-validate, link checks, `ci.yml` (ADR 0012) |
-| 7–8 | Not started. Launch needs Johnny's accounts and DNS access |
+| 7. Launch | Prepared, not run: redirect map from a crawl of the old site, `npm run check:redirects`, and the runbook with rollback (`docs/runbook-launch.md`, ADR 0013). Needs Johnny's accounts |
+| 8. After launch | Not started |
 
 ## Stack
 
@@ -43,6 +44,7 @@ npm install
 | `npm run lint:html` | html-validate on the build in `dist/` |
 | `npm run lhci` | Build, then Lighthouse CI against the budgets in `lighthouserc.cjs` (reports in `.lighthouseci/`) |
 | `npm run indexnow -- plan` | Which show URLs IndexNow would be told about (run by the deploy workflow) |
+| `npm run check:redirects` | After cutover: every old Bandzoogle URL in `docs/redirect-map.csv` answers 301 to its target |
 
 First time running end-to-end tests: `npx playwright install chromium`.
 

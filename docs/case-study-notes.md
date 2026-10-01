@@ -4,6 +4,17 @@ A running log for the portfolio write-up (PLAN.md section 16): numbers, screensh
 
 ---
 
+## 2026-09-30: Phase 7 prep, before touching anything
+
+**What changed.** Nothing live. The launch is written down step by step (`docs/runbook-launch.md`) with a ten-minute rollback, the old site's URLs are mapped, and a script checks the redirects after cutover.
+
+**Worth telling**
+
+- *Look before you move.* Two public lookups changed the plan. The DNS was already on Cloudflare, so the "move DNS" step became "find out whose account it's on." And the MX records point at Zoho: Johnny has email on the domain. The plan's free Cloudflare Email Routing for `booking@` would have replaced those records and silently cut off his mailbox. `booking@` becomes a Zoho alias instead.
+- *The old site was smaller than assumed.* Bandzoogle served seven URLs: the root, `/home` and five track pages. The pages the plan guessed at (`/music` and so on) were already 404s. Six redirect rows, one wildcard rule.
+
+---
+
 ## 2026-09-30: Phase 6, hardening
 
 **What changed.** The site now tells crawlers and answer engines what's there (a sitemap that follows the show data, a welcoming robots.txt, an `llms.txt` written from the facts ledger) and pings IndexNow after each deploy with only the show pages that changed. A Content Security Policy for Cloudflare is drafted and tested by serving the whole site under it. Lighthouse CI, html-validate and link checks run on every pull request.

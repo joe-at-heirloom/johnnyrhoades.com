@@ -6,6 +6,7 @@
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { expect, test } from '@playwright/test';
+import { parseRedirectMap } from '../../src/lib/redirects';
 
 const ORIGIN = 'https://johnnyrhoades.com';
 
@@ -80,4 +81,13 @@ test('every internal link, image, script and stylesheet in the build resolves', 
     }
   }
   expect([...missing]).toEqual([]);
+});
+
+test('every redirect target in the map exists, down to the section it points at', () => {
+  for (const row of parseRedirectMap(readFileSync('docs/redirect-map.csv', 'utf8'))) {
+    const url = new URL(row.to, ORIGIN);
+    const file = join('dist', url.pathname.endsWith('/') ? `${url.pathname}index.html` : url.pathname);
+    expect(existsSync(file), row.to).toBe(true);
+    if (url.hash) expect(readFileSync(file, 'utf8'), row.to).toContain(`id="${url.hash.slice(1)}"`);
+  }
 });

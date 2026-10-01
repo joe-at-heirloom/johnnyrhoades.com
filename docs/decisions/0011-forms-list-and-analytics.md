@@ -36,4 +36,4 @@ The v1 forms used `data-netlify`, which only works on Netlify. On GitHub Pages, 
 
 - Phase 5's acceptance needs real accounts: a test booking landing in Johnny's inbox, a signup with its tag in Buttondown, and events in Umami. These are listed in `docs/manual-checks.md`. The end-to-end tests cover everything up to the network: payloads, subjects, tags, messages and events, against intercepted endpoints.
 - The Content Security Policy in Phase 6 has to allow `api.web3forms.com`, `buttondown.com` and the Umami script host.
-- `booking@johnnyrhoades.com` (Cloudflare Email Routing) waits until DNS moves to Cloudflare in Phase 7. Web3Forms can deliver to it from then on.
+- `booking@johnnyrhoades.com` (Cloudflare Email Routing) waits until DNS moves to Cloudflare in Phase 7. Web3Forms can deliver to it from then on. *Superseded by ADR 0013: the domain's email is Zoho, so `booking@` is a Zoho alias.*

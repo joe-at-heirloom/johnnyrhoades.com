@@ -28,6 +28,7 @@ Available now:
 - `npm run lint:html`: html-validate on `dist/` (build first)
 - `npm run lhci`: build, then Lighthouse CI against the budgets in `lighthouserc.cjs` (ADR 0012). Takes a couple of minutes.
 - `npm run indexnow -- plan` / `submit`: IndexNow (run by `site.yml`; `plan --all` on launch day)
+- `npm run check:redirects`: the live site against `docs/redirect-map.csv` (after cutover; `--base` for another host)
 
 - `npm run sync`: pull Bandsintown into `src/data/shows.json` (needs `BANDSINTOWN_APP_ID`; flags: `--capture`, `--force`, `--dry-run`, `--now`)
 - `npm run sync:fixtures`: the same, offline, from `tests/fixtures/bandsintown/` (mocks until the key arrives; ADR 0006)

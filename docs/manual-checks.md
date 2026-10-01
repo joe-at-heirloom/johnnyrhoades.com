@@ -15,6 +15,10 @@ Acceptance criteria that need a person, a deployed site or a third-party tool. E
 
 ## Waiting on launch day (Phase 7)
 
+The full sequence is `docs/runbook-launch.md`; these are the checks that close it.
+
+- [ ] **Redirects.** `npm run check:redirects` after the Cloudflare rules are in. Expect every row of `docs/redirect-map.csv` to answer 301 to its target. *Automated now:* the map parses, and every target exists in the build.
+
 - [ ] **Submit the sitemap** (`https://johnnyrhoades.com/sitemap-index.xml`) in Search Console and Bing Webmaster Tools. Expect "Success" and the show pages discovered.
 - [ ] **First IndexNow ping.** Staging deploys will already have `/shows.json` live, so the deploy's diff is empty on launch day. Build, then run `npm run -s indexnow -- plan --all | npm run -s indexnow -- submit` once, and check Bing Webmaster Tools → IndexNow.
 - [ ] **Core Web Vitals in the field** (28 days after launch). Search Console → Core Web Vitals, mobile. Expect LCP ≤ 2.0 s, CLS ≤ 0.05, INP ≤ 150 ms. Lighthouse in the lab reads LCP around 2.6 s under its slow-4G simulation (ADR 0012).
@@ -27,7 +31,7 @@ Set each ID as a GitHub Actions repository **variable** (not a secret; they're p
 - [ ] **Buttondown** (`PUBLIC_BUTTONDOWN_USER`). Create the account, import the Bandzoogle export (see below), and create the tags Metro Detroit, Ann Arbor, Lansing, West Michigan, Elsewhere in Michigan and Out of state. Sign up from staging with a 48080 ZIP. Expect the subscriber with the Metro Detroit tag and `zip` metadata. *Automated now:* the region mapping and the posted fields.
 - [ ] **Umami** (`PUBLIC_UMAMI_WEBSITE_ID`). Add johnnyrhoades.com in Umami Cloud. After launch, click through a show page and play a video. Expect the pageviews and the events (`directions_click`, `video_play` and so on). Staging won't count, by design (`data-domains`). *Automated now:* every event name, and the script attributes.
 - [ ] **Bandzoogle mailing list export.** Export before anything else changes on the old site, and record the count as the baseline (PLAN.md section 13).
-- [ ] **booking@johnnyrhoades.com** (Phase 7). Once DNS is on Cloudflare, add an Email Routing rule forwarding to Johnny's inbox, send a test, and point Web3Forms at it if he wants.
+- [ ] **booking@johnnyrhoades.com** (Phase 7). The domain's email is Zoho Mail, so add `booking@` as an alias or group in Zoho, **not** Cloudflare Email Routing, which would replace Zoho's MX records (ADR 0013). Send a test, and point Web3Forms at it if Johnny wants.
 
 ## Waiting on Johnny's Bandsintown key
 
