@@ -37,3 +37,6 @@ export function buildNow(): DateTime {
 
 export const absolute = (path: string) => new URL(path, SITE_URL).href;
 export const showPath = (slug: string) => `/shows/${slug}/`;
+
+/** File name (without .zip) of the press photo download. */
+export const PRESS_ZIP = 'johnny-rhoades-press-photos';

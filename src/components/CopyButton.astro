@@ -1,0 +1,31 @@
+---
+/* Copies the plain text of another element. Used for the press kit bios. */
+interface Props {
+  target: string;
+  label: string;
+}
+const { target, label } = Astro.props;
+---
+
+<button class="btn btn-ghost btn-sm copy-btn" type="button" data-copy={target}>
+  <span data-copy-label>{label}</span>
+</button>
+
+<script>
+  for (const btn of document.querySelectorAll<HTMLButtonElement>('[data-copy]')) {
+    const label = btn.querySelector('[data-copy-label]');
+    const original = label?.textContent ?? '';
+    btn.addEventListener('click', async () => {
+      const text = document.getElementById(btn.dataset.copy ?? '')?.innerText.trim() ?? '';
+      try {
+        await navigator.clipboard.writeText(text);
+        if (label) label.textContent = 'Copied';
+      } catch {
+        if (label) label.textContent = 'Select the text to copy';
+      }
+      window.setTimeout(() => {
+        if (label) label.textContent = original;
+      }, 2000);
+    });
+  }
+</script>

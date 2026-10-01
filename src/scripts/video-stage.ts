@@ -4,9 +4,9 @@ import { $, $$, prefersReducedMotion } from './dom';
 const frame = $('[data-video-frame]');
 const items = $$<HTMLButtonElement>('[data-video]');
 
-if (frame && items.length) {
-  let currentId = items[0]?.dataset.video ?? '';
-  let currentTitle = items[0]?.dataset.title ?? '';
+if (frame) {
+  let currentId = items[0]?.dataset.video ?? frame.dataset.videoId ?? '';
+  let currentTitle = items[0]?.dataset.title ?? frame.dataset.videoTitle ?? '';
 
   const embed = (id: string, title: string) => {
     const iframe = document.createElement('iframe');
