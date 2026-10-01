@@ -8,6 +8,7 @@ Short notes on choices that shape the code, so the reasoning survives. One file 
 | [0002](0002-self-hosted-archivo.md) | Self-host Archivo instead of loading Google Fonts | Accepted |
 | [0003](0003-button-red-contrast.md) | Darken the button red to pass WCAG AA | Accepted |
 | [0004](0004-toolchain-pins.md) | Require npm 11 and pin TypeScript 6 | Accepted |
-| [0005](0005-visual-parity-testing.md) | How visual parity with v1 is measured | Accepted |
+| [0005](0005-visual-parity-testing.md) | How visual parity with v1 is measured | Retired in Phase 2 |
 | [0006](0006-bandsintown-mock-and-data-model.md) | Mock Bandsintown until the API key arrives; where the data model grew | Accepted (mock part temporary) |
 | [0007](0007-scripts-run-on-node-type-stripping.md) | Run TypeScript scripts with Node's built-in type stripping | Accepted |
+| [0008](0008-shows-on-the-site.md) | Shows on the site, built from data | Accepted |

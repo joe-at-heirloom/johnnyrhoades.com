@@ -24,7 +24,7 @@ Available now:
 - `npm run dev`, `npm run build`, `npm run preview` (Astro 7 runs preview in the background; stop it with `npx astro preview stop`)
 - `npm run check`: `astro check` (type-checks `.astro` and `.ts`)
 - `npm test`: Vitest unit tests in `tests/unit/`
-- `npm run test:e2e`: Playwright against the production build (run `npm run build` first). It covers behavior, axe accessibility, and visual parity with `reference/v1/` (ADR 0005). Screenshots land in `test-results/`.
+- `npm run test:e2e`: Playwright. It builds the site with a pinned date (`SITE_NOW`, see `playwright.config.ts`) and serves it on port 4500, then covers behavior, axe accessibility, show pages, feeds and the Tonight bar. Traces and screenshots of failures land in `test-results/`.
 
 - `npm run sync`: pull Bandsintown into `src/data/shows.json` (needs `BANDSINTOWN_APP_ID`; flags: `--capture`, `--force`, `--dry-run`, `--now`)
 - `npm run sync:fixtures`: the same, offline, from `tests/fixtures/bandsintown/` (mocks until the key arrives; ADR 0006)

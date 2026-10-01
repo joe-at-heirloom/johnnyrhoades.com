@@ -1,6 +1,6 @@
 # 0005: How visual parity with v1 is measured
 
-**Status:** Accepted, 2026-09-30 (Phase 0)
+**Status:** Retired in Phase 2 (2026-09-30), after doing its job in Phase 0. See ADR 0008.
 
 ## Context
 

@@ -6,7 +6,12 @@ The website for Johnny Rhoades, a blues guitarist and singer from Detroit.
 
 ## Status
 
-**Phase 0 (scaffold with visual parity): done, except deploy.** The original one-page prototype is ported to Astro and matches it pixel for pixel. The deploy waits on Johnny's OK to make the repo public. Next is Phase 1, the Bandsintown sync, which needs an API `app_id` from Johnny's Bandsintown for Artists account.
+| Phase | State |
+|---|---|
+| 0. Scaffold with visual parity | Done, except the deploy, which waits on Johnny's OK to make the repo public |
+| 1. Show data pipeline | Done on mock data. Live sync waits on a Bandsintown `app_id` (ADR 0006) |
+| 2. Shows on the site | Done: shows rendered at build time, show pages, calendar, RSS, `/shows.json`, Tonight |
+| 3–8 | Not started |
 
 ## Stack
 
@@ -27,7 +32,8 @@ npm install
 | `npm run preview` | Serve `dist/` (Astro 7 runs it in the background; stop it with `npx astro preview stop`) |
 | `npm run check` | `astro check`: type-checks `.astro` and `.ts` files |
 | `npm test` | Unit tests (Vitest, `tests/unit/`) |
-| `npm run test:e2e` | End-to-end tests (Playwright, `tests/e2e/`): behavior, accessibility and visual parity with v1. Run `npm run build` first. |
+| `npm run sync:fixtures` | Rebuild `src/data/shows.json` from the Bandsintown fixtures (offline) |
+| `npm run test:e2e` | End-to-end tests (Playwright, `tests/e2e/`). Builds with a pinned date first. |
 
 First time running end-to-end tests: `npx playwright install chromium`.
 
@@ -35,7 +41,7 @@ First time running end-to-end tests: `npx playwright install chromium`.
 
 ```
 src/
-  pages/        index, thanks, 404
+  pages/        index, shows/ (list, show pages, .ics, feed), shows.ics, shows.json, thanks, 404
   layouts/      BaseLayout: head, fonts, meta
   components/   one per section: Header, Hero, ShowsSection, MusicSection, StrumNeck,
                 AlbumRecord, VideoStage, AboutSection, PhotoGallery, BookingForm, MailingList, Footer
