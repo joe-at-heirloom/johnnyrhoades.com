@@ -1,0 +1,25 @@
+---
+/* "Promote this show" (PLAN.md section 7.2): poster downloads for Instagram, and a printable flyer. */
+import { posterPath } from '../lib/posters/formats';
+import type { Show } from '../lib/shows-schema';
+
+interface Props {
+  show: Show;
+}
+const { show } = Astro.props;
+const file = (kind: string) => `johnny-rhoades-${show.slug}-${kind}.png`;
+---
+
+<section class="show-section promote" aria-labelledby="promote-title">
+  <h2 class="show-section-title" id="promote-title">Promote this show</h2>
+  <p>Posting about it, or putting it up on the wall? These are ready to go.</p>
+  <div class="actions promote-actions">
+    <a class="btn btn-ghost" href={posterPath(show.slug, 'feed')} download={file('instagram-post')}>Download Instagram post</a>
+    <a class="btn btn-ghost" href={posterPath(show.slug, 'story')} download={file('instagram-story')}>Download Instagram story</a>
+    <button class="btn btn-ghost" type="button" data-print-flyer>Print a flyer</button>
+  </div>
+</section>
+
+<script>
+  document.querySelector('[data-print-flyer]')?.addEventListener('click', () => window.print());
+</script>

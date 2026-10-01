@@ -141,3 +141,9 @@
 
 /* 404 */
 .simple-shows { margin-top: 40px; }
+
+/* Poster image on show pages */
+.show-poster-img { width: 100%; height: auto; box-shadow: 0 40px 80px -40px #000, 0 0 0 1px var(--line); }
+.show-bill.is-print-only { display: none; }
+.promote > p { color: var(--bone-2); font-size: var(--text-lede); }
+.promote-actions { margin-top: 22px; }

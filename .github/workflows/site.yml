@@ -84,6 +84,14 @@ jobs:
         with:
           ref: ${{ needs.sync.outputs.sha || github.sha }}
 
+      # Rendered posters, keyed by content hash, so unchanged shows never re-render (ADR 0009).
+      - name: Restore the poster cache
+        uses: actions/cache@v6
+        with:
+          path: .cache/posters
+          key: posters-${{ hashFiles('src/lib/posters/**', 'src/assets/fonts/poster/**') }}-${{ github.run_id }}
+          restore-keys: posters-${{ hashFiles('src/lib/posters/**', 'src/assets/fonts/poster/**') }}-
+
       - name: Build with Astro
         uses: withastro/action@v6
         with:

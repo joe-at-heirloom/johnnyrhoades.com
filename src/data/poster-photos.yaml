@@ -1,0 +1,11 @@
+# Photos the posters may use, behind the type on portrait formats (PLAN.md section 4.1).
+# Each show picks one deterministically from those that fit its act.
+#
+# Only add a photo once its photographer credit and license are confirmed
+# (PLAN.md section 17). Empty means type-only posters. Phase 4 moves this into
+# media.yaml as `use: [poster:solo]` and so on.
+#
+# Example:
+# - file: src/assets/photos/hero.jpg
+#   acts: all               # or a list: [solo, unspecified]
+[]

@@ -4,6 +4,7 @@ import { z } from 'zod';
 import type { Overrides } from './merge.ts';
 import { ACTS, STATUSES } from './shows-schema.ts';
 import type { VenueBook } from './venues.ts';
+import type { PosterPhoto } from './posters/duotone.ts';
 
 const VenueEntrySchema = z.strictObject({
   match: z.array(z.string()).optional(),
@@ -46,3 +47,12 @@ export function parseSyncMeta(text: string): SyncMeta {
 }
 
 export const serializeSyncMeta = (meta: SyncMeta) => `${JSON.stringify(meta, null, 2)}\n`;
+
+const PosterPhotoSchema = z.strictObject({
+  file: z.string().min(1),
+  acts: z.union([z.literal('all'), z.array(z.enum(ACTS)).min(1)]),
+});
+
+export function parsePosterPhotos(yamlText: string): PosterPhoto[] {
+  return z.array(PosterPhotoSchema).parse(parseYaml(yamlText) ?? []);
+}

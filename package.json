@@ -20,8 +20,12 @@
     "sync:fixtures": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/sync-shows.ts --fixtures tests/fixtures/bandsintown"
   },
   "dependencies": {
+    "@resvg/resvg-js": "^2.6.2",
     "astro": "^7.3.5",
     "luxon": "^3.7.2",
+    "opentype.js": "^2.0.0",
+    "satori": "^0.33.5",
+    "sharp": "^0.35.5",
     "yaml": "^2.9.1",
     "zod": "^4.6.5"
   },

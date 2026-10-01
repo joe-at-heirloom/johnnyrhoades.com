@@ -12,12 +12,15 @@ import Header from '../../components/Header.astro';
 import JsonLd from '../../components/JsonLd.astro';
 import NextShowsData from '../../components/NextShowsData.astro';
 import ShowList from '../../components/ShowList.astro';
+import PromoteShow from '../../components/PromoteShow.astro';
 import ShowPoster from '../../components/ShowPoster.astro';
 import { actLabel } from '../../lib/act';
 import { directionsUrl } from '../../lib/links';
 import { allShows, BUILD_NOW, venueBook } from '../../lib/load-shows';
 import { breadcrumbs, musicEvent } from '../../lib/schema';
-import { hasPage, isIndexable, showEnd, showsAfter, venueHistory } from '../../lib/shows-data';
+import { posterContent } from '../../lib/posters/content';
+import { EVENT_IMAGE_FORMATS, posterPath } from '../../lib/posters/formats';
+import { hasPage, isIndexable, isUpcoming, showEnd, showsAfter, venueHistory } from '../../lib/shows-data';
 import type { Show } from '../../lib/shows-schema';
 import { absolute, showPath } from '../../lib/site';
 import { clockTime, longDate, shortDate, titleDate } from '../../lib/time';
@@ -50,7 +53,11 @@ const cover = show.tickets?.free ? ' Free.' : show.tickets?.url ? ' Tickets avai
 const description = cancelled
   ? `Cancelled: ${show.billing} at ${v.name} in ${v.city}, ${longDate(show.start, zone)}.`
   : `${act || 'Live'} blues at ${v.name} in ${v.city}, ${longDate(show.start, zone)} at ${clockTime(show.start, zone)}.${cover}`;
-const ogImage = absolute('/assets/img/og-image.jpg'); // Phase 3 swaps in the show's poster.
+const upcoming = isUpcoming(show, BUILD_NOW);
+const poster = posterContent(show);
+const ogImage = absolute(posterPath(show.slug, 'og'));
+// Google asks for 1:1, 4:3 and 16:9. Those are generated for upcoming shows only.
+const eventImages = upcoming ? EVENT_IMAGE_FORMATS.map((f) => absolute(posterPath(show.slug, f))) : [ogImage];
 const next = showsAfter(allShows, show, BUILD_NOW);
 ---
 
@@ -76,10 +83,10 @@ const next = showsAfter(allShows, show, BUILD_NOW);
       description={description}
       canonical={url}
       robots={isIndexable(show, BUILD_NOW) ? undefined : 'noindex, follow'}
-      social={{ title: `${show.billing} at ${v.name}`, description, image: ogImage, imageWidth: 1200, imageHeight: 630 }}
+      social={{ title: `${show.billing} at ${v.name}`, description, image: ogImage, imageWidth: 1200, imageHeight: 630, imageAlt: poster.alt }}
     >
       <Fragment slot="head">
-        <JsonLd data={musicEvent(show, { images: [ogImage] })} />
+        <JsonLd data={musicEvent(show, { images: eventImages })} />
         <JsonLd
           data={breadcrumbs([
             { name: 'Home', url: absolute('/') },
@@ -126,9 +133,19 @@ const next = showsAfter(allShows, show, BUILD_NOW);
               }
             </div>
             <div class="show-poster-wrap">
-              <ShowPoster show={show} />
+              {
+                upcoming ? (
+                  <img class="show-poster-img" src={posterPath(show.slug, 'feed')} width="1080" height="1350" alt={poster.alt} fetchpriority="high" />
+                ) : null
+              }
+              {/* The HTML bill: shown for past shows, and always used for the printed flyer. */}
+              <div class:list={['show-bill', { 'is-print-only': upcoming }]}>
+                <ShowPoster show={show} />
+              </div>
             </div>
           </div>
+
+          {upcoming && !cancelled && <PromoteShow show={show} />}
 
           {
             (blurb || history) && (
