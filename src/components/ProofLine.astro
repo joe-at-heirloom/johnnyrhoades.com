@@ -1,0 +1,10 @@
+---
+/* "112 shows in the last year, in 34 rooms across 19 towns." Renders nothing under ten shows (PLAN.md section 4.3). */
+interface Props {
+  text: string | null;
+  class?: string;
+}
+const { text, class: className } = Astro.props;
+---
+
+{text && <p class:list={['proof-line', className]}>{text}</p>}

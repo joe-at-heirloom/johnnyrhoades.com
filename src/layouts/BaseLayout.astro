@@ -1,19 +1,26 @@
 ---
 import '../styles/index.css';
+import { getImage } from 'astro:assets';
 import archivoUrl from '../assets/fonts/archivo-normal-latin.woff2?url';
+import portrait from '../assets/photos/portrait.jpg';
+import JsonLd from '../components/JsonLd.astro';
+import { siteGraph } from '../lib/schema';
+import { absolute } from '../lib/site';
 
 interface Props {
   title: string;
   description?: string;
-  /** Absolute canonical URL. Pages without one (thanks, 404) are noindex. */
+  /** Absolute canonical URL. */
   canonical?: string;
   /** Open Graph and Twitter card tags. */
-  social?: { title: string; description: string; image: string; imageWidth: number; imageHeight: number };
-  noindex?: boolean;
+  social?: { title: string; description: string; image: string; imageWidth: number; imageHeight: number; imageAlt?: string };
+  /** e.g. "noindex" or "noindex, follow". */
+  robots?: string;
 }
 
-const { title, description, canonical, social, noindex = false } = Astro.props;
+const { title, description, canonical, social, robots } = Astro.props;
 const siteName = 'Johnny Rhoades';
+const portraitImage = await getImage({ src: portrait, width: 1200, format: 'jpg', quality: 82 });
 ---
 
 <!doctype html>
@@ -24,7 +31,7 @@ const siteName = 'Johnny Rhoades';
     <title>{title}</title>
     {description && <meta name="description" content={description} />}
     {canonical && <link rel="canonical" href={canonical} />}
-    {noindex && <meta name="robots" content="noindex" />}
+    {robots && <meta name="robots" content={robots} />}
     <meta name="theme-color" content="#0d0b0a" />
 
     {
@@ -38,6 +45,7 @@ const siteName = 'Johnny Rhoades';
           <meta property="og:image" content={social.image} />
           <meta property="og:image:width" content={String(social.imageWidth)} />
           <meta property="og:image:height" content={String(social.imageHeight)} />
+          {social.imageAlt && <meta property="og:image:alt" content={social.imageAlt} />}
           <meta name="twitter:card" content="summary_large_image" />
         </>
       )
@@ -45,7 +53,9 @@ const siteName = 'Johnny Rhoades';
 
     <link rel="icon" type="image/png" sizes="64x64" href="/assets/img/favicon-64.png" />
     <link rel="apple-touch-icon" href="/assets/img/apple-touch-icon.png" />
+    <link rel="alternate" type="application/rss+xml" title="Johnny Rhoades: new shows" href="/shows/feed.xml" />
     <link rel="preload" href={archivoUrl} as="font" type="font/woff2" crossorigin />
+    <JsonLd data={siteGraph({ portraitUrl: absolute(portraitImage.src) })} />
     <slot name="head" />
   </head>
   <body>

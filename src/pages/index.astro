@@ -1,8 +1,9 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import JsonLd from '../components/JsonLd.astro';
 import Header from '../components/Header.astro';
 import Hero from '../components/Hero.astro';
+import TonightBar from '../components/TonightBar.astro';
+import ProofLine from '../components/ProofLine.astro';
 import ShowsSection from '../components/ShowsSection.astro';
 import MusicSection from '../components/MusicSection.astro';
 import VideoStage from '../components/VideoStage.astro';
@@ -11,53 +12,32 @@ import PhotoGallery from '../components/PhotoGallery.astro';
 import BookingForm from '../components/BookingForm.astro';
 import MailingList from '../components/MailingList.astro';
 import Footer from '../components/Footer.astro';
+import NextShowsData from '../components/NextShowsData.astro';
+import { allShows, BUILD_NOW } from '../lib/load-shows';
+import { proofLine } from '../lib/shows-data';
+import { absolute } from '../lib/site';
 
-const canonical = new URL('/', Astro.site).href;
-
-// Carried over from v1 as-is. Phases 2 and 6 replace it with the full graph (PLAN.md Appendix B).
-const structuredData = {
-  '@context': 'https://schema.org',
-  '@type': 'MusicGroup',
-  name: 'Johnny Rhoades',
-  url: canonical,
-  image: new URL('/assets/img/og-image.jpg', Astro.site).href,
-  genre: ['Blues'],
-  description: 'Blues guitarist and singer from Detroit.',
-  foundingLocation: { '@type': 'Place', name: 'Detroit, Michigan' },
-  album: {
-    '@type': 'MusicAlbum',
-    name: 'Waiting on the Sun',
-    datePublished: '2014-11-02',
-    numTracks: 10,
-    url: 'https://music.apple.com/us/album/waiting-on-the-sun/942326904',
-  },
-  sameAs: [
-    'https://www.facebook.com/profile.php?id=100085365311010',
-    'https://www.youtube.com/@johnnyrhoades86',
-    'https://www.bandsintown.com/a/11869348',
-    'https://music.apple.com/us/album/waiting-on-the-sun/942326904',
-  ],
-};
+const proof = proofLine(allShows, BUILD_NOW);
 ---
 
 <BaseLayout
   title="Johnny Rhoades · Blues Guitarist & Singer, Detroit"
   description="Johnny Rhoades, blues guitarist and singer from Detroit. Shows, music, videos and booking."
-  canonical={canonical}
+  canonical={absolute('/')}
   social={{
     title: 'Johnny Rhoades',
     description: 'Blues guitarist and singer from Detroit.',
-    image: new URL('/assets/img/og-image.jpg', Astro.site).href,
+    image: absolute('/assets/img/og-image.jpg'),
     imageWidth: 1200,
     imageHeight: 630,
   }}
 >
-  <JsonLd slot="head" data={structuredData} />
-
   <a class="skip-link" href="#main">Skip to content</a>
   <Header />
   <main id="main">
     <Hero />
+    <TonightBar />
+    {proof && <div class="wrap proof-wrap"><ProofLine text={proof} /></div>}
     <ShowsSection />
     <MusicSection />
     <VideoStage />
@@ -67,4 +47,5 @@ const structuredData = {
     <MailingList />
   </main>
   <Footer />
+  <NextShowsData shows={allShows} now={BUILD_NOW} />
 </BaseLayout>

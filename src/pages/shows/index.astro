@@ -1,0 +1,94 @@
+---
+/* All shows: upcoming by month, then the archive by year (PLAN.md section 7.3). */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import JsonLd from '../../components/JsonLd.astro';
+import NextShowsData from '../../components/NextShowsData.astro';
+import ProofLine from '../../components/ProofLine.astro';
+import ShowList from '../../components/ShowList.astro';
+import { allShows, BUILD_NOW } from '../../lib/load-shows';
+import { itemList } from '../../lib/schema';
+import { hasPage, pastShows, proofLine, showSummary, upcomingShows } from '../../lib/shows-data';
+import { BANDSINTOWN_PROFILE, SITE_HOST, absolute, showPath } from '../../lib/site';
+
+const upcoming = upcomingShows(allShows, BUILD_NOW);
+const past = pastShows(allShows, BUILD_NOW);
+
+const group = <T,>(items: T[], key: (item: T) => string | number) => {
+  const groups = new Map<string | number, T[]>();
+  for (const item of items) groups.set(key(item), [...(groups.get(key(item)) ?? []), item]);
+  return [...groups.entries()];
+};
+const byMonth = group(upcoming, (s) => showSummary(s).month);
+const byYear = group(past, (s) => showSummary(s).year);
+
+const first = upcoming.find((s) => s.status !== 'cancelled');
+const description = first
+  ? `${upcoming.length} upcoming ${upcoming.length === 1 ? 'show' : 'shows'}. Next: ${showSummary(first).date} at ${first.venue.name}, ${first.venue.city}.`
+  : 'Where Johnny Rhoades is playing next, and where he’s played.';
+const calendarUrl = `webcal://${SITE_HOST}/shows.ics`;
+const googleSubscribe = `https://calendar.google.com/calendar/r?cid=${encodeURIComponent(calendarUrl)}`;
+---
+
+<BaseLayout
+  title="Johnny Rhoades Shows | Live Blues in Metro Detroit"
+  description={description}
+  canonical={absolute('/shows/')}
+  social={{ title: 'Johnny Rhoades shows', description, image: absolute('/assets/img/og-image.jpg'), imageWidth: 1200, imageHeight: 630 }}
+>
+  <JsonLd slot="head" data={itemList(upcoming.filter(hasPage).map((s) => absolute(showPath(s.slug))))} />
+  <a class="skip-link" href="#main">Skip to content</a>
+  <Header solid />
+
+  <main id="main" class="page shows-page">
+    <div class="wrap">
+      <header class="page-head">
+        <h1 class="display">Shows</h1>
+        <ProofLine text={proofLine(allShows, BUILD_NOW)} />
+        <p class="lede">Where I’m playing next. Subscribe to the calendar and new dates show up on your phone on their own.</p>
+        <div class="actions">
+          <a class="btn btn-red" href={calendarUrl}>Subscribe to the calendar</a>
+          <a class="text-link" href={googleSubscribe} target="_blank" rel="noopener">Add to Google Calendar</a>
+          <a class="text-link" href={BANDSINTOWN_PROFILE} target="_blank" rel="noopener">Follow on Bandsintown</a>
+          <a class="text-link" href="/shows/feed.xml">RSS</a>
+        </div>
+      </header>
+
+      <section class="shows-upcoming" aria-labelledby="upcoming-title">
+        <h2 class="sr-only" id="upcoming-title">Upcoming shows</h2>
+        {
+          byMonth.length === 0 ? (
+            <ShowList shows={[]} upcoming empty="Nothing on the calendar right now. Follow me on Bandsintown and you’ll hear about the next one." />
+          ) : (
+            byMonth.map(([month, shows]) => (
+              <div class="month">
+                <h3 class="month-title">{month}</h3>
+                <ShowList shows={shows} upcoming label={`Shows in ${month}`} />
+              </div>
+            ))
+          )
+        }
+      </section>
+
+      {
+        byYear.length > 0 && (
+          <section class="shows-archive" aria-labelledby="archive-title">
+            <h2 class="archive-title" id="archive-title">Where I’ve played</h2>
+            {byYear.map(([year, shows]) => (
+              <details class="archive-year">
+                <summary>
+                  {year} <span class="archive-count">{shows.length} {shows.length === 1 ? 'show' : 'shows'}</span>
+                </summary>
+                <ShowList shows={shows} label={`Shows in ${year}`} />
+              </details>
+            ))}
+          </section>
+        )
+      }
+    </div>
+  </main>
+
+  <Footer />
+  <NextShowsData shows={allShows} now={BUILD_NOW} />
+</BaseLayout>

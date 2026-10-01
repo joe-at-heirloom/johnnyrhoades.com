@@ -5,8 +5,9 @@ const toggle = $<HTMLButtonElement>('[data-nav-toggle]');
 const nav = $('[data-nav]');
 
 if (header && toggle && nav) {
-  // Solid background once you scroll.
-  const onScroll = () => header.classList.toggle('is-scrolled', window.scrollY > 40);
+  // Solid background once you scroll (always, on pages without the hero).
+  const solid = header.hasAttribute('data-solid');
+  const onScroll = () => header.classList.toggle('is-scrolled', solid || window.scrollY > 40);
   onScroll();
   window.addEventListener('scroll', onScroll, { passive: true });
 

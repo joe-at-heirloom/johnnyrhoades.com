@@ -1,4 +1,6 @@
 ---
+import { BUILD_NOW } from '../lib/load-shows';
+
 // Phase 4 moves these into src/data/profiles.yaml.
 const profiles = [
   { label: 'Facebook', url: 'https://www.facebook.com/profile.php?id=100085365311010' },
@@ -7,12 +9,12 @@ const profiles = [
   { label: 'Apple Music', url: 'https://music.apple.com/us/album/waiting-on-the-sun/942326904' },
   { label: 'Amazon', url: 'https://www.amazon.com/Waiting-Sun-Johnny-Rhoades/dp/B00PQ33NZK' },
 ];
-const year = new Date().getFullYear();
+const year = BUILD_NOW.year;
 ---
 
 <footer class="site-footer">
   <div class="wrap footer-inner">
-    <a class="brand brand--footer" href="#top" aria-label="Johnny Rhoades, back to top"><span class="logo-mark" aria-hidden="true"></span></a>
+    <a class="brand brand--footer" href="/#top" aria-label="Johnny Rhoades, back to top"><span class="logo-mark" aria-hidden="true"></span></a>
     <ul class="socials" aria-label="Johnny Rhoades elsewhere">
       {profiles.map((p) => <li><a href={p.url} target="_blank" rel="noopener">{p.label}</a></li>)}
     </ul>

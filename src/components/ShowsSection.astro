@@ -1,9 +1,11 @@
 ---
-/*
-  Shows, still rendered by the Bandsintown widget in the browser.
-  Phase 2 replaces this with shows rendered at build time from src/data/shows.json.
-*/
-const BANDSINTOWN_URL = 'https://www.bandsintown.com/a/11869348';
+/* Home page shows: the next eight, rendered at build time (PLAN.md section 7.1). */
+import ShowList from './ShowList.astro';
+import { allShows, BUILD_NOW } from '../lib/load-shows';
+import { upcomingShows } from '../lib/shows-data';
+import { BANDSINTOWN_PROFILE, SITE_HOST } from '../lib/site';
+
+const next = upcomingShows(allShows, BUILD_NOW).slice(0, 8);
 ---
 
 <section class="section shows" id="shows" aria-labelledby="shows-title">
@@ -12,44 +14,12 @@ const BANDSINTOWN_URL = 'https://www.bandsintown.com/a/11869348';
       <h2 class="display" id="shows-title">Shows</h2>
       <p class="lede">Where I’m playing next. Follow me on Bandsintown and it’ll let you know when I’ve got a show near you.</p>
       <div class="actions">
-        <a class="btn btn-ghost" href={BANDSINTOWN_URL} target="_blank" rel="noopener">Follow on Bandsintown</a>
-        <a class="text-link" href="#book">Want to book me? <span aria-hidden="true">→</span></a>
+        <a class="btn btn-ghost" href="/shows/">All shows</a>
+        <a class="text-link" href={`webcal://${SITE_HOST}/shows.ics`}>Subscribe to the calendar</a>
+        <a class="text-link" href={BANDSINTOWN_PROFILE} target="_blank" rel="noopener">Follow on Bandsintown</a>
       </div>
     </header>
 
-    <div class="shows-list" data-shows>
-      <a
-        class="bit-widget-initializer"
-        data-artist-name="id_11869348"
-        data-app-id="js_johnnyrhoades.com"
-        data-display-local-dates="false"
-        data-display-past-dates="false"
-        data-auto-style="false"
-        data-text-color="#EFE6D3"
-        data-link-color="#E8503F"
-        data-background-color="rgba(0,0,0,0)"
-        data-display-limit="15"
-        data-display-start-time="true"
-        data-display-lineup="false"
-        data-display-play-my-city="false"
-        data-display-track-button="false"
-        data-display-logo="false"
-        data-separator-color="rgba(239,230,211,0.14)"
-        data-font="Archivo"
-        data-date-format="ddd, MMM D"
-        data-language="en"
-        data-layout-breakpoint="600"
-        data-bit-logo-position="hidden"
-        data-follow-section-position="hidden"
-        data-play-my-city-position="hidden"></a>
-      <p class="shows-fallback" data-shows-fallback>
-        Loading shows…
-        <span>If nothing shows up, they’re all on <a href={BANDSINTOWN_URL} target="_blank" rel="noopener">Bandsintown</a>.</span>
-      </p>
-    </div>
+    <ShowList shows={next} upcoming label="Upcoming shows" empty="Nothing on the calendar right now. Follow me on Bandsintown and you’ll hear about the next one." />
   </div>
 </section>
-
-<script>
-  import '../scripts/shows-widget';
-</script>

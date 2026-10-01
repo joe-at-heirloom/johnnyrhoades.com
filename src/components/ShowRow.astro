@@ -1,0 +1,31 @@
+---
+/* One show in a list: date and time | venue, town and act. Links to the show page when there is one. */
+import { hasPage, showEnd, showSummary } from '../lib/shows-data';
+import { showPath } from '../lib/site';
+import type { Show } from '../lib/shows-schema';
+
+interface Props {
+  show: Show;
+}
+const { show } = Astro.props;
+const s = showSummary(show);
+const linked = hasPage(show);
+const cancelled = show.status === 'cancelled';
+const Tag = linked ? 'a' : 'div';
+---
+
+<li class:list={['show-row', { 'is-cancelled': cancelled }]} data-show-end={showEnd(show).toISO()}>
+  <Tag class="show-row-inner" href={linked ? showPath(show.slug) : undefined}>
+    <span class="show-when">
+      <span class="show-date">{s.date}</span>
+      <span class="show-time">{s.time}</span>
+    </span>
+    <span class="show-where">
+      <span class="show-venue">{show.venue.name}</span>
+      <span class="show-meta">
+        {s.town}{s.act && ` · ${s.act}`}{cancelled && <> · <strong>Cancelled</strong></>}
+      </span>
+    </span>
+    {linked && <span class="show-arrow" aria-hidden="true">→</span>}
+  </Tag>
+</li>

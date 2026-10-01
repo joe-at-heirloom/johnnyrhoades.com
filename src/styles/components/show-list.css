@@ -1,0 +1,72 @@
+/* ---------- Show lists: date | venue, town and act ---------- */
+
+.shows { padding-top: calc(var(--section-y) - 20px); }
+
+.show-rows { border-top: 1px solid var(--line); }
+.show-row { border-bottom: 1px solid var(--line); }
+.show-row-inner {
+  display: grid;
+  grid-template-columns: 8.5rem minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: 28px;
+  padding: 22px 12px;
+  text-decoration: none;
+  transition: background-color .25s;
+}
+a.show-row-inner:hover { background: rgba(239, 230, 211, .04); }
+
+.show-when { display: grid; gap: 2px; }
+.show-date {
+  font-stretch: var(--stretch-display);
+  font-weight: 900;
+  text-transform: uppercase;
+  font-size: 1.5rem;
+  letter-spacing: .02em;
+  line-height: 1;
+  color: var(--red-hi);
+}
+.show-time { color: var(--muted); font-size: .92rem; }
+
+.show-where { display: grid; gap: 4px; min-width: 0; }
+.show-venue {
+  font-stretch: var(--stretch-display);
+  font-weight: 900;
+  text-transform: uppercase;
+  font-size: clamp(1.5rem, 2.2vw, 1.9rem);
+  line-height: 1;
+  letter-spacing: .01em;
+  color: var(--bone);
+  transition: color .2s;
+}
+a.show-row-inner:hover .show-venue { color: var(--red-hi); }
+.show-meta { color: var(--bone-2); font-size: 1rem; }
+.show-meta strong { color: var(--red-hi); font-weight: 700; }
+.show-arrow { color: var(--muted); font-size: 1.4rem; transition: color .2s; }
+a.show-row-inner:hover .show-arrow { color: var(--red-hi); }
+
+.is-cancelled .show-venue { color: var(--muted); text-decoration: line-through; text-decoration-thickness: 2px; }
+.is-cancelled .show-date { color: var(--muted); }
+
+.show-empty { color: var(--muted); border-top: 1px solid var(--line); padding-top: 24px; }
+.show-empty a { color: var(--bone); }
+
+@media (max-width: 600px) {
+  .show-row-inner { grid-template-columns: 5.4rem minmax(0, 1fr) auto; column-gap: 16px; align-items: start; padding: 20px 4px; }
+  .show-date { font-size: 1.2rem; }
+  .show-venue { font-size: 1.35rem; }
+  .show-arrow { align-self: center; }
+}
+
+/* ---------- Proof line ---------- */
+
+.proof-wrap { padding-top: clamp(48px, 7vw, 80px); }
+.proof-line {
+  font-stretch: var(--stretch-display);
+  font-weight: 900;
+  text-transform: uppercase;
+  font-size: clamp(1.5rem, 3vw, 2.4rem);
+  line-height: 1.05;
+  letter-spacing: .01em;
+  color: var(--bone);
+  max-width: 28ch;
+}

@@ -1,0 +1,159 @@
+---
+/*
+  One page per public show (PLAN.md section 7.2), plus a redirect stub for
+  every old slug in `aliases`. GitHub Pages can't redirect, so stubs use a
+  meta refresh and a canonical link.
+*/
+import type { GetStaticPaths } from 'astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AddToCalendar from '../../components/AddToCalendar.astro';
+import Footer from '../../components/Footer.astro';
+import Header from '../../components/Header.astro';
+import JsonLd from '../../components/JsonLd.astro';
+import NextShowsData from '../../components/NextShowsData.astro';
+import ShowList from '../../components/ShowList.astro';
+import ShowPoster from '../../components/ShowPoster.astro';
+import { actLabel } from '../../lib/act';
+import { directionsUrl } from '../../lib/links';
+import { allShows, BUILD_NOW, venueBook } from '../../lib/load-shows';
+import { breadcrumbs, musicEvent } from '../../lib/schema';
+import { hasPage, isIndexable, showEnd, showsAfter, venueHistory } from '../../lib/shows-data';
+import type { Show } from '../../lib/shows-schema';
+import { absolute, showPath } from '../../lib/site';
+import { clockTime, longDate, shortDate, titleDate } from '../../lib/time';
+import { known } from '../../lib/venues';
+
+export const getStaticPaths = (() => {
+  const shows = allShows.filter(hasPage);
+  return [
+    ...shows.map((show) => ({ params: { slug: show.slug }, props: { show, redirect: false } })),
+    ...shows.flatMap((show) => show.aliases.map((alias) => ({ params: { slug: alias }, props: { show, redirect: true } }))),
+  ];
+}) satisfies GetStaticPaths;
+
+interface Props {
+  show: Show;
+  redirect: boolean;
+}
+const { show, redirect } = Astro.props;
+const url = absolute(showPath(show.slug));
+const v = show.venue;
+const zone = v.timeZone;
+const blurb = known(venueBook[v.key]?.blurb);
+const history = venueHistory(allShows, show, BUILD_NOW);
+const act = actLabel(show.act, show.billing);
+const cancelled = show.status === 'cancelled';
+const when = `${longDate(show.start, zone)}, ${clockTime(show.start, zone)}`;
+
+const title = `${show.billing} at ${v.name}, ${v.city} | ${titleDate(show.start, zone)}`;
+const cover = show.tickets?.free ? ' Free.' : show.tickets?.url ? ' Tickets available.' : '';
+const description = cancelled
+  ? `Cancelled: ${show.billing} at ${v.name} in ${v.city}, ${longDate(show.start, zone)}.`
+  : `${act || 'Live'} blues at ${v.name} in ${v.city}, ${longDate(show.start, zone)} at ${clockTime(show.start, zone)}.${cover}`;
+const ogImage = absolute('/assets/img/og-image.jpg'); // Phase 3 swaps in the show's poster.
+const next = showsAfter(allShows, show, BUILD_NOW);
+---
+
+{
+  redirect ? (
+    <html lang="en">
+      <head>
+        <meta charset="utf-8" />
+        <title>{title}</title>
+        <meta name="robots" content="noindex" />
+        <link rel="canonical" href={url} />
+        <meta http-equiv="refresh" content={`0; url=${showPath(show.slug)}`} />
+      </head>
+      <body>
+        <p>
+          This show moved: <a href={showPath(show.slug)}>{show.billing} at {v.name}, {shortDate(show.start, zone)}</a>.
+        </p>
+      </body>
+    </html>
+  ) : (
+    <BaseLayout
+      title={title}
+      description={description}
+      canonical={url}
+      robots={isIndexable(show, BUILD_NOW) ? undefined : 'noindex, follow'}
+      social={{ title: `${show.billing} at ${v.name}`, description, image: ogImage, imageWidth: 1200, imageHeight: 630 }}
+    >
+      <Fragment slot="head">
+        <JsonLd data={musicEvent(show, { images: [ogImage] })} />
+        <JsonLd
+          data={breadcrumbs([
+            { name: 'Home', url: absolute('/') },
+            { name: 'Shows', url: absolute('/shows/') },
+            { name: `${v.name}, ${shortDate(show.start, zone)}`, url },
+          ])}
+        />
+      </Fragment>
+      <a class="skip-link" href="#main">Skip to content</a>
+      <Header solid />
+
+      <main id="main" class="page show-page" data-show-page data-show-end={showEnd(show).toISO()}>
+        <div class="wrap">
+          <nav class="breadcrumbs" aria-label="Breadcrumbs">
+            <a href="/shows/">Shows</a> <span aria-hidden="true">/</span> <span aria-current="page">{v.name}, {shortDate(show.start, zone)}</span>
+          </nav>
+
+          {cancelled && <p class="show-banner is-cancelled">This show is cancelled.</p>}
+          <p class="show-banner is-past" data-past-banner hidden>
+            This show has happened.<span data-past-next-wrap> Next up: <a data-past-next href="/shows/">see all shows</a>.</span>
+          </p>
+
+          <div class="show-hero">
+            <div class="show-details">
+              <h1 class="show-title">
+                <span class="show-billing">{show.billing}</span>
+                <span class="show-at">at {v.name}</span>
+              </h1>
+              <p class="show-when-line">{when}</p>
+              {act && <p class="show-act">{act}</p>}
+              <address class="show-address">
+                {v.street && <>{v.street}<br /></>}
+                {v.city}, {v.region} {v.postalCode}
+              </address>
+              {cover && <p class="show-cover">{show.tickets?.free ? 'Free show.' : <a href={show.tickets?.url} target="_blank" rel="noopener">Get tickets</a>}</p>}
+              {
+                !cancelled && (
+                  <div class="actions show-actions">
+                    <a class="btn btn-red" href={directionsUrl(show)} target="_blank" rel="noopener">Directions</a>
+                    <AddToCalendar show={show} />
+                    <a class="text-link" href={show.bandsintownUrl} target="_blank" rel="noopener">RSVP on Bandsintown</a>
+                  </div>
+                )
+              }
+            </div>
+            <div class="show-poster-wrap">
+              <ShowPoster show={show} />
+            </div>
+          </div>
+
+          {
+            (blurb || history) && (
+              <section class="show-section" aria-labelledby="room-title">
+                <h2 class="show-section-title" id="room-title">About the room</h2>
+                {blurb && <p>{blurb}</p>}
+                {history && <p>{history}</p>}
+              </section>
+            )
+          }
+
+          <section class="show-section" aria-labelledby="next-title">
+            <h2 class="show-section-title" id="next-title">Next up</h2>
+            <ShowList shows={next} upcoming label="Next shows" empty="Nothing else on the calendar yet." />
+            <p class="show-more"><a class="text-link" href="/shows/">All shows <span aria-hidden="true">→</span></a></p>
+          </section>
+
+          <section class="show-section show-booking">
+            <p>Booking your room? <a class="text-link" href="/#book">Send Johnny the date <span aria-hidden="true">→</span></a></p>
+          </section>
+        </div>
+      </main>
+
+      <Footer />
+      <NextShowsData shows={allShows} now={BUILD_NOW} />
+    </BaseLayout>
+  )
+}

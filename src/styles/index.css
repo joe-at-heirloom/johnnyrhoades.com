@@ -7,7 +7,8 @@
 @import "./base.css";
 @import "./components/header.css";
 @import "./components/hero.css";
-@import "./components/shows.css";
+@import "./components/tonight.css";
+@import "./components/show-list.css";
 @import "./components/music.css";
 @import "./components/strum.css";
 @import "./components/videos.css";
@@ -17,4 +18,5 @@
 @import "./components/mailing-list.css";
 @import "./components/footer.css";
 @import "./components/simple-page.css";
+@import "./components/pages.css";
 @import "./motion.css";

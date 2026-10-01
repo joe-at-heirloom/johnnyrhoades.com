@@ -1,16 +1,23 @@
 ---
+interface Props {
+  /** Pages without the hero: solid background and the logo showing from the start. */
+  solid?: boolean;
+}
+const { solid = false } = Astro.props;
+
+// Root-relative, so the same links work from show pages (same-page jumps on the home page).
 const links = [
-  { href: '#shows', label: 'Shows' },
-  { href: '#music', label: 'Music' },
-  { href: '#videos', label: 'Videos' },
-  { href: '#about', label: 'About' },
-  { href: '#photos', label: 'Photos' },
+  { href: '/#shows', label: 'Shows' },
+  { href: '/#music', label: 'Music' },
+  { href: '/#videos', label: 'Videos' },
+  { href: '/#about', label: 'About' },
+  { href: '/#photos', label: 'Photos' },
 ];
 ---
 
-<header class="site-header" data-header>
+<header class:list={['site-header', { 'is-scrolled is-solid': solid }]} data-header data-solid={solid ? '' : undefined}>
   <div class="wrap header-inner">
-    <a class="brand" href="#top" aria-label="Johnny Rhoades, back to top">
+    <a class="brand" href={solid ? '/' : '#top'} aria-label={solid ? 'Johnny Rhoades, home' : 'Johnny Rhoades, back to top'}>
       <span class="logo-mark" aria-hidden="true"></span>
     </a>
     <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav" data-nav-toggle>
@@ -21,7 +28,7 @@ const links = [
       <ul>
         {links.map((l) => <li><a href={l.href}>{l.label}</a></li>)}
       </ul>
-      <a class="btn btn-outline btn-sm" href="#book">Booking</a>
+      <a class="btn btn-outline btn-sm" href="/#book">Booking</a>
     </nav>
   </div>
 </header>

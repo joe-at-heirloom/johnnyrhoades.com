@@ -1,0 +1,43 @@
+---
+/*
+  The JSON island the Tonight script reads: the next ten shows, with display
+  strings formatted at build time so the script stays tiny (PLAN.md section 4.2).
+*/
+import { directionsUrl } from '../lib/links';
+import { showEnd, showSummary, upcomingShows } from '../lib/shows-data';
+import { showPath } from '../lib/site';
+import type { Show } from '../lib/shows-schema';
+import { localDate } from '../lib/time';
+import type { DateTime } from 'luxon';
+
+interface Props {
+  shows: Show[];
+  now: DateTime;
+}
+const { shows, now } = Astro.props;
+
+const island = upcomingShows(shows, now)
+  .filter((s) => s.status !== 'cancelled')
+  .slice(0, 10)
+  .map((s) => {
+    const summary = showSummary(s);
+    return {
+      url: showPath(s.slug),
+      day: localDate(s.start, s.venue.timeZone),
+      end: showEnd(s).toISO(),
+      venue: s.venue.name,
+      town: summary.town,
+      date: summary.date,
+      time: summary.time,
+      directions: directionsUrl(s),
+      rsvp: s.bandsintownUrl,
+    };
+  });
+const json = JSON.stringify(island).replace(/</g, '\\u003c');
+---
+
+<script type="application/json" id="next-shows" set:html={json} />
+
+<script>
+  import '../scripts/tonight';
+</script>

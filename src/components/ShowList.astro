@@ -1,0 +1,30 @@
+---
+/*
+  A list of shows. Upcoming lists are marked so the Tonight script can hide
+  shows that end between builds, and show the empty message if none are left.
+*/
+import ShowRow from './ShowRow.astro';
+import type { Show } from '../lib/shows-schema';
+
+interface Props {
+  shows: Show[];
+  upcoming?: boolean;
+  empty?: string;
+  label?: string;
+}
+const { shows, upcoming = false, empty = 'Nothing on the calendar right now.', label } = Astro.props;
+---
+
+<div class="show-list" data-upcoming={upcoming ? '' : undefined}>
+  {
+    shows.length > 0 && (
+      <ol class="show-rows" aria-label={label}>
+        {shows.map((show) => <ShowRow show={show} />)}
+      </ol>
+    )
+  }
+  <p class="show-empty" data-show-empty hidden={shows.length > 0}>
+    {empty}
+    <slot name="empty" />
+  </p>
+</div>

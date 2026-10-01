@@ -1,14 +1,33 @@
 ---
+/* A useful dead end: the next three shows and the way back (PLAN.md section 7.5). */
 import BaseLayout from '../layouts/BaseLayout.astro';
+import NextShowsData from '../components/NextShowsData.astro';
+import ShowList from '../components/ShowList.astro';
+import { allShows, BUILD_NOW } from '../lib/load-shows';
+import { upcomingShows } from '../lib/shows-data';
+
+const next = upcomingShows(allShows, BUILD_NOW)
+  .filter((s) => s.status !== 'cancelled')
+  .slice(0, 3);
 ---
 
-<BaseLayout title="Page not found · Johnny Rhoades" noindex>
+<BaseLayout title="Page not found · Johnny Rhoades" robots="noindex">
   <main class="simple-page">
     <a class="brand brand--simple" href="/" aria-label="Johnny Rhoades, home"><span class="logo-mark" aria-hidden="true"></span></a>
     <h1 class="display">Page not found</h1>
     <p class="lede">That page doesn’t exist.</p>
+    {
+      next.length > 0 && (
+        <section class="simple-shows" aria-labelledby="next-title">
+          <h2 class="simple-shows-title" id="next-title">Where I’m playing next</h2>
+          <ShowList shows={next} upcoming label="Next shows" />
+        </section>
+      )
+    }
     <div class="actions">
       <a class="btn btn-red" href="/">Back to the site</a>
+      <a class="text-link" href="/shows/">All shows</a>
     </div>
   </main>
+  <NextShowsData shows={allShows} now={BUILD_NOW} />
 </BaseLayout>
