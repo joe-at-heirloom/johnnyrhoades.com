@@ -52,39 +52,50 @@ videos:
     channel: Adam
 
 # use: where a photo may appear. gallery | epk | press (offered as a high-resolution download)
+# shape: portrait | landscape. Gallery photos need it: it decides their place in the grid (src/lib/gallery.ts).
 # Press downloads need a confirmed credit and license (PLAN.md section 17).
 # Credits read from watermarks are marked as such until the photographer confirms.
 photos:
   - file: photos/gallery/seated-studio.jpg
+    shape: portrait
     alt: Johnny seated with a hollow-body guitar in front of a wall of amplifiers, black and white
     use: [gallery, epk]
   - file: photos/gallery/blues-by-the-bay.jpg
+    shape: landscape
     alt: Johnny and another guitarist raising their fists onstage at a festival tent
     credit: Jane Cassisi Photography (from the watermark)
     use: [gallery]
   - file: photos/gallery/outdoor-festival.jpg
+    shape: portrait
     alt: Johnny grinning mid-solo on an outdoor festival stage
     use: [gallery, epk]
   - file: photos/gallery/dueling-guitars.jpg
+    shape: landscape
     alt: Two guitarists playing side by side onstage at night
     use: [gallery]
   - file: photos/gallery/bookshelf.jpg
+    shape: landscape
     alt: Johnny sitting with his guitar in a room lined with books, black and white
     use: [gallery, epk]
   - file: photos/gallery/bar-stage.jpg
+    shape: portrait
     alt: Johnny and a bandmate playing a small bar stage under purple lights
     use: [gallery]
   - file: photos/gallery/mississippi-blues-trail.jpg
+    shape: landscape
     alt: Johnny and bandmates beside a Mississippi Blues Trail marker
     use: [gallery]
   - file: photos/gallery/festival-stage.jpg
+    shape: landscape
     alt: Johnny playing a Stratocaster beside a guitarist in a cream suit
     credit: John Rocklin (from the watermark)
     use: [gallery]
   - file: photos/gallery/fence.jpg
+    shape: landscape
     alt: Johnny standing by a wooden fence holding his guitar, black and white
     use: [gallery, epk]
   - file: photos/gallery/backstage.jpg
+    shape: portrait
     alt: Johnny with his arm around a friend in an empty theater
     use: [gallery]
     gridWidth: 640

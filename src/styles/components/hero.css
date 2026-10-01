@@ -31,22 +31,36 @@
   animation: rise .9s .25s var(--ease) both;
 }
 .hero-title { width: min(640px, 58vw); animation: rise 1s .35s var(--ease) both; }
-.hero-actions { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 44px; animation: rise 1s .65s var(--ease) both; }
-@keyframes rise { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
+.hero-actions { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 36px; animation: rise 1s .65s var(--ease) both; }
 
-.scroll-cue {
-  position: absolute; right: var(--gutter); bottom: 40px;
-  width: 26px; height: 44px; border: 2px solid var(--line-strong); border-radius: 20px;
-  display: grid; justify-items: center; padding-top: 8px;
+/* Next show: the first thing a fan wants, set like the top line of a gig poster. */
+.hero-next {
+  display: grid; gap: 6px;
+  width: fit-content; max-width: 100%;
+  margin-top: clamp(28px, 4vw, 40px);
+  padding-top: 18px;
+  border-top: 2px solid var(--red);
+  text-decoration: none;
+  animation: rise 1s .5s var(--ease) both;
 }
-.scroll-cue span { width: 3px; height: 8px; border-radius: 2px; background: var(--red-hi); animation: cue 2s var(--ease) infinite; }
-@keyframes cue { 0% { transform: translateY(0); opacity: 1; } 70% { transform: translateY(14px); opacity: 0; } 100% { opacity: 0; } }
+.hero-next-label {
+  font-stretch: var(--stretch-label); font-weight: 800; text-transform: uppercase;
+  letter-spacing: .2em; font-size: .78rem; color: var(--red-hi);
+}
+.hero-next-venue {
+  font-stretch: var(--stretch-display); font-weight: 900; text-transform: uppercase;
+  font-size: clamp(1.9rem, 3.4vw, 2.8rem); line-height: .92; color: var(--bone);
+  transition: color .2s;
+}
+.hero-next-venue::after { content: " →"; color: var(--red-hi); }
+.hero-next-when { color: var(--bone-2); font-size: 1.05rem; font-weight: 500; }
+.hero-next:hover .hero-next-venue { color: var(--red-hi); }
+@keyframes rise { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
 
 @media (max-width: 860px) {
   .hero { align-items: flex-end; min-height: max(620px, 100svh); }
   .hero-media { inset: 0 0 32% 0; }
   .hero-media img { object-position: 64% 100%; }
-  .hero-shade { background: linear-gradient(to top, var(--ink) 30%, rgba(13, 11, 10, .85) 42%, transparent 62%); }
+  .hero-shade { background: linear-gradient(to top, var(--ink) 34%, rgba(13, 11, 10, .9) 50%, transparent 70%); }
   .hero-title { width: min(520px, 88vw); }
-  .scroll-cue { display: none; }
 }

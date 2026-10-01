@@ -1,11 +1,17 @@
 ---
 import { Image, getImage } from 'astro:assets';
+import { galleryLayout } from '../lib/gallery';
 import { image, media } from '../lib/load-content';
 
-// From media.yaml. `gridWidth` overrides the 700px grid size for narrower originals.
-// Don't read properties off the image objects here: Astro then ships the
-// full-size original alongside the resized copies.
-const photos = media.photos.filter((p) => p.use.includes('gallery')).map((p) => ({ ...p, src: image(p.file) }));
+// From media.yaml, placed by shape (src/lib/gallery.ts). `gridWidth` overrides
+// the 700px tile size for narrower originals. Don't read properties off the
+// image objects here: Astro then ships the full-size original alongside the
+// resized copies.
+const photos = galleryLayout(media.photos.filter((p) => p.use.includes('gallery'))).map(({ photo, slot }) => ({
+  ...photo,
+  slot,
+  src: image(photo.file),
+}));
 
 // The lightbox loads a larger version on demand (never upscaled past the master).
 const full = await Promise.all(photos.map((p) => getImage({ src: p.src, width: 1600, format: 'webp', quality: 80 })));
@@ -20,14 +26,13 @@ const full = await Promise.all(photos.map((p) => getImage({ src: p.src, width: 1
     <ul class="gallery" data-gallery>
       {
         photos.map((p, i) => (
-          <li>
+          <li class={`g-${p.slot}`}>
             <button type="button" data-full={full[i]?.src}>
-              <Image
-                src={p.src}
-                width={p.gridWidth ?? 700}
-                quality={76}
-                alt={p.alt}
-              />
+              {p.slot === 'feature' ? (
+                <Image src={p.src} widths={[700, 1200]} sizes="(min-width: 760px) 50vw, 100vw" quality={76} alt={p.alt} />
+              ) : (
+                <Image src={p.src} width={p.gridWidth ?? 700} quality={76} alt={p.alt} />
+              )}
             </button>
           </li>
         ))

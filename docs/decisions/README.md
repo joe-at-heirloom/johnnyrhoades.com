@@ -17,3 +17,4 @@ Short notes on choices that shape the code, so the reasoning survives. One file 
 | [0011](0011-forms-list-and-analytics.md) | Forms, mailing list and analytics on a static host | Accepted |
 | [0012](0012-hardening.md) | Hardening: discovery files, security headers and quality gates | Accepted |
 | [0013](0013-launch-dns-and-email.md) | Launch prep: DNS is already on Cloudflare, and email stays on Zoho | Accepted (supersedes the `booking@` part of 0011) |
+| [0014](0014-design-pass.md) | Design pass: layout and rhythm, same visual language | Accepted |

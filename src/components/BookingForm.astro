@@ -19,15 +19,19 @@ if (!key && process.env.CI) console.warn('PUBLIC_WEB3FORMS_KEY is not set: the b
 ---
 
 <section class="section book" id="book" aria-labelledby="book-title">
-  <div class="wrap split">
-    <div class="book-copy">
-      <h2 class="display" id="book-title">Booking</h2>
-      <p class="lede">Bars, festivals, private parties, you name it. Send me the date and where it is and I’ll get back to you.</p>
-      {facebook && <p class="book-alt">Or message me on <a href={facebook.url} target="_blank" rel="noopener">Facebook</a>.</p>}
-      <p class="book-alt">Booking agent or festival? See the <a href="/epk/">press kit</a>.</p>
-    </div>
+  <div class="wrap">
+    <header class="book-head">
+      <div>
+        <h2 class="display" id="book-title">Booking</h2>
+        <p class="book-lede">Bars, festivals, private parties, you name it. Send me the date and where it is and I’ll get back to you.</p>
+      </div>
+      <div class="book-alts">
+        {facebook && <p>Or message me on <a href={facebook.url} target="_blank" rel="noopener">Facebook</a>.</p>}
+        <p>Booking agent or festival? See the <a href="/epk/">press kit</a>.</p>
+      </div>
+    </header>
 
-    <form class="form card" method="POST" action={key ? WEB3FORMS_ENDPOINT : '#book'} data-form="booking" data-web3forms-key={key}>
+    <form class="form" method="POST" action={key ? WEB3FORMS_ENDPOINT : '#book'} data-form="booking" data-web3forms-key={key}>
       {
         key && (
           <>
@@ -39,7 +43,7 @@ if (!key && process.env.CI) console.warn('PUBLIC_WEB3FORMS_KEY is not set: the b
       }
       <p class="hp" aria-hidden="true"><label>Leave this unchecked <input type="checkbox" name="botcheck" tabindex="-1" /></label></p>
 
-      <div class="field-row">
+      <div class="form-grid">
         <div class="field">
           <label for="b-name">Name</label>
           <input id="b-name" name="name" type="text" autocomplete="name" required />
@@ -48,8 +52,6 @@ if (!key && process.env.CI) console.warn('PUBLIC_WEB3FORMS_KEY is not set: the b
           <label for="b-email">Email</label>
           <input id="b-email" name="email" type="email" autocomplete="email" required />
         </div>
-      </div>
-      <div class="field-row">
         <div class="field">
           <label for="b-phone">Phone <span class="opt">optional</span></label>
           <input id="b-phone" name="phone" type="tel" autocomplete="tel" />
@@ -58,8 +60,6 @@ if (!key && process.env.CI) console.warn('PUBLIC_WEB3FORMS_KEY is not set: the b
           <label for="b-date">Date</label>
           <input id="b-date" name="date" type="date" />
         </div>
-      </div>
-      <div class="field-row">
         <div class="field">
           <label for="b-venue">Where</label>
           <input id="b-venue" name="venue" type="text" placeholder="Venue and town" />
@@ -70,8 +70,6 @@ if (!key && process.env.CI) console.warn('PUBLIC_WEB3FORMS_KEY is not set: the b
             {eventTypes.map((t) => <option>{t}</option>)}
           </select>
         </div>
-      </div>
-      <div class="field-row">
         <div class="field">
           <label for="b-act">Solo, trio or band</label>
           <select id="b-act" name="act">
@@ -82,10 +80,10 @@ if (!key && process.env.CI) console.warn('PUBLIC_WEB3FORMS_KEY is not set: the b
           <label for="b-budget">Budget <span class="opt">optional</span></label>
           <input id="b-budget" name="budget" type="text" inputmode="text" />
         </div>
-      </div>
-      <div class="field">
-        <label for="b-msg">Details</label>
-        <textarea id="b-msg" name="message" rows="4" placeholder="How long a set, anything else I should know"></textarea>
+        <div class="field field--wide">
+          <label for="b-msg">Details</label>
+          <textarea id="b-msg" name="message" rows="4" placeholder="How long a set, anything else I should know"></textarea>
+        </div>
       </div>
       <div class="form-foot">
         <button class="btn btn-red" type="submit">Send booking request</button>

@@ -152,9 +152,9 @@ const following = next[0] ? { url: showPath(next[0].slug), ...showSummary(next[0
                 <ShowPoster show={show} />
               </div>
             </div>
-          </div>
 
-          {upcoming && !cancelled && <PromoteShow show={show} />}
+            {upcoming && !cancelled && <PromoteShow show={show} />}
+          </div>
 
           {
             (blurb || history) && (

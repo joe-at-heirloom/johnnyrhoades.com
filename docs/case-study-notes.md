@@ -4,6 +4,20 @@ A running log for the portfolio write-up (PLAN.md section 16): numbers, screensh
 
 ---
 
+## 2026-10-01: Design pass, after "this website isn't world class"
+
+**What changed.** Same colors, same typeface, same record and strum; different layout. The hero now says where Johnny plays next. Show lists read like a gig listing, with a date block and a bone "ticket" on hover. No more half-empty columns. Booking is a bone section, the mailing list a flat red band, and the photo grid closes square. ADR 0014.
+
+**Before and after:** `docs/case-study/design-pass-before-desktop.jpg` and `design-pass-after-desktop.jpg` (and `-mobile`).
+
+**Worth telling**
+
+- *The critique was layout, not branding.* Every section used the same template: a giant heading over two columns, the left one mostly empty. Breaking that pattern did more than any new color or font would have, and none were added.
+- *The most useful sentence on a gigging musician's site is "next show: Friday, 15th Street Tavern."* It was a full scroll down. Now it's under his name, and it updates itself when the show ends.
+- *Lighter as well as better:* home page Lighthouse 96 to 97, 345 KB to 321 KB.
+
+---
+
 ## 2026-09-30: Phase 7 prep, before touching anything
 
 **What changed.** Nothing live. The launch is written down step by step (`docs/runbook-launch.md`) with a ten-minute rollback, the old site's URLs are mapped, and a script checks the redirects after cutover.

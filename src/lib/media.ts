@@ -26,6 +26,7 @@ const PhotoSchema = z.strictObject({
   credit: z.string().optional(),
   license: z.string().optional(),
   use: z.array(z.enum(['gallery', 'epk', 'press'])).min(1),
+  shape: z.enum(['portrait', 'landscape']).optional(),
   gridWidth: z.number().int().positive().optional(),
 });
 
@@ -45,6 +46,9 @@ export const MediaSchema = z
   })
   .superRefine((m, ctx) => {
     for (const p of m.photos) {
+      if (p.use.includes('gallery') && !p.shape) {
+        ctx.addIssue({ code: 'custom', message: `${p.file}: gallery photos need a shape (portrait or landscape)` });
+      }
       if (p.use.includes('press') && (!p.credit || !p.license || /from the watermark/i.test(p.credit))) {
         ctx.addIssue({ code: 'custom', message: `${p.file}: press downloads need a confirmed credit and license` });
       }

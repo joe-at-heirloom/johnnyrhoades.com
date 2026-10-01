@@ -25,6 +25,9 @@ test('home lists upcoming shows from the data, with no Bandsintown widget', asyn
   await expect(rows.first()).toContainText('15th Street Tavern');
   await expect(rows.first()).toContainText('Fri, Oct 2');
   await expect(rows.first().locator('a')).toHaveAttribute('href', TAVERN);
+  // The hero says where the next show is, with no script needed.
+  await expect(page.locator('[data-hero-next]')).toHaveAttribute('href', TAVERN);
+  await expect(page.locator('[data-hero-next]')).toContainText('15th Street Tavern');
   await page.locator('#shows').scrollIntoViewIfNeeded();
   expect(widget).toEqual([]);
 });
@@ -64,9 +67,17 @@ test('Tonight bar shows on a show day and goes away when the show ends', async (
   await expect(bar).toContainText('15th Street Tavern, Clarkston, MI · 6 pm');
   await expect(bar.getByRole('link', { name: '15th Street Tavern' })).toHaveAttribute('href', TAVERN);
 
+  const heroNext = page.locator('[data-hero-next]');
+  await expect(heroNext).toHaveAttribute('href', TAVERN);
+  await expect(heroNext).toContainText('Tonight');
+
   await page.clock.setFixedTime(new Date('2026-10-02T21:30:00-04:00')); // the tavern show ends at 9
   await page.reload();
   await expect(bar).toBeHidden();
+  await expect(heroNext).toHaveAttribute('href', '/shows/2026-10-04-the-token-lounge-westland/');
+  await expect(heroNext).toContainText('Next show');
+  await expect(heroNext).toContainText('The Token Lounge');
+  await expect(heroNext).toContainText('Sun, Oct 4 · 6 pm · Westland, MI');
   await expect(page.locator('#shows .show-row').filter({ hasText: '15th Street Tavern' })).toBeHidden();
   await expect(page.locator('#shows .show-row:visible').first()).toContainText('The Token Lounge');
 });

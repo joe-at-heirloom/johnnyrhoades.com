@@ -65,8 +65,13 @@ export function topRooms(shows: Show[], now: DateTime, limit = 10) {
 /** Display strings for a show row, all in the venue's time zone. */
 export function showSummary(s: Show) {
   const zone = s.venue.timeZone;
+  const local = dt(s.start).setZone(zone);
   return {
     date: shortDate(s.start, zone),
+    // The parts of the date block in show lists: "Oct" over "2", "Fri" beside it.
+    weekday: local.toFormat('ccc'),
+    monthShort: local.toFormat('LLL'),
+    day: local.toFormat('d'),
     time: clockTime(s.start, zone),
     town: [s.venue.city, s.venue.region].filter(Boolean).join(', '),
     act: actLabel(s.act, s.billing),

@@ -1,8 +1,8 @@
-/* ---------- Mailing list band: bone "paper" ---------- */
+/* ---------- Mailing list: a flat red band ---------- */
 
 .list-band {
-  background: var(--bone);
-  color: var(--ink);
+  background: var(--red);
+  color: var(--bone);
   padding: clamp(56px, 8vw, 88px) 0;
   position: relative;
 }
@@ -11,21 +11,20 @@
   font-stretch: var(--stretch-display); font-weight: 900; text-transform: uppercase;
   font-size: clamp(3rem, 6.5vw, 5.2rem); line-height: .88;
 }
-.list-title em { font-style: normal; color: var(--red); }
-.list-sub { margin-top: 14px; font-weight: 500; font-size: 1.08rem; max-width: 28rem; color: #3a332c; }
+.list-sub { margin-top: 14px; font-weight: 500; font-size: 1.08rem; max-width: 28rem; color: var(--bone); }
 .list-form { display: grid; grid-template-columns: 1.6fr 1fr auto; gap: 10px; position: relative; }
 .list-form input {
   min-height: 54px; padding: 0 16px;
-  border: 2px solid var(--ink); border-radius: var(--radius);
-  background: #fbf6ea; color: var(--ink);
+  border: 2px solid var(--bone); border-radius: var(--radius);
+  background: var(--bone); color: var(--ink);
 }
-.list-form input::placeholder { color: #6b6257; }
-.list-form input:focus { outline: none; border-color: var(--red); }
+.list-form input::placeholder { color: var(--ink-on-bone-3); }
+.list-form input:focus { outline: none; border-color: var(--ink); }
 .list-form .btn { min-height: 54px; }
-.list-form .form-status { grid-column: 1 / -1; font-weight: 700; }
-.list-form .form-status.is-ok { color: var(--ink); }
-.list-form .form-status.is-error { color: var(--red); }
-.list-band :focus-visible { outline-color: var(--ink); }
+.list-form .btn-ink:hover { background: var(--bone); border-color: var(--bone); color: var(--ink); }
+.list-form .form-status { grid-column: 1 / -1; font-weight: 700; color: var(--bone); }
+.list-band :focus-visible { outline-color: var(--bone); }
+.list-band ::selection { background: var(--ink); color: var(--bone); }
 
 @media (max-width: 900px) {
   .list-inner { grid-template-columns: 1fr; }

@@ -17,6 +17,11 @@
   --bone-2: #c9bfad;
   --muted: #978d7c;
 
+  /* Text on bone (the booking section, show rows on hover). Tints of ink, not new hues. */
+  --ink-on-bone-2: #3a332c;  /* secondary text (10:1 on bone) */
+  --ink-on-bone-3: #5f574b;  /* hints and placeholders (5.7:1) */
+  --paper: #fbf6ea;          /* form fields on bone */
+
   /* Accent */
   --red: #c02e28;      /* fills, with bone text on top (4.6:1) */
   --red-deep: #a52520; /* hover and pressed fills (5.9:1 with bone) */
@@ -33,7 +38,7 @@
   /* Space and shape */
   --wrap: 1200px;
   --gutter: clamp(16px, 4vw, 40px);
-  --section-y: clamp(80px, 11vw, 150px);
+  --section-y: clamp(72px, 8vw, 116px);
   --radius: 3px;
   --header-h: 72px;
 

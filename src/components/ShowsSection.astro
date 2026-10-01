@@ -1,5 +1,5 @@
 ---
-/* Home page shows: the next eight, rendered at build time (PLAN.md section 7.1). */
+/* Home page shows: the next eight, rendered at build time (PLAN.md section 7.1). Full width, like a gig listing. */
 import ShowList from './ShowList.astro';
 import { allShows, BUILD_NOW } from '../lib/load-shows';
 import { upcomingShows } from '../lib/shows-data';
@@ -9,17 +9,18 @@ const next = upcomingShows(allShows, BUILD_NOW).slice(0, 8);
 ---
 
 <section class="section shows" id="shows" aria-labelledby="shows-title">
-  <div class="wrap split">
-    <header class="section-head sticky-head">
+  <div class="wrap">
+    <header class="shows-head">
       <h2 class="display" id="shows-title">Shows</h2>
-      <p class="lede">Where I’m playing next. Follow me on Bandsintown and it’ll let you know when I’ve got a show near you.</p>
-      <div class="actions">
-        <a class="btn btn-ghost" href="/shows/">All shows</a>
-        <a class="text-link" href={`webcal://${SITE_HOST}/shows.ics`} data-umami-event="calendar_subscribe" data-umami-event-kind="webcal">Subscribe to the calendar</a>
-        <a class="text-link" href={BANDSINTOWN_PROFILE} target="_blank" rel="noopener">Follow on Bandsintown</a>
-      </div>
+      <p class="shows-lede">Where I’m playing next. Follow me on Bandsintown and it’ll let you know when I’ve got a show near you.</p>
     </header>
 
     <ShowList shows={next} upcoming label="Upcoming shows" empty="Nothing on the calendar right now. Follow me on Bandsintown and you’ll hear about the next one." />
+
+    <div class="actions shows-actions">
+      <a class="btn btn-ghost" href="/shows/">All shows</a>
+      <a class="text-link" href={`webcal://${SITE_HOST}/shows.ics`} data-umami-event="calendar_subscribe" data-umami-event-kind="webcal">Subscribe to the calendar</a>
+      <a class="text-link" href={BANDSINTOWN_PROFILE} target="_blank" rel="noopener">Follow on Bandsintown</a>
+    </div>
   </div>
 </section>

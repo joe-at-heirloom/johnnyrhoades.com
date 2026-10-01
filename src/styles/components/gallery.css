@@ -1,14 +1,23 @@
 /* ---------- Photos ---------- */
 
 .photos { background: var(--ink-2); }
-.gallery { columns: 3 280px; column-gap: 14px; }
-.gallery li { break-inside: avoid; margin-bottom: 14px; }
+/* A fixed grid that closes square (src/lib/gallery.ts): features 2x2, talls 1x2, smalls 1x1. */
+.gallery { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.gallery li { display: grid; min-height: 0; }
+.g-feature { grid-column: span 2; grid-row: span 2; aspect-ratio: 3 / 2; }
+.g-tall { grid-row: span 2; }
+.g-small { aspect-ratio: 3 / 2; }
 .gallery button {
-  display: block; width: 100%; padding: 0; border: 0; background: #000;
+  display: block; width: 100%; height: 100%; padding: 0; border: 0; background: #000;
   position: relative; overflow: hidden;
 }
-.gallery img { width: 100%; transition: transform .8s var(--ease), opacity .3s; opacity: .92; }
+/* Absolutely placed, so a photo never sizes its cell: the features and smalls set the row heights, talls fill two. */
+.gallery img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform .8s var(--ease), opacity .3s; opacity: .92; }
 .gallery button:hover img { transform: scale(1.04); opacity: 1; }
+@media (max-width: 760px) {
+  .gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .g-tall { aspect-ratio: 3 / 4; } /* two talls share their rows on a phone, with nothing else to set the height */
+}
 
 /* Lightbox */
 .lightbox {

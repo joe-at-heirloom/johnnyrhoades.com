@@ -37,7 +37,7 @@
 .archive-count { font-stretch: 100%; font-weight: 400; font-size: 1rem; color: var(--muted); margin-left: 10px; }
 .archive-year .show-list { padding-bottom: 20px; }
 .archive-year .show-venue { font-size: 1.35rem; }
-.archive-year .show-date { font-size: 1.2rem; }
+.archive-year .date-day { font-size: 2.1rem; }
 
 /* Show page */
 .show-banner {
@@ -50,12 +50,18 @@
 .show-banner.is-cancelled { background: var(--red); border-color: var(--red-deep); color: var(--bone); }
 .show-banner a { color: var(--bone); text-underline-offset: 3px; }
 
+/* Details and the promote block on the left, the poster beside them; on phones the poster comes between. */
 .show-hero {
   display: grid;
   grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
-  gap: clamp(40px, 6vw, 88px);
+  grid-template-areas: "details poster" "promote poster";
+  grid-template-rows: auto 1fr;
+  column-gap: clamp(40px, 6vw, 88px);
   align-items: start;
 }
+.show-details { grid-area: details; }
+.show-poster-wrap { grid-area: poster; }
+.show-hero .promote { grid-area: promote; margin-top: clamp(40px, 5vw, 56px); padding-top: 28px; border-top: 1px solid var(--line); }
 .show-title { display: grid; gap: 10px; }
 .show-billing {
   font-stretch: var(--stretch-label);
@@ -89,8 +95,9 @@
 .show-booking { padding-top: 28px; border-top: 1px solid var(--line); }
 
 @media (max-width: 860px) {
-  .show-hero { grid-template-columns: 1fr; }
+  .show-hero { grid-template-columns: 1fr; grid-template-areas: "details" "poster" "promote"; grid-template-rows: auto; row-gap: 40px; }
   .show-poster-wrap { max-width: 420px; }
+  .show-hero .promote { margin-top: 0; }
 }
 
 /* The bill (stands in for the poster image until Phase 3) */

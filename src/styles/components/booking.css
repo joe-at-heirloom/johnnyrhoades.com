@@ -1,48 +1,59 @@
-/* ---------- Booking ---------- */
+/* ---------- Booking: a bone section, so the one form that matters stands out ---------- */
 
-.book-alt { margin-top: 30px; color: var(--muted); }
-.book-alt a { color: var(--bone); text-decoration-color: var(--red); text-underline-offset: 3px; }
+.book { background: var(--bone); color: var(--ink); }
+.book :focus-visible { outline-color: var(--ink); }
+.book ::selection { background: var(--ink); color: var(--bone); }
 
-.card {
-  background: var(--ink-2);
-  border: 1px solid var(--line);
-  border-top: 4px solid var(--red);
-  padding: clamp(24px, 4vw, 44px);
-  position: relative;
+.book-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 24px 64px;
+  margin-bottom: clamp(32px, 5vw, 52px);
 }
-.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
-.field { display: grid; gap: 7px; margin-bottom: 18px; }
-.field label { font-size: .78rem; letter-spacing: .16em; color: var(--bone-2); }
-.field .opt { color: var(--muted); letter-spacing: .06em; text-transform: none; font-stretch: 100%; font-weight: 400; margin-left: 4px; }
+.book-lede { margin-top: 22px; font-size: var(--text-lede); font-weight: 500; color: var(--ink-on-bone-2); max-width: 34rem; }
+.book-alts { display: grid; gap: 8px; color: var(--ink-on-bone-2); padding-bottom: 4px; }
+.book-alts a { color: var(--ink); font-weight: 600; text-decoration-color: var(--red); text-decoration-thickness: 2px; text-underline-offset: 3px; }
+
+.form-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0 18px; }
+.field { display: grid; gap: 7px; margin-bottom: 18px; align-content: start; }
+.field--wide { grid-column: 1 / -1; }
+.field label { font-size: .78rem; letter-spacing: .16em; color: var(--ink); }
+.field .opt { color: var(--ink-on-bone-3); letter-spacing: .06em; text-transform: none; font-stretch: 100%; font-weight: 400; margin-left: 4px; }
 .field input, .field select, .field textarea {
   width: 100%;
-  background: var(--ink);
-  border: 1px solid var(--line-strong);
+  background: var(--paper);
+  border: 2px solid var(--ink);
   border-radius: var(--radius);
-  padding: 12px 14px;
-  min-height: 48px;
-  color: var(--bone);
+  padding: 11px 14px;
+  min-height: 52px;
+  color: var(--ink);
   transition: border-color .2s;
 }
-.field input::placeholder, .field textarea::placeholder { color: #6f675b; }
-.field input:focus, .field select:focus, .field textarea:focus { outline: none; border-color: var(--red-hi); }
+.field input::placeholder, .field textarea::placeholder { color: var(--ink-on-bone-3); }
+.field input:focus, .field select:focus, .field textarea:focus { outline: none; border-color: var(--red); }
 .field select {
   appearance: none;
-  background-image: linear-gradient(45deg, transparent 50%, var(--bone-2) 50%), linear-gradient(135deg, var(--bone-2) 50%, transparent 50%);
-  background-position: calc(100% - 20px) 21px, calc(100% - 15px) 21px;
+  background-image: linear-gradient(45deg, transparent 50%, var(--ink) 50%), linear-gradient(135deg, var(--ink) 50%, transparent 50%);
+  background-position: calc(100% - 20px) 22px, calc(100% - 15px) 22px;
   background-size: 5px 5px;
   background-repeat: no-repeat;
   padding-right: 40px;
 }
-.field select option { background: var(--ink-2); color: var(--bone); }
-.field input[type="date"] { color-scheme: dark; }
+.field input[type="date"] { color-scheme: light; }
 .field textarea { resize: vertical; min-height: 120px; }
 .form-foot { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 20px; margin-top: 6px; }
-.form-status { font-weight: 600; }
-.form-status.is-ok { color: var(--bone); }
-.form-status.is-error { color: var(--red-hi); }
+.form-status { font-weight: 700; }
+.form-status.is-ok { color: var(--ink); }
+.form-status.is-error { color: var(--red); }
 .hp { position: absolute; left: -9999px; }
 
+@media (max-width: 1000px) {
+  .form-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 760px) {
+  .book-head { grid-template-columns: 1fr; }
+}
 @media (max-width: 560px) {
-  .field-row { grid-template-columns: 1fr; gap: 0; }
+  .form-grid { grid-template-columns: 1fr; }
 }

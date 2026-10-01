@@ -25,8 +25,9 @@ if (header && toggle && nav) {
     if (e.key === 'Escape' && header.classList.contains('nav-open')) setNav(false);
   });
 
-  // Highlight the nav link for the section in view.
-  const links = $$<HTMLAnchorElement>('a', nav);
+  // Highlight the nav link for the section in view. Only on the page the
+  // links point into: the press kit has its own #photos, for one.
+  const links = $$<HTMLAnchorElement>('a', nav).filter((a) => a.pathname === location.pathname);
   const sections = links
     .map((a) => {
       const id = a.hash.slice(1);

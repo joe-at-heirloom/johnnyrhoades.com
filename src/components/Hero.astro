@@ -1,6 +1,18 @@
 ---
+/*
+  The first screen: the photo, the name, and where to see him next. The next
+  show is rendered at build time; src/scripts/tonight.ts moves it on if that
+  show ends before the next build, and says "Tonight" on the day.
+*/
 import { Image } from 'astro:assets';
 import hero from '../assets/photos/hero.jpg';
+import { allShows, BUILD_NOW } from '../lib/load-shows';
+import { showEnd, showSummary, upcomingShows } from '../lib/shows-data';
+import { showPath } from '../lib/site';
+import { localDate } from '../lib/time';
+
+const next = upcomingShows(allShows, BUILD_NOW).find((s) => s.status !== 'cancelled');
+const s = next && showSummary(next);
 ---
 
 <section class="hero" id="top" aria-label="Introduction">
@@ -21,12 +33,24 @@ import hero from '../assets/photos/hero.jpg';
       <span class="logo-mark" aria-hidden="true"></span>
       <span class="sr-only">Johnny Rhoades</span>
     </h1>
+    {
+      next && s && (
+        <a
+          class="hero-next"
+          href={showPath(next.slug)}
+          data-hero-next
+          data-show-end={showEnd(next).toISO()}
+          data-day={localDate(next.start, next.venue.timeZone)}
+        >
+          <span class="hero-next-label" data-hero-next-label>Next show</span>
+          <span class="hero-next-venue" data-hero-next-venue>{next.venue.name}</span>
+          <span class="hero-next-when" data-hero-next-when>{s.date} · {s.time} · {s.town}</span>
+        </a>
+      )
+    }
     <div class="hero-actions">
-      <a class="btn btn-red" href="#shows">Shows</a>
+      <a class="btn btn-red" href="#shows">All shows</a>
       <a class="btn btn-ghost" href="#book">Booking</a>
     </div>
   </div>
-  <a class="scroll-cue" href="#shows" aria-label="Scroll to shows">
-    <span aria-hidden="true"></span>
-  </a>
 </section>

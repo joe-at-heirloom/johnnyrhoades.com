@@ -1,5 +1,10 @@
 ---
-/* One show in a list: date and time | venue, town and act. Links to the show page when there is one. */
+/*
+  One show in a list, set like a gig listing: a date block (month over a big
+  day number, weekday beside it) | venue, town and act | time. Links to the
+  show page when there is one. Screen readers get the plain date instead of
+  the block.
+*/
 import { hasPage, showEnd, showSummary } from '../lib/shows-data';
 import { showPath } from '../lib/site';
 import type { Show } from '../lib/shows-schema';
@@ -17,8 +22,15 @@ const Tag = linked ? 'a' : 'div';
 <li class:list={['show-row', { 'is-cancelled': cancelled }]} data-show-end={showEnd(show).toISO()}>
   <Tag class="show-row-inner" href={linked ? showPath(show.slug) : undefined}>
     <span class="show-when">
-      <span class="show-date">{s.date}</span>
-      <span class="show-time">{s.time}</span>
+      <span class="sr-only">{s.date}, {s.time}</span>
+      <span class="date-block" aria-hidden="true">
+        <span class="date-month">{s.monthShort}</span>
+        <span class="date-day">{s.day}</span>
+      </span>
+      <span class="date-side" aria-hidden="true">
+        <span class="date-weekday">{s.weekday}</span>
+        <span class="show-time">{s.time}</span>
+      </span>
     </span>
     <span class="show-where">
       <span class="show-venue">{show.venue.name}</span>

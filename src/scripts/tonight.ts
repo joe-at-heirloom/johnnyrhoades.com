@@ -4,6 +4,7 @@
 
   - Hides shows in upcoming lists that have ended since the last build.
   - Fills the Tonight bar when a show is on today and hasn't ended.
+  - Keeps the hero's "Next show" current, and says "Tonight" on the day.
   - On a show page whose show has ended, shows "This show has happened. Next up: …"
 
   The times here are full ISO strings with UTC offsets, written at build time,
@@ -64,7 +65,22 @@ if (bar && tonight) {
   bar.hidden = false;
 }
 
-// 3. A show page for a show that has ended.
+// 3. The hero's "Next show": move on once it has ended, and say "Tonight" on the day.
+const heroNext = document.querySelector<HTMLAnchorElement>('[data-hero-next]');
+if (heroNext && ended(heroNext.dataset.showEnd)) {
+  const first = upcoming[0];
+  if (first) {
+    heroNext.href = first.url;
+    heroNext.dataset.day = first.day;
+    set(heroNext, '[data-hero-next-venue]', first.venue);
+    set(heroNext, '[data-hero-next-when]', `${first.date} · ${first.time} · ${first.town}`);
+  } else {
+    heroNext.hidden = true;
+  }
+}
+if (heroNext && heroNext.dataset.day === today) set(heroNext, '[data-hero-next-label]', 'Tonight');
+
+// 4. A show page for a show that has ended.
 const page = document.querySelector<HTMLElement>('[data-show-page]');
 const banner = document.querySelector<HTMLElement>('[data-past-banner]');
 if (page && banner?.hidden && ended(page.dataset.showEnd)) {
