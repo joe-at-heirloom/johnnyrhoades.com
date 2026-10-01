@@ -183,11 +183,13 @@ describe('structured data', () => {
     expect(() => musicEvent({ ...t!, public: false }, { images })).toThrow(/private/);
   });
 
-  it('lists only real profiles in sameAs', () => {
-    const graph = siteGraph({ portraitUrl: 'https://johnnyrhoades.com/p.jpg' }) as { '@graph': Record<string, unknown>[] };
+  it('builds the Person from what it is given', () => {
+    const album = { title: 'A', released: new Date('2014-11-02'), cover: '', coverAlt: '', appleMusic: 'https://x/', amazon: 'https://y/', tracks: [] };
+    const graph = siteGraph({ portraitUrl: 'https://johnnyrhoades.com/p.jpg', sameAs: ['https://a/'], album, description: 'D.' }) as {
+      '@graph': Record<string, unknown>[];
+    };
     const person = graph['@graph'].find((n) => n['@type'] === 'Person')!;
-    expect(person.sameAs).not.toContainEqual(expect.stringContaining('music.apple.com'));
-    expect(person.alternateName).toEqual(['John Rhoades']);
+    expect(person).toMatchObject({ sameAs: ['https://a/'], description: 'D.', alternateName: ['John Rhoades'] });
   });
 
   it('numbers breadcrumbs from one', () => {
