@@ -9,6 +9,16 @@ Acceptance criteria that need a person, a deployed site or a third-party tool. E
 - [ ] **Calendar subscription in Google Calendar** (Phase 2). Use "Add to Google Calendar" on `/shows/`. Expect the calendar to appear and update within a day.
 - [ ] **Link previews** (Phase 3). Paste a show page link into iMessage, Facebook's Sharing Debugger and Slack. Expect the show's poster as the preview image.
 
+- [ ] **Staging stays out of search** (Phase 6). With `SITE_NOINDEX=true` set, view source on a few staging pages: expect `<meta name="robots" content="noindex, nofollow">`, and no `Sitemap:` line in `/robots.txt`. *Automated now:* the robots.txt rule; checked by hand with a local `SITE_NOINDEX=true` build.
+- [ ] **Security headers in report-only mode** (Phase 6). Add the headers from `docs/security-headers.md` with the CSP as `Content-Security-Policy-Report-Only`, then click through every page with the console open. Expect no reports. Then enforce it. *Automated now:* `tests/e2e/csp.spec.ts` serves the site under the exact policy.
+- [ ] **Security headers scan** (Phase 7). After cutover, run https://securityheaders.com and https://observatory.mozilla.org on the apex. Expect an A or better.
+
+## Waiting on launch day (Phase 7)
+
+- [ ] **Submit the sitemap** (`https://johnnyrhoades.com/sitemap-index.xml`) in Search Console and Bing Webmaster Tools. Expect "Success" and the show pages discovered.
+- [ ] **First IndexNow ping.** Staging deploys will already have `/shows.json` live, so the deploy's diff is empty on launch day. Build, then run `npm run -s indexnow -- plan --all | npm run -s indexnow -- submit` once, and check Bing Webmaster Tools → IndexNow.
+- [ ] **Core Web Vitals in the field** (28 days after launch). Search Console → Core Web Vitals, mobile. Expect LCP ≤ 2.0 s, CLS ≤ 0.05, INP ≤ 150 ms. Lighthouse in the lab reads LCP around 2.6 s under its slow-4G simulation (ADR 0012).
+
 ## Waiting on the service accounts (Phase 5, ADR 0011)
 
 Set each ID as a GitHub Actions repository **variable** (not a secret; they're public by design) and in `.env` for local testing.

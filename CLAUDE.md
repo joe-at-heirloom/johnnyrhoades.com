@@ -24,22 +24,21 @@ Available now:
 - `npm run dev`, `npm run build`, `npm run preview` (Astro 7 runs preview in the background; stop it with `npx astro preview stop`)
 - `npm run check`: `astro check` (type-checks `.astro` and `.ts`), then `npm run check:facts` (the facts-ledger rules, ADR 0010)
 - `npm test`: Vitest unit tests in `tests/unit/`
-- `npm run test:e2e`: Playwright. It builds the site with a pinned date (`SITE_NOW`, see `playwright.config.ts`) and serves it on port 4500, then covers behavior, axe accessibility, show pages, feeds and the Tonight bar. Traces and screenshots of failures land in `test-results/`.
+- `npm run test:e2e`: Playwright. It builds the site with a pinned date (`SITE_NOW`, see `playwright.config.ts`) and serves it on port 4500, then covers behavior, axe accessibility, show pages, feeds, the Tonight bar, forms, the CSP draft, the sitemap and internal links. Traces and screenshots of failures land in `test-results/`.
+- `npm run lint:html`: html-validate on `dist/` (build first)
+- `npm run lhci`: build, then Lighthouse CI against the budgets in `lighthouserc.cjs` (ADR 0012). Takes a couple of minutes.
+- `npm run indexnow -- plan` / `submit`: IndexNow (run by `site.yml`; `plan --all` on launch day)
 
 - `npm run sync`: pull Bandsintown into `src/data/shows.json` (needs `BANDSINTOWN_APP_ID`; flags: `--capture`, `--force`, `--dry-run`, `--now`)
 - `npm run sync:fixtures`: the same, offline, from `tests/fixtures/bandsintown/` (mocks until the key arrives; ADR 0006)
 
 - `python3 scripts/make-poster-fonts.py`: regenerate the static poster fonts (needs fonttools; output is committed)
+- `python3 scripts/trim-web-font.py`: regenerate the trimmed web font from `src/assets/fonts/source/` (needs fonttools and brotli)
 - `UPDATE_POSTER_SNAPSHOTS=1 npm test -- posters`: rewrite poster snapshots after an intended design change, then look at them and bump `TEMPLATE_VERSION` (ADR 0009)
 
 Forms and analytics read public IDs from `PUBLIC_*` build variables (copy `.env.example` to `.env`; ADR 0011). Without them the site still builds, and the forms say they aren't connected. The end-to-end build sets fake ones and intercepts the services.
 
-Planned, added by the phase that needs them:
-
-- `npm run check` grows lint: Phase 6
-- `npm run lhci`: Phase 6
-
-Before calling any task done, run `npm run check && npm test && npm run build`. For UI changes, also run `npm run test:e2e` and look at the screenshots.
+Before calling any task done, run `npm run check && npm test && npm run build`. For UI changes, also run `npm run test:e2e`, `npm run lint:html` and `npm run lhci`, and look at the screenshots. Adding a third-party service means updating `src/lib/security-headers.ts` and `docs/security-headers.md` too; the CSP test fails until you do.
 
 ## Non-negotiables
 

@@ -13,7 +13,7 @@ if (frame) {
     const iframe = document.createElement('iframe');
     iframe.src = `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0&modestbranding=1`;
     iframe.title = title;
-    iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+    iframe.allow = 'autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share'; // matches the Permissions-Policy (ADR 0012)
     iframe.allowFullscreen = true;
     frame.replaceChildren(iframe);
     track('video_play', { id });

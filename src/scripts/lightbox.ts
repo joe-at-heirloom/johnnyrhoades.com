@@ -6,14 +6,17 @@ const lb = $<HTMLDialogElement>('[data-lightbox]');
 
 if (gallery && lb && typeof lb.showModal === 'function') {
   const buttons = $$<HTMLButtonElement>('button', gallery);
-  const img = $<HTMLImageElement>('[data-lb-img]', lb);
+  // Created here rather than in the markup: an <img> has to have a real src.
+  const img = document.createElement('img');
+  img.dataset.lbImg = '';
+  $('[data-lb-figure]', lb)?.append(img);
   let index = 0;
 
   const show = (i: number) => {
     index = (i + buttons.length) % buttons.length;
     const btn = buttons[index];
     const thumb = btn ? $<HTMLImageElement>('img', btn) : null;
-    if (!btn || !img || !thumb) return;
+    if (!btn || !thumb) return;
     img.src = btn.dataset.full ?? thumb.src;
     img.alt = thumb.alt;
   };

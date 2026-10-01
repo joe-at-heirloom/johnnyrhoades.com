@@ -9,7 +9,7 @@ import { plain } from '../lib/facts';
 import { sameAs } from '../lib/media';
 import { siteGraph } from '../lib/schema';
 import { SCHEMA_DESCRIPTION } from '../lib/copy';
-import { absolute } from '../lib/site';
+import { NOINDEX, absolute } from '../lib/site';
 import { PUBLIC_CONFIG } from '../lib/public-config';
 
 interface Props {
@@ -23,7 +23,8 @@ interface Props {
   robots?: string;
 }
 
-const { title, description, canonical, social, robots } = Astro.props;
+const { title, description, canonical, social } = Astro.props;
+const robots = NOINDEX ? 'noindex, nofollow' : Astro.props.robots;
 const siteName = 'Johnny Rhoades';
 const portraitImage = await getImage({ src: portrait, width: 1200, format: 'jpg', quality: 82 });
 ---

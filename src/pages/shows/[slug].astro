@@ -20,7 +20,7 @@ import { allShows, BUILD_NOW, venueBook } from '../../lib/load-shows';
 import { breadcrumbs, musicEvent } from '../../lib/schema';
 import { posterContent } from '../../lib/posters/content';
 import { EVENT_IMAGE_FORMATS, posterPath } from '../../lib/posters/formats';
-import { hasPage, isIndexable, isUpcoming, showEnd, showsAfter, venueHistory } from '../../lib/shows-data';
+import { hasPage, isIndexable, isUpcoming, showEnd, showsAfter, showSummary, venueHistory } from '../../lib/shows-data';
 import type { Show } from '../../lib/shows-schema';
 import { absolute, showPath } from '../../lib/site';
 import { clockTime, longDate, shortDate, titleDate } from '../../lib/time';
@@ -59,6 +59,9 @@ const ogImage = absolute(posterPath(show.slug, 'og'));
 // Google asks for 1:1, 4:3 and 16:9. Those are generated for upcoming shows only.
 const eventImages = upcoming ? EVENT_IMAGE_FORMATS.map((f) => absolute(posterPath(show.slug, f))) : [ogImage];
 const next = showsAfter(allShows, show, BUILD_NOW);
+// Built after the show: the banner is in the HTML. Built before: src/scripts/tonight.ts shows it once the show ends.
+const pastAtBuild = !upcoming && !cancelled;
+const following = next[0] ? { url: showPath(next[0].slug), ...showSummary(next[0]), venue: next[0].venue.name } : null;
 ---
 
 {
@@ -105,8 +108,14 @@ const next = showsAfter(allShows, show, BUILD_NOW);
           </nav>
 
           {cancelled && <p class="show-banner is-cancelled">This show is cancelled.</p>}
-          <p class="show-banner is-past" data-past-banner hidden>
-            This show has happened.<span data-past-next-wrap> Next up: <a data-past-next href="/shows/">see all shows</a>.</span>
+          <p class="show-banner is-past" data-past-banner hidden={!pastAtBuild}>
+            This show has happened.{
+              (following || !pastAtBuild) && (
+                <span data-past-next-wrap>
+                  {' '}Next up: <a data-past-next href={following?.url ?? '/shows/'}>{following ? `${following.date} at ${following.venue}, ${following.town}` : 'see all shows'}</a>.
+                </span>
+              )
+            }
           </p>
 
           <div class="show-hero">

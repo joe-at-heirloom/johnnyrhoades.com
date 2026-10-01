@@ -29,6 +29,16 @@ export const EPK_FAQ = {
   travels: ['started-with-motor-city-josh', 'toured-us-europe-mexico-caribbean'],
 } as const;
 
+/** /llms.txt: who Johnny is, for answer engines. Same rules as the press kit. The first one is the summary line. */
+export const LLMS_ABOUT = [
+  'detroit-guitarist-singer',
+  'started-with-motor-city-josh',
+  'toured-us-europe-mexico-caribbean',
+  'covers-and-originals',
+  'played-with',
+  'album-waiting-on-the-sun',
+] as const;
+
 /** The Person description in the site-wide structured data. Must be verified. */
 export const SCHEMA_DESCRIPTION = 'detroit-guitarist-singer';
 
@@ -39,5 +49,6 @@ export const FACT_USES: { context: FactContext; ids: readonly string[]; where: s
   { context: 'epk', ids: Object.values(EPK_FAQ).flat(), where: 'press kit FAQ' },
   { context: 'epk', ids: BIOS.short, where: 'short bio' },
   { context: 'epk', ids: BIOS.medium, where: 'medium bio' },
+  { context: 'epk', ids: LLMS_ABOUT, where: '/llms.txt' },
   { context: 'schema', ids: [SCHEMA_DESCRIPTION], where: 'structured data' },
 ];

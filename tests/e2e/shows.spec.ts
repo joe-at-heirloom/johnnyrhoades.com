@@ -166,3 +166,14 @@ test('the printed flyer is the bill alone, on one page', async ({ page }) => {
   const pdf = await page.pdf({ format: 'Letter', printBackground: true });
   expect(pdf.toString('latin1').match(/\/Type\s*\/Page[^s]/g)).toHaveLength(1);
 });
+
+test('a show page built after the show says so in the HTML, so nothing shifts when scripts run', async ({ browser }) => {
+  const context = await browser.newContext({ javaScriptEnabled: false });
+  const page = await context.newPage();
+  await page.goto('/shows/2026-09-26-three-blind-mice-irish-pub-mount-clemens/');
+  const banner = page.locator('[data-past-banner]');
+  await expect(banner).toBeVisible();
+  await expect(banner).toHaveText('This show has happened. Next up: Fri, Oct 2 at 15th Street Tavern, Clarkston, MI.');
+  await expect(banner.getByRole('link')).toHaveAttribute('href', TAVERN);
+  await context.close();
+});

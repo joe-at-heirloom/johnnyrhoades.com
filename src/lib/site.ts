@@ -35,6 +35,16 @@ export function buildNow(): DateTime {
   return now.setZone(HOME_ZONE);
 }
 
+/**
+ * Staging builds set SITE_NOINDEX=true (a repository variable): every page
+ * gets noindex, robots.txt drops the sitemap, and IndexNow stays quiet.
+ * PLAN.md section 14, steps 7 and 11.
+ */
+export const NOINDEX = process.env.SITE_NOINDEX === 'true';
+
+/** IndexNow key. Public by design: it's served at /<key>.txt to prove the site is ours. */
+export const INDEXNOW_KEY = '5dbf688a154337ece3e2407784b67ca8';
+
 export const absolute = (path: string) => new URL(path, SITE_URL).href;
 export const showPath = (slug: string) => `/shows/${slug}/`;
 

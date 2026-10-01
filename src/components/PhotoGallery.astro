@@ -39,9 +39,7 @@ const full = await Promise.all(photos.map((p) => getImage({ src: p.src, width: 1
 <dialog class="lightbox" data-lightbox aria-label="Photo viewer">
   <button class="lb-close" type="button" data-lb-close aria-label="Close">×</button>
   <button class="lb-nav lb-prev" type="button" data-lb-prev aria-label="Previous photo">‹</button>
-  <figure class="lb-figure">
-    <img src="" alt="" data-lb-img />
-  </figure>
+  <figure class="lb-figure" data-lb-figure></figure>
   <button class="lb-nav lb-next" type="button" data-lb-next aria-label="Next photo">›</button>
 </dialog>
 

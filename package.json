@@ -18,7 +18,10 @@
     "test:e2e": "playwright test",
     "sync": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/sync-shows.ts",
     "sync:fixtures": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/sync-shows.ts --fixtures tests/fixtures/bandsintown",
-    "check:facts": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/check-facts.ts"
+    "check:facts": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/check-facts.ts",
+    "lhci": "npm run build && lhci autorun",
+    "lint:html": "html-validate \"dist/**/*.html\"",
+    "indexnow": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/indexnow.ts"
   },
   "dependencies": {
     "@resvg/resvg-js": "^2.6.2",
@@ -34,10 +37,12 @@
   "devDependencies": {
     "@astrojs/check": "^0.9.10",
     "@axe-core/playwright": "^4.13.0",
+    "@lhci/cli": "^0.15.1",
     "@playwright/test": "^1.63.0",
     "@types/luxon": "^3.7.6",
     "@types/node": "^24.19.0",
     "@types/pngjs": "^6.0.5",
+    "html-validate": "^11.16.1",
     "ical.js": "^2.2.1",
     "pixelmatch": "^7.2.0",
     "pngjs": "^7.0.0",

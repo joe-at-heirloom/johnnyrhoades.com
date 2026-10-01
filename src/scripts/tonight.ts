@@ -67,7 +67,7 @@ if (bar && tonight) {
 // 3. A show page for a show that has ended.
 const page = document.querySelector<HTMLElement>('[data-show-page]');
 const banner = document.querySelector<HTMLElement>('[data-past-banner]');
-if (page && banner && ended(page.dataset.showEnd)) {
+if (page && banner?.hidden && ended(page.dataset.showEnd)) {
   const following = upcoming.find((s) => s.url !== location.pathname);
   if (following) {
     link(banner, '[data-past-next]', following.url);

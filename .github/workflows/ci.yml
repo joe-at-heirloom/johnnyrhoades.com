@@ -1,0 +1,108 @@
+# Checks on every pull request (PLAN.md section 12), plus a weekly external link check.
+#
+# - check: astro check, the facts-ledger rules, unit tests.
+# - site: end-to-end tests (axe, forms, CSP, sitemap, internal links) on a
+#   build pinned to SITE_NOW; then a real-date build for html-validate and
+#   Lighthouse CI against the budgets in lighthouserc.cjs.
+# - links (weekly, non-blocking): lychee on external links. Internal links
+#   are already covered by tests/e2e/discovery.spec.ts.
+#
+# Not yet run: the repo isn't on GitHub until Johnny OKs making it public.
+name: CI
+
+on:
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: "23 9 * * 1" # Mondays: external links
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    if: github.event_name != 'schedule'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24 # ships npm 11 (ADR 0004)
+          cache: npm
+      - run: npm ci
+      - run: npm run check
+      - run: npm test
+
+  site:
+    if: github.event_name != 'schedule'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+
+      - name: Restore the poster cache
+        uses: actions/cache@v6
+        with:
+          path: .cache/posters
+          key: posters-${{ hashFiles('src/lib/posters/**', 'src/assets/fonts/poster/**') }}-${{ github.run_id }}
+          restore-keys: posters-${{ hashFiles('src/lib/posters/**', 'src/assets/fonts/poster/**') }}-
+
+      - run: npx playwright install --with-deps chromium
+
+      - name: End-to-end tests
+        run: npm run test:e2e
+
+      - name: Build as of today
+        run: npm run build
+
+      - name: Validate HTML
+        run: npm run lint:html
+
+      - name: Lighthouse CI
+        run: npx lhci autorun
+
+      - uses: actions/upload-artifact@v7
+        if: ${{ !cancelled() }}
+        with:
+          name: reports
+          path: |
+            playwright-report/
+            .lighthouseci/
+          retention-days: 14
+
+  links:
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+
+      - name: Check external links
+        uses: lycheeverse/lychee-action@v2
+        with:
+          fail: false
+          args: >-
+            --no-progress
+            --max-concurrency 4
+            --accept 200,206,429
+            --scheme https --scheme http
+            --exclude 'johnnyrhoades\.com'
+            --exclude 'calendar\.google\.com'
+            --exclude 'google\.com/maps'
+            --exclude 'api\.web3forms\.com'
+            --exclude 'buttondown\.com/api'
+            'dist/**/*.html'

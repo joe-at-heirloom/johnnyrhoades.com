@@ -69,7 +69,7 @@ const description = 'Press kit for Johnny Rhoades, blues guitarist and singer fr
       <section class="epk-video" aria-label={`Video: ${video.title}`}>
         <div class="video-frame" data-video-frame data-video-id={video.id} data-video-title={video.title}>
           <button class="video-facade" type="button" data-video-play aria-label={`Play video: ${video.title}`}>
-            <Image src={videoThumb(video.id)} widths={[640, 960, 1280]} sizes="(max-width: 900px) 100vw, 1200px" quality={78} alt="" />
+            <Image src={videoThumb(video.id)} widths={[640, 960, 1280]} sizes="(max-width: 900px) 100vw, 1200px" quality={78} alt="" loading="eager" fetchpriority="high" />
             <span class="play-btn" aria-hidden="true"></span>
           </button>
         </div>

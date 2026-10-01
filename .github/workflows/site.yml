@@ -1,8 +1,13 @@
-# Sync shows from Bandsintown, build, and deploy to GitHub Pages (PLAN.md section 12).
+# Sync shows from Bandsintown, build, deploy to GitHub Pages, then ping
+# IndexNow (PLAN.md section 12).
 #
 # - Every three hours: sync. Build and deploy only if the shows changed.
 # - Nightly: sync, then always rebuild, so shows that have passed roll off.
 # - Push to main or a manual run: sync, build and deploy.
+#
+# Staging (PLAN.md section 14, step 7): set the repository variable
+# SITE_NOINDEX to "true". Every page is then noindex and IndexNow stays
+# quiet. Delete the variable at cutover.
 #
 # Sync, build and deploy are jobs in one workflow because commits pushed with
 # GITHUB_TOKEN don't trigger other workflows. Until the BANDSINTOWN_APP_ID
@@ -78,6 +83,9 @@ jobs:
       PUBLIC_WEB3FORMS_KEY: ${{ vars.PUBLIC_WEB3FORMS_KEY }}
       PUBLIC_BUTTONDOWN_USER: ${{ vars.PUBLIC_BUTTONDOWN_USER }}
       PUBLIC_UMAMI_WEBSITE_ID: ${{ vars.PUBLIC_UMAMI_WEBSITE_ID }}
+      SITE_NOINDEX: ${{ vars.SITE_NOINDEX }}
+    outputs:
+      indexnow_urls: ${{ steps.indexnow.outputs.urls }}
     # Three-hourly runs only rebuild when the shows changed; everything else always does.
     if: >-
       github.event_name != 'schedule'
@@ -102,6 +110,11 @@ jobs:
         with:
           node-version: 24
 
+      # Before the deploy, while the old /shows.json is still live: which show pages are new or changed (ADR 0012).
+      - name: Plan IndexNow
+        id: indexnow
+        run: npm run indexnow -- plan
+
   deploy:
     needs: build
     runs-on: ubuntu-latest
@@ -112,3 +125,19 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v5
+
+  indexnow:
+    needs: [build, deploy]
+    if: needs.build.outputs.indexnow_urls != ''
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Tell IndexNow about new and changed show pages
+        env:
+          INDEXNOW_URLS: ${{ needs.build.outputs.indexnow_urls }}
+        run: npm run indexnow -- submit
