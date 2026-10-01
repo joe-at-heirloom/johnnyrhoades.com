@@ -12,7 +12,8 @@ The website for Johnny Rhoades, a blues guitarist and singer from Detroit.
 | 1. Show data pipeline | Done on mock data. Live sync waits on a Bandsintown `app_id` (ADR 0006) |
 | 2. Shows on the site | Done: shows rendered at build time, show pages, calendar, RSS, `/shows.json`, Tonight |
 | 3. Poster engine | Done: six formats per upcoming show, fit-to-width type, cached renders, print flyer. Photos off until credits are confirmed |
-| 4–8 | Not started |
+| 4. Press kit and facts ledger | Done: `/epk/`, ledger rules enforced in `npm run check` and on built pages. Some sections wait on Johnny's answers |
+| 5–8 | Not started |
 
 ## Stack
 
@@ -31,7 +32,7 @@ npm install
 | `npm run dev` | Dev server at http://localhost:4321 |
 | `npm run build` | Production build to `dist/` |
 | `npm run preview` | Serve `dist/` (Astro 7 runs it in the background; stop it with `npx astro preview stop`) |
-| `npm run check` | `astro check`: type-checks `.astro` and `.ts` files |
+| `npm run check` | `astro check` plus the facts-ledger rules |
 | `npm test` | Unit tests (Vitest, `tests/unit/`) |
 | `npm run sync:fixtures` | Rebuild `src/data/shows.json` from the Bandsintown fixtures (offline) |
 | `npm run test:e2e` | End-to-end tests (Playwright, `tests/e2e/`). Builds with a pinned date first. |
@@ -42,7 +43,7 @@ First time running end-to-end tests: `npx playwright install chromium`.
 
 ```
 src/
-  pages/        index, shows/ (list, show pages, .ics, feed), shows.ics, shows.json, thanks, 404
+  pages/        index, shows/ (list, show pages, .ics, feed), epk, posters/, press/, shows.ics, shows.json, thanks, 404
   layouts/      BaseLayout: head, fonts, meta
   components/   one per section: Header, Hero, ShowsSection, MusicSection, StrumNeck,
                 AlbumRecord, VideoStage, AboutSection, PhotoGallery, BookingForm, MailingList, Footer

@@ -12,3 +12,9 @@ Acceptance criteria that need a person, a deployed site or a third-party tool. E
 ## Waiting on Johnny's Bandsintown key
 
 - [ ] **Live sync** (Phase 1). Run `BANDSINTOWN_APP_ID=… npm run sync -- --capture`, compare the captured payloads with the mocks (`tests/fixtures/bandsintown/README.md`), fix any differences, and close ADR 0006.
+
+## Waiting on Johnny's answers (PLAN.md section 17)
+
+- [ ] **Press photo zip** (Phase 4). Once photographers and licenses are confirmed, add `credit` and `license` and the `press` use in `src/data/media.yaml`. The zip builds itself. *Automated now:* the zip route, and a test that it's absent without qualifying photos.
+- [ ] **Detroit Music Award line.** With a year, category and listing, move the fact to `confirmed_by_johnny` or `verified` in `facts.yaml` and add it back to `HOME_ABOUT` in `src/lib/copy.ts`.
+- [ ] **Formats, long bio, booking email.** Each needs Johnny's answer first; the press kit leaves them out until then.

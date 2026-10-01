@@ -13,3 +13,4 @@ Short notes on choices that shape the code, so the reasoning survives. One file 
 | [0007](0007-scripts-run-on-node-type-stripping.md) | Run TypeScript scripts with Node's built-in type stripping | Accepted |
 | [0008](0008-shows-on-the-site.md) | Shows on the site, built from data | Accepted |
 | [0009](0009-poster-engine.md) | The poster engine | Accepted |
+| [0010](0010-facts-ledger-and-press-kit.md) | The facts ledger, enforced; and the press kit built on it | Accepted |

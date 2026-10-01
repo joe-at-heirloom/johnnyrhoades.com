@@ -22,7 +22,7 @@ Keep this list accurate. Requires Node ≥ 22.12 and npm ≥ 11 (ADR 0004).
 Available now:
 
 - `npm run dev`, `npm run build`, `npm run preview` (Astro 7 runs preview in the background; stop it with `npx astro preview stop`)
-- `npm run check`: `astro check` (type-checks `.astro` and `.ts`)
+- `npm run check`: `astro check` (type-checks `.astro` and `.ts`), then `npm run check:facts` (the facts-ledger rules, ADR 0010)
 - `npm test`: Vitest unit tests in `tests/unit/`
 - `npm run test:e2e`: Playwright. It builds the site with a pinned date (`SITE_NOW`, see `playwright.config.ts`) and serves it on port 4500, then covers behavior, axe accessibility, show pages, feeds and the Tonight bar. Traces and screenshots of failures land in `test-results/`.
 
@@ -34,7 +34,7 @@ Available now:
 
 Planned, added by the phase that needs them:
 
-- `npm run check` grows lint and the facts-ledger rules: Phases 4 and 6
+- `npm run check` grows lint: Phase 6
 - `npm run lhci`: Phase 6
 
 Before calling any task done, run `npm run check && npm test && npm run build`. For UI changes, also run `npm run test:e2e` and look at the screenshots.
