@@ -22,7 +22,13 @@ export default defineConfig({
   projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
   webServer: {
     command: 'npx astro build && npx astro preview --host 127.0.0.1 --port 4500 --ignore-lock',
-    env: { SITE_NOW },
+    // Fake service IDs: tests intercept the requests (tests/e2e/forms.spec.ts).
+    env: {
+      SITE_NOW,
+      PUBLIC_WEB3FORMS_KEY: 'test-web3forms-key',
+      PUBLIC_BUTTONDOWN_USER: 'test-johnny',
+      PUBLIC_UMAMI_WEBSITE_ID: 'test-umami-id',
+    },
     url: SITE_URL,
     reuseExistingServer: false,
     timeout: 180_000,

@@ -1,5 +1,6 @@
 /* Click-to-load YouTube player: nothing from YouTube loads until someone presses play. */
 import { $, $$, prefersReducedMotion } from './dom';
+import { track } from './track';
 
 const frame = $('[data-video-frame]');
 const items = $$<HTMLButtonElement>('[data-video]');
@@ -15,6 +16,7 @@ if (frame) {
     iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
     iframe.allowFullscreen = true;
     frame.replaceChildren(iframe);
+    track('video_play', { id });
   };
 
   frame.addEventListener('click', (e) => {

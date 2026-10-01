@@ -11,6 +11,6 @@ const { show } = Astro.props;
 ---
 
 <span class="add-to-calendar">
-  <a class="btn btn-ghost" href={googleCalendarUrl(show, absolute(showPath(show.slug)))} target="_blank" rel="noopener">Add to Google Calendar</a>
-  <a class="text-link" href={`/shows/${show.slug}.ics`} download>Apple or Outlook (.ics)</a>
+  <a class="btn btn-ghost" href={googleCalendarUrl(show, absolute(showPath(show.slug)))} target="_blank" rel="noopener" data-umami-event="calendar_add" data-umami-event-kind="google">Add to Google Calendar</a>
+  <a class="text-link" href={`/shows/${show.slug}.ics`} download data-umami-event="calendar_add" data-umami-event-kind="ics">Apple or Outlook (.ics)</a>
 </span>

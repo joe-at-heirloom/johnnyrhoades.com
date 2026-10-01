@@ -14,3 +14,4 @@ Short notes on choices that shape the code, so the reasoning survives. One file 
 | [0008](0008-shows-on-the-site.md) | Shows on the site, built from data | Accepted |
 | [0009](0009-poster-engine.md) | The poster engine | Accepted |
 | [0010](0010-facts-ledger-and-press-kit.md) | The facts ledger, enforced; and the press kit built on it | Accepted |
+| [0011](0011-forms-list-and-analytics.md) | Forms, mailing list and analytics on a static host | Accepted |

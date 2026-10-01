@@ -1,5 +1,14 @@
 ---
-/* Mailing list signup. Phase 5 moves it to Kit or Buttondown with ZIP region tags. */
+/*
+  Mailing list signup through Buttondown (PLAN.md section 11). With
+  JavaScript, the ZIP code becomes a region tag (src/lib/regions.ts) so show
+  announcements can go to people nearby.
+*/
+import { buttondownEndpoint } from '../lib/forms';
+import { PUBLIC_CONFIG } from '../lib/public-config';
+
+const user = PUBLIC_CONFIG.buttondownUser;
+if (!user && process.env.CI) console.warn('PUBLIC_BUTTONDOWN_USER is not set: mailing list signups will not deliver.');
 ---
 
 <section class="list-band" id="list" aria-labelledby="list-title">
@@ -8,13 +17,12 @@
       <h2 class="list-title" id="list-title">Mailing list</h2>
       <p class="list-sub">I’ll email you when there are new shows or new music. That’s it.</p>
     </div>
-    <form class="list-form" name="mailing-list" method="POST" action="/thanks/" data-netlify="true" netlify-honeypot="company-url" data-ajax-form>
-      <input type="hidden" name="form-name" value="mailing-list" />
-      <p class="hp" aria-hidden="true"><label>Leave this empty <input name="company-url" tabindex="-1" autocomplete="off" /></label></p>
+    <form class="list-form" method="POST" action={user ? buttondownEndpoint(user) : '#list'} data-form="signup" data-buttondown-user={user}>
+      <p class="hp" aria-hidden="true"><label>Leave this unchecked <input type="checkbox" name="botcheck" tabindex="-1" /></label></p>
       <label class="sr-only" for="l-email">Email address</label>
       <input id="l-email" name="email" type="email" autocomplete="email" placeholder="Email" required />
       <label class="sr-only" for="l-zip">ZIP code (optional, for shows near you)</label>
-      <input id="l-zip" name="zip" type="text" inputmode="numeric" autocomplete="postal-code" placeholder="ZIP (optional)" maxlength="10" />
+      <input id="l-zip" name="metadata__zip" type="text" inputmode="numeric" autocomplete="postal-code" placeholder="ZIP (optional)" maxlength="10" />
       <button class="btn btn-ink" type="submit">Sign up</button>
       <p class="form-status" role="status" aria-live="polite" data-form-status></p>
     </form>

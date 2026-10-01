@@ -9,6 +9,16 @@ Acceptance criteria that need a person, a deployed site or a third-party tool. E
 - [ ] **Calendar subscription in Google Calendar** (Phase 2). Use "Add to Google Calendar" on `/shows/`. Expect the calendar to appear and update within a day.
 - [ ] **Link previews** (Phase 3). Paste a show page link into iMessage, Facebook's Sharing Debugger and Slack. Expect the show's poster as the preview image.
 
+## Waiting on the service accounts (Phase 5, ADR 0011)
+
+Set each ID as a GitHub Actions repository **variable** (not a secret; they're public by design) and in `.env` for local testing.
+
+- [ ] **Web3Forms** (`PUBLIC_WEB3FORMS_KEY`). Create an access key at https://web3forms.com with the inbox Johnny reads. Send a test booking from staging. Expect an email with the subject `Booking: {date}, {venue}, {event type}` and reply-to set to the booker. Then turn JavaScript off and send another; expect `/thanks/`. *Automated now:* `tests/e2e/forms.spec.ts` checks the payload, subject, success and error messages, and the no-JavaScript form attributes against an intercepted endpoint.
+- [ ] **Buttondown** (`PUBLIC_BUTTONDOWN_USER`). Create the account, import the Bandzoogle export (see below), and create the tags Metro Detroit, Ann Arbor, Lansing, West Michigan, Elsewhere in Michigan and Out of state. Sign up from staging with a 48080 ZIP. Expect the subscriber with the Metro Detroit tag and `zip` metadata. *Automated now:* the region mapping and the posted fields.
+- [ ] **Umami** (`PUBLIC_UMAMI_WEBSITE_ID`). Add johnnyrhoades.com in Umami Cloud. After launch, click through a show page and play a video. Expect the pageviews and the events (`directions_click`, `video_play` and so on). Staging won't count, by design (`data-domains`). *Automated now:* every event name, and the script attributes.
+- [ ] **Bandzoogle mailing list export.** Export before anything else changes on the old site, and record the count as the baseline (PLAN.md section 13).
+- [ ] **booking@johnnyrhoades.com** (Phase 7). Once DNS is on Cloudflare, add an Email Routing rule forwarding to Johnny's inbox, send a test, and point Web3Forms at it if he wants.
+
 ## Waiting on Johnny's Bandsintown key
 
 - [ ] **Live sync** (Phase 1). Run `BANDSINTOWN_APP_ID=… npm run sync -- --capture`, compare the captured payloads with the mocks (`tests/fixtures/bandsintown/README.md`), fix any differences, and close ADR 0006.
@@ -17,4 +27,4 @@ Acceptance criteria that need a person, a deployed site or a third-party tool. E
 
 - [ ] **Press photo zip** (Phase 4). Once photographers and licenses are confirmed, add `credit` and `license` and the `press` use in `src/data/media.yaml`. The zip builds itself. *Automated now:* the zip route, and a test that it's absent without qualifying photos.
 - [ ] **Detroit Music Award line.** With a year, category and listing, move the fact to `confirmed_by_johnny` or `verified` in `facts.yaml` and add it back to `HOME_ABOUT` in `src/lib/copy.ts`.
-- [ ] **Formats, long bio, booking email.** Each needs Johnny's answer first; the press kit leaves them out until then.
+- [ ] **Formats, long bio, booking email.** Each needs Johnny's answer first; the press kit leaves them out until then. Once there's a booking email, make it the form's error fallback in `src/scripts/forms.ts` (Facebook for now).

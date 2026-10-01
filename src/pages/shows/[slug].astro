@@ -121,13 +121,13 @@ const next = showsAfter(allShows, show, BUILD_NOW);
                 {v.street && <>{v.street}<br /></>}
                 {v.city}, {v.region} {v.postalCode}
               </address>
-              {cover && <p class="show-cover">{show.tickets?.free ? 'Free show.' : <a href={show.tickets?.url} target="_blank" rel="noopener">Get tickets</a>}</p>}
+              {cover && <p class="show-cover">{show.tickets?.free ? 'Free show.' : <a href={show.tickets?.url} target="_blank" rel="noopener" data-umami-event="ticket_click">Get tickets</a>}</p>}
               {
                 !cancelled && (
                   <div class="actions show-actions">
-                    <a class="btn btn-red" href={directionsUrl(show)} target="_blank" rel="noopener">Directions</a>
+                    <a class="btn btn-red" href={directionsUrl(show)} target="_blank" rel="noopener" data-umami-event="directions_click">Directions</a>
                     <AddToCalendar show={show} />
-                    <a class="text-link" href={show.bandsintownUrl} target="_blank" rel="noopener">RSVP on Bandsintown</a>
+                    <a class="text-link" href={show.bandsintownUrl} target="_blank" rel="noopener" data-umami-event="rsvp_click">RSVP on Bandsintown</a>
                   </div>
                 )
               }

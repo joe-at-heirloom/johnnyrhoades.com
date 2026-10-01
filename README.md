@@ -13,11 +13,12 @@ The website for Johnny Rhoades, a blues guitarist and singer from Detroit.
 | 2. Shows on the site | Done: shows rendered at build time, show pages, calendar, RSS, `/shows.json`, Tonight |
 | 3. Poster engine | Done: six formats per upcoming show, fit-to-width type, cached renders, print flyer. Photos off until credits are confirmed |
 | 4. Press kit and facts ledger | Done: `/epk/`, ledger rules enforced in `npm run check` and on built pages. Some sections wait on Johnny's answers |
-| 5–8 | Not started |
+| 5. Forms, list and analytics | Done in code: Web3Forms booking with a triage subject, Buttondown signup with region tags, cookieless Umami with the custom events. Needs the three accounts (ADR 0011) |
+| 6–8 | Not started |
 
 ## Stack
 
-Astro 7 (static output), TypeScript strict, plain CSS with design tokens, and self-hosted Archivo. Tested with Vitest, Playwright and axe-core. Deploys to GitHub Pages through `.github/workflows/site.yml`.
+Astro 7 (static output), TypeScript strict, plain CSS with design tokens, and self-hosted Archivo. Booking requests go through Web3Forms, the mailing list through Buttondown, and analytics through Umami (cookieless); their public IDs are build variables listed in `.env.example`. Tested with Vitest, Playwright and axe-core. Deploys to GitHub Pages through `.github/workflows/site.yml`.
 
 ## Commands
 

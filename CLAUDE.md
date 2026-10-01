@@ -32,6 +32,8 @@ Available now:
 - `python3 scripts/make-poster-fonts.py`: regenerate the static poster fonts (needs fonttools; output is committed)
 - `UPDATE_POSTER_SNAPSHOTS=1 npm test -- posters`: rewrite poster snapshots after an intended design change, then look at them and bump `TEMPLATE_VERSION` (ADR 0009)
 
+Forms and analytics read public IDs from `PUBLIC_*` build variables (copy `.env.example` to `.env`; ADR 0011). Without them the site still builds, and the forms say they aren't connected. The end-to-end build sets fake ones and intercepts the services.
+
 Planned, added by the phase that needs them:
 
 - `npm run check` grows lint: Phase 6

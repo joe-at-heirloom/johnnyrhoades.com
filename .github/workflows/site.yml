@@ -73,6 +73,11 @@ jobs:
 
   build:
     needs: sync
+    # Public service IDs (ADR 0011). Repository variables, not secrets: they end up in the page.
+    env:
+      PUBLIC_WEB3FORMS_KEY: ${{ vars.PUBLIC_WEB3FORMS_KEY }}
+      PUBLIC_BUTTONDOWN_USER: ${{ vars.PUBLIC_BUTTONDOWN_USER }}
+      PUBLIC_UMAMI_WEBSITE_ID: ${{ vars.PUBLIC_UMAMI_WEBSITE_ID }}
     # Three-hourly runs only rebuild when the shows changed; everything else always does.
     if: >-
       github.event_name != 'schedule'

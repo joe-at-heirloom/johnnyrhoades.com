@@ -48,8 +48,8 @@ const googleSubscribe = `https://calendar.google.com/calendar/r?cid=${encodeURIC
         <ProofLine text={proofLine(allShows, BUILD_NOW)} />
         <p class="lede">Where I’m playing next. Subscribe to the calendar and new dates show up on your phone on their own.</p>
         <div class="actions">
-          <a class="btn btn-red" href={calendarUrl}>Subscribe to the calendar</a>
-          <a class="text-link" href={googleSubscribe} target="_blank" rel="noopener">Add to Google Calendar</a>
+          <a class="btn btn-red" href={calendarUrl} data-umami-event="calendar_subscribe" data-umami-event-kind="webcal">Subscribe to the calendar</a>
+          <a class="text-link" href={googleSubscribe} target="_blank" rel="noopener" data-umami-event="calendar_subscribe" data-umami-event-kind="google">Add to Google Calendar</a>
           <a class="text-link" href={BANDSINTOWN_PROFILE} target="_blank" rel="noopener">Follow on Bandsintown</a>
           <a class="text-link" href="/shows/feed.xml">RSS</a>
         </div>

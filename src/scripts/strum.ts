@@ -10,6 +10,7 @@
 */
 import { E7_TUNING, crossedStrings, fretPositions, karplusStrong } from '../lib/strum';
 import { prefersReducedMotion } from './dom';
+import { track } from './track';
 
 const NS = 'http://www.w3.org/2000/svg';
 const GAUGE = [3.6, 2.9, 2.3, 1.7, 1.3, 1];
@@ -196,6 +197,7 @@ export function initStrum(root: HTMLElement): void {
     speaker!.setAttribute('aria-checked', String(on));
     if (!ctx) return;
     if (on) {
+      track('strum_sound_on');
       if (ctx.state !== 'running') void ctx.resume();
     } else {
       for (const v of voices) v?.gain.gain.setTargetAtTime(0, ctx.currentTime, 0.03);

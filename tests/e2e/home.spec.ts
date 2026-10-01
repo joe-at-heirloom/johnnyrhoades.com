@@ -87,10 +87,10 @@ test('strum code is not in the initial page; it loads and draws six strings near
 
 test('booking form validates required fields before sending', async ({ page }) => {
   await page.goto('/');
-  await page.getByRole('button', { name: 'Send' }).click();
+  await page.getByRole('button', { name: 'Send booking request' }).click();
   const valid = await page.locator('#b-name').evaluate((el: HTMLInputElement) => el.validity.valid);
   expect(valid).toBe(false);
-  await expect(page.locator('form[name="booking"] [data-form-status]')).toHaveText('');
+  await expect(page.locator('form[data-form="booking"] [data-form-status]')).toHaveText('');
 });
 
 test('thanks and 404 pages are noindex', async ({ page }) => {

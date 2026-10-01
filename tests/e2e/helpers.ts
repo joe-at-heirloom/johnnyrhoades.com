@@ -1,8 +1,8 @@
 import type { Page } from '@playwright/test';
 
-/** YouTube only loads after a click; block it so tests never depend on the network. */
+/** Block third parties so tests never depend on the network: YouTube (after a click) and analytics. */
 export async function blockThirdParties(page: Page): Promise<void> {
-  await page.route(/youtube(-nocookie)?\.com|ytimg\.com/, (route) => route.abort());
+  await page.route(/youtube(-nocookie)?\.com|ytimg\.com|umami\.is/, (route) => route.abort());
 }
 
 /** Scroll through the page so lazy images and the strum load, then return to the top and settle. */

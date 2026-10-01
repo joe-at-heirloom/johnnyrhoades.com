@@ -10,6 +10,7 @@ import { sameAs } from '../lib/media';
 import { siteGraph } from '../lib/schema';
 import { SCHEMA_DESCRIPTION } from '../lib/copy';
 import { absolute } from '../lib/site';
+import { PUBLIC_CONFIG } from '../lib/public-config';
 
 interface Props {
   title: string;
@@ -65,6 +66,17 @@ const portraitImage = await getImage({ src: portrait, width: 1200, format: 'jpg'
         album: media.album,
         description: plain(facts.third(SCHEMA_DESCRIPTION, 'schema')),
       })} />
+    {
+      PUBLIC_CONFIG.umamiWebsiteId && (
+        <script
+          is:inline
+          defer
+          src={PUBLIC_CONFIG.umamiSrc}
+          data-website-id={PUBLIC_CONFIG.umamiWebsiteId}
+          data-domains={PUBLIC_CONFIG.umamiDomains}
+          data-do-not-track="true"></script>
+      )
+    }
     <slot name="head" />
   </head>
   <body>
