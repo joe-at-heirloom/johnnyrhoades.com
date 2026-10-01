@@ -29,6 +29,9 @@ Available now:
 - `npm run sync`: pull Bandsintown into `src/data/shows.json` (needs `BANDSINTOWN_APP_ID`; flags: `--capture`, `--force`, `--dry-run`, `--now`)
 - `npm run sync:fixtures`: the same, offline, from `tests/fixtures/bandsintown/` (mocks until the key arrives; ADR 0006)
 
+- `python3 scripts/make-poster-fonts.py`: regenerate the static poster fonts (needs fonttools; output is committed)
+- `UPDATE_POSTER_SNAPSHOTS=1 npm test -- posters`: rewrite poster snapshots after an intended design change, then look at them and bump `TEMPLATE_VERSION` (ADR 0009)
+
 Planned, added by the phase that needs them:
 
 - `npm run check` grows lint and the facts-ledger rules: Phases 4 and 6
