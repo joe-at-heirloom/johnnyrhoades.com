@@ -1,0 +1,71 @@
+# Venue details that Bandsintown doesn't have or gets wrong (PLAN.md section 6.3).
+#
+# - Keys are stable ids, used to count rooms and match shows to venues.
+# - `match` lists other names the venue appears under in Bandsintown.
+# - Fields here win over Bandsintown's. Values starting with "TODO" count as
+#   missing and never reach a page.
+# - Blurbs: one or two specific sentences, confirmed with Johnny. Only for the
+#   fifteen most-played rooms.
+
+15th-street-tavern:
+  name: 15th Street Tavern
+  street: 10081 S Ortonville Rd # from Bandsintown, 2026-09-30
+  city: Clarkston
+  region: MI
+  postalCode: "48348"
+  url: TODO
+  blurb: TODO
+
+blue-goose-inn:
+  match: ["Blue Goose Inn", "The Blue Goose"]
+  name: Blue Goose Inn
+  street: 28911 Jefferson Ave
+  city: St. Clair Shores
+  region: MI
+  postalCode: TODO
+  url: TODO
+  blurb: TODO
+
+cadieux-cafe:
+  name: Cadieux Cafe
+  city: Detroit
+  region: MI
+  street: TODO
+  url: TODO
+  blurb: TODO
+
+octopus-beer-garden:
+  match: ["Octopus' Beer Garden", "Octopus Beer Garden"]
+  name: Octopus' Beer Garden
+  city: Mount Clemens
+  region: MI
+  street: TODO
+  url: TODO
+  blurb: TODO
+
+the-fed-community:
+  match: ["The Fed Community", "The Fed"]
+  name: The Fed Community
+  city: Clarkston
+  region: MI
+  street: TODO
+  url: TODO
+  blurb: TODO
+
+three-blind-mice-irish-pub:
+  match: ["Three Blind Mice Irish Pub", "Three Blind Mice"]
+  name: Three Blind Mice Irish Pub
+  city: Mount Clemens
+  region: MI
+  street: TODO
+  url: TODO
+  blurb: TODO
+
+token-lounge:
+  match: ["The Token Lounge", "Token Lounge"]
+  name: The Token Lounge
+  city: Westland
+  region: MI
+  street: TODO
+  url: TODO
+  blurb: TODO

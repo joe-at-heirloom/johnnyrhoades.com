@@ -263,7 +263,8 @@ type Show = {
   id: string;              // Bandsintown event id
   slug: string;            // "2026-10-23-blue-goose-inn-st-clair-shores"
   aliases: string[];       // earlier slugs; each gets a redirect stub
-  start: string;           // ISO 8601 with offset, America/Detroit
+  start: string;           // ISO 8601 with the venue's offset (America/Detroit for Michigan rooms)
+  end?: string;            // ISO 8601, when Bandsintown has an end time (ADR 0006)
   act: Act;
   billing: string;         // "Johnny Rhoades Trio", or "Motor City Josh & The Big 3, with Johnny on guitar"
   lineup: string[];
@@ -279,6 +280,7 @@ type Show = {
     lat?: number;
     lng?: number;
     url?: string;
+    timeZone: string;      // IANA zone the times are in; Bandsintown times are venue-local (ADR 0006)
   };
   tickets?: { url?: string; price?: number; free?: boolean };
   bandsintownUrl: string;

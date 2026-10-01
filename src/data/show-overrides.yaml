@@ -1,0 +1,16 @@
+# Per-show corrections, keyed by Bandsintown event id (PLAN.md section 6.3).
+# Overrides always win over what the sync infers.
+#
+# Fields:
+#   act: solo | trio | band | guest | host | unspecified
+#   billing: who's billed, e.g. "Jill Jack, with Johnny Rhoades"
+#   status: scheduled | cancelled | postponed | rescheduled
+#     A future show marked cancelled or postponed keeps its page (with
+#     EventCancelled markup) after it disappears from Bandsintown.
+#   public: false hides a show entirely: no page, poster or event markup.
+#   note: free text for people; ignored by the code.
+
+"108445076":
+  note: Ann Arbor State Street Art Fair, July 16, 2026 (from PLAN.md; not in the mock data)
+  act: guest
+  billing: "Jill Jack, with Johnny Rhoades"

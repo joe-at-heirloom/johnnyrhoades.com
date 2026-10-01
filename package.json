@@ -15,15 +15,21 @@
     "preview": "astro preview",
     "check": "astro check",
     "test": "vitest run",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "sync": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/sync-shows.ts",
+    "sync:fixtures": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/sync-shows.ts --fixtures tests/fixtures/bandsintown"
   },
   "dependencies": {
-    "astro": "^7.3.5"
+    "astro": "^7.3.5",
+    "luxon": "^3.7.2",
+    "yaml": "^2.9.1",
+    "zod": "^4.6.5"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.10",
     "@axe-core/playwright": "^4.13.0",
     "@playwright/test": "^1.63.0",
+    "@types/luxon": "^3.7.6",
     "@types/node": "^24.19.0",
     "@types/pngjs": "^6.0.5",
     "pixelmatch": "^7.2.0",
