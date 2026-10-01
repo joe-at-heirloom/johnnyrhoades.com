@@ -121,3 +121,48 @@ test('the 404 page offers the next shows', async ({ page }) => {
   await expect(page.locator('.show-row')).toHaveCount(3);
   await expect(page.getByRole('link', { name: 'All shows' })).toHaveAttribute('href', '/shows/');
 });
+
+test('posters: link preview, event images, the poster on the page, and downloads', async ({ page, request }) => {
+  await page.goto(GOOSE);
+  const slug = '2026-10-23-blue-goose-inn-st-clair-shores';
+  await expect(page.locator('meta[property="og:image"]')).toHaveAttribute('content', `https://johnnyrhoades.com/posters/${slug}/og.png`);
+  await expect(page.locator('meta[property="og:image:alt"]')).toHaveAttribute('content', /^Poster: Johnny Rhoades at Blue Goose Inn/);
+
+  const event = JSON.parse((await page.locator('script[type="application/ld+json"]').nth(1).textContent()) ?? '{}');
+  expect(event.image).toEqual(['1x1', '4x3', '16x9'].map((f) => `https://johnnyrhoades.com/posters/${slug}/${f}.png`));
+
+  const img = page.locator('img.show-poster-img');
+  await expect(img).toBeVisible();
+  await expect(img).toHaveAttribute('alt', 'Poster: Johnny Rhoades at Blue Goose Inn, St. Clair Shores, Friday, October 23, 9 pm.');
+  expect(await img.evaluate((el: HTMLImageElement) => el.naturalWidth)).toBe(1080);
+
+  const post = page.getByRole('link', { name: 'Download Instagram post' });
+  await expect(post).toHaveAttribute('download', `johnny-rhoades-${slug}-instagram-post.png`);
+  for (const format of ['og', '1x1', '4x3', '16x9', 'feed', 'story']) {
+    const res = await request.get(`/posters/${slug}/${format}.png`);
+    expect(res.status(), format).toBe(200);
+    expect(res.headers()['content-type']).toBe('image/png');
+  }
+  await expect(page.getByRole('button', { name: 'Print a flyer' })).toBeVisible();
+});
+
+test('a past show keeps a link preview but no downloads', async ({ page, request }) => {
+  const slug = '2026-09-26-three-blind-mice-irish-pub-mount-clemens';
+  await page.goto(`/shows/${slug}/`);
+  await expect(page.locator('img.show-poster-img')).toHaveCount(0);
+  await expect(page.locator('.show-bill .poster')).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Promote this show' })).toHaveCount(0);
+  expect((await request.get(`/posters/${slug}/og.png`)).status()).toBe(200);
+  expect((await request.get(`/posters/${slug}/feed.png`)).status()).toBe(404);
+});
+
+test('the printed flyer is the bill alone, on one page', async ({ page }) => {
+  await page.goto(GOOSE);
+  await page.emulateMedia({ media: 'print' });
+  await expect(page.locator('.show-bill .poster')).toBeVisible();
+  for (const hidden of ['.site-header', '.site-footer', '.show-details', 'img.show-poster-img', '.promote']) {
+    await expect(page.locator(hidden).first()).toBeHidden();
+  }
+  const pdf = await page.pdf({ format: 'Letter', printBackground: true });
+  expect(pdf.toString('latin1').match(/\/Type\s*\/Page[^s]/g)).toHaveLength(1);
+});
