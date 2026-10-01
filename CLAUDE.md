@@ -26,9 +26,11 @@ Available now:
 - `npm test`: Vitest unit tests in `tests/unit/`
 - `npm run test:e2e`: Playwright against the production build (run `npm run build` first). It covers behavior, axe accessibility, and visual parity with `reference/v1/` (ADR 0005). Screenshots land in `test-results/`.
 
+- `npm run sync`: pull Bandsintown into `src/data/shows.json` (needs `BANDSINTOWN_APP_ID`; flags: `--capture`, `--force`, `--dry-run`, `--now`)
+- `npm run sync:fixtures`: the same, offline, from `tests/fixtures/bandsintown/` (mocks until the key arrives; ADR 0006)
+
 Planned, added by the phase that needs them:
 
-- `npm run sync` (needs `BANDSINTOWN_APP_ID`) and `npm run sync:fixtures` (offline, from `tests/fixtures/`): Phase 1
 - `npm run check` grows lint and the facts-ledger rules: Phases 4 and 6
 - `npm run lhci`: Phase 6
 
