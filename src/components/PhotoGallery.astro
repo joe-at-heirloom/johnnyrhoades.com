@@ -1,33 +1,11 @@
 ---
 import { Image, getImage } from 'astro:assets';
-import type { ImageMetadata } from 'astro';
-import seatedStudio from '../assets/photos/gallery/seated-studio.jpg';
-import bluesByTheBay from '../assets/photos/gallery/blues-by-the-bay.jpg';
-import outdoorFestival from '../assets/photos/gallery/outdoor-festival.jpg';
-import duelingGuitars from '../assets/photos/gallery/dueling-guitars.jpg';
-import bookshelf from '../assets/photos/gallery/bookshelf.jpg';
-import barStage from '../assets/photos/gallery/bar-stage.jpg';
-import mississippiBluesTrail from '../assets/photos/gallery/mississippi-blues-trail.jpg';
-import festivalStage from '../assets/photos/gallery/festival-stage.jpg';
-import fence from '../assets/photos/gallery/fence.jpg';
-import backstage from '../assets/photos/gallery/backstage.jpg';
+import { image, media } from '../lib/load-content';
 
-// Phase 4 moves these into src/data/media.yaml, with photographer credits.
-// `width` is the grid size. Don't read properties off `src` here: Astro then
-// ships the full-size original alongside the resized copies.
-type Photo = { src: ImageMetadata; alt: string; width?: number };
-const photos: Photo[] = [
-  { src: seatedStudio, alt: 'Johnny seated with a hollow-body guitar in front of a wall of amplifiers, black and white' },
-  { src: bluesByTheBay, alt: 'Johnny and another guitarist raising their fists onstage at a festival tent' },
-  { src: outdoorFestival, alt: 'Johnny grinning mid-solo on an outdoor festival stage' },
-  { src: duelingGuitars, alt: 'Two guitarists playing side by side onstage at night' },
-  { src: bookshelf, alt: 'Johnny sitting with his guitar in a room lined with books, black and white' },
-  { src: barStage, alt: 'Johnny and a bandmate playing a small bar stage under purple lights' },
-  { src: mississippiBluesTrail, alt: 'Johnny and bandmates beside a Mississippi Blues Trail marker' },
-  { src: festivalStage, alt: 'Johnny playing a Stratocaster beside a guitarist in a cream suit' },
-  { src: fence, alt: 'Johnny standing by a wooden fence holding his guitar, black and white' },
-  { src: backstage, alt: 'Johnny with his arm around a friend in an empty theater', width: 640 },
-];
+// From media.yaml. `gridWidth` overrides the 700px grid size for narrower originals.
+// Don't read properties off the image objects here: Astro then ships the
+// full-size original alongside the resized copies.
+const photos = media.photos.filter((p) => p.use.includes('gallery')).map((p) => ({ ...p, src: image(p.file) }));
 
 // The lightbox loads a larger version on demand (never upscaled past the master).
 const full = await Promise.all(photos.map((p) => getImage({ src: p.src, width: 1600, format: 'webp', quality: 80 })));
@@ -46,7 +24,7 @@ const full = await Promise.all(photos.map((p) => getImage({ src: p.src, width: 1
             <button type="button" data-full={full[i]?.src}>
               <Image
                 src={p.src}
-                width={p.width ?? 700}
+                width={p.gridWidth ?? 700}
                 quality={76}
                 alt={p.alt}
               />

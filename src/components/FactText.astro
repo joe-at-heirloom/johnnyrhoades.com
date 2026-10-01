@@ -1,0 +1,11 @@
+---
+/* Renders ledger text, setting *titles* in <cite>. */
+import { segments } from '../lib/facts';
+
+interface Props {
+  text: string;
+}
+const { text } = Astro.props;
+---
+
+{segments(text).map((s) => (s.title ? <cite>{s.text}</cite> : s.text))}

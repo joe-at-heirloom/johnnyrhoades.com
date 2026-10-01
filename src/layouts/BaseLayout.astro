@@ -4,7 +4,11 @@ import { getImage } from 'astro:assets';
 import archivoUrl from '../assets/fonts/archivo-normal-latin.woff2?url';
 import portrait from '../assets/photos/portrait.jpg';
 import JsonLd from '../components/JsonLd.astro';
+import { facts, media, profiles } from '../lib/load-content';
+import { plain } from '../lib/facts';
+import { sameAs } from '../lib/media';
 import { siteGraph } from '../lib/schema';
+import { SCHEMA_DESCRIPTION } from '../lib/copy';
 import { absolute } from '../lib/site';
 
 interface Props {
@@ -55,7 +59,12 @@ const portraitImage = await getImage({ src: portrait, width: 1200, format: 'jpg'
     <link rel="apple-touch-icon" href="/assets/img/apple-touch-icon.png" />
     <link rel="alternate" type="application/rss+xml" title="Johnny Rhoades: new shows" href="/shows/feed.xml" />
     <link rel="preload" href={archivoUrl} as="font" type="font/woff2" crossorigin />
-    <JsonLd data={siteGraph({ portraitUrl: absolute(portraitImage.src) })} />
+    <JsonLd data={siteGraph({
+        portraitUrl: absolute(portraitImage.src),
+        sameAs: sameAs(profiles),
+        album: media.album,
+        description: plain(facts.third(SCHEMA_DESCRIPTION, 'schema')),
+      })} />
     <slot name="head" />
   </head>
   <body>

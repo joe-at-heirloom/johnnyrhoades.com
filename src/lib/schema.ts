@@ -8,6 +8,7 @@
   Only `live` official profiles go into sameAs. Album and store links aren't
   profiles and stay out (PLAN.md section 2).
 */
+import { isoDuration, type Media, type Video } from './media.ts';
 import { ARTIST, SITE_URL, absolute, showPath } from './site.ts';
 import type { Show } from './shows-schema.ts';
 
@@ -18,16 +19,10 @@ export const IDS = {
   album: `${SITE_URL}/#waiting-on-the-sun`,
 } as const;
 
-/** Official profiles that exist today. Phase 4 moves these into profiles.yaml. */
-export const LIVE_PROFILES = [
-  'https://www.bandsintown.com/a/11869348',
-  'https://www.youtube.com/@johnnyrhoades86',
-  'https://www.facebook.com/profile.php?id=100085365311010',
-];
-
 type Node = Record<string, unknown>;
 
-export function siteGraph({ portraitUrl }: { portraitUrl: string }): Node {
+/** `description` must come from a verified ledger fact (structured data allows nothing weaker). */
+export function siteGraph({ portraitUrl, sameAs, album, description }: { portraitUrl: string; sameAs: string[]; album: Media['album']; description: string }): Node {
   return {
     '@context': 'https://schema.org',
     '@graph': [
@@ -43,12 +38,12 @@ export function siteGraph({ portraitUrl }: { portraitUrl: string }): Node {
         '@id': IDS.johnny,
         name: ARTIST,
         alternateName: ['John Rhoades'],
-        description: 'Blues guitarist and singer from Detroit, Michigan.',
+        description,
         jobTitle: 'Blues guitarist and singer',
         url: `${SITE_URL}/`,
         image: portraitUrl,
         homeLocation: { '@type': 'Place', name: 'Detroit, Michigan' },
-        sameAs: LIVE_PROFILES,
+        sameAs,
       },
       {
         '@type': 'MusicGroup',
@@ -61,11 +56,20 @@ export function siteGraph({ portraitUrl }: { portraitUrl: string }): Node {
       {
         '@type': 'MusicAlbum',
         '@id': IDS.album,
-        name: 'Waiting on the Sun',
-        datePublished: '2014-11-02',
-        numTracks: 10,
+        name: album.title,
+        datePublished: album.released.toISOString().slice(0, 10),
+        numTracks: album.tracks.length,
         byArtist: { '@id': IDS.johnny },
-        url: 'https://music.apple.com/us/album/waiting-on-the-sun/942326904',
+        url: album.appleMusic,
+        track: {
+          '@type': 'ItemList',
+          numberOfItems: album.tracks.length,
+          itemListElement: album.tracks.map((t, i) => ({
+            '@type': 'ListItem',
+            position: i + 1,
+            item: { '@type': 'MusicRecording', name: t.title, duration: isoDuration(t.length), url: `https://music.apple.com/us/album/${t.slug}/942326904?i=${t.appleId}` },
+          })),
+        },
       },
     ],
   };
@@ -156,5 +160,20 @@ export function itemList(urls: string[]): Node {
     '@context': 'https://schema.org',
     '@type': 'ItemList',
     itemListElement: urls.map((url, i) => ({ '@type': 'ListItem', position: i + 1, url })),
+  };
+}
+
+/** VideoObject for a YouTube video (PLAN.md section 7.1). Facts come from the video's own page. */
+export function videoObject(v: Video): Node {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'VideoObject',
+    name: v.title,
+    description: `${v.title}. ${v.context}.`,
+    thumbnailUrl: `https://i.ytimg.com/vi/${v.id}/maxresdefault.jpg`,
+    uploadDate: v.uploadDate.toISOString().slice(0, 10),
+    duration: isoDuration(v.duration),
+    contentUrl: `https://www.youtube.com/watch?v=${v.id}`,
+    embedUrl: `https://www.youtube-nocookie.com/embed/${v.id}`,
   };
 }

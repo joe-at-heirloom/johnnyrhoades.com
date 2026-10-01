@@ -1,0 +1,52 @@
+# Official profiles (PLAN.md sections 6.5 and 10).
+#   status: live | to_claim | to_create. Only `live` ones render as links.
+#   kind:   profile (an official presence, goes into structured data `sameAs`)
+#           | store (somewhere to buy or stream the album; linked, never in sameAs)
+
+- name: Bandsintown
+  url: https://www.bandsintown.com/a/11869348
+  kind: profile
+  status: live
+
+- name: YouTube
+  url: https://www.youtube.com/@johnnyrhoades86
+  kind: profile
+  status: live
+
+- name: Facebook
+  url: https://www.facebook.com/profile.php?id=100085365311010
+  kind: profile
+  status: live
+  note: A numbered personal-style profile; create a named artist page and move over (PLAN.md section 10)
+
+- name: Apple Music
+  url: https://music.apple.com/us/album/waiting-on-the-sun/942326904
+  kind: store
+  status: live
+  note: Album page. Claim Apple Music for Artists and add the artist page.
+
+- name: Amazon
+  url: https://www.amazon.com/Waiting-Sun-Johnny-Rhoades/dp/B00PQ33NZK
+  kind: store
+  status: live
+
+- name: Spotify
+  kind: profile
+  status: to_claim
+
+- name: Instagram
+  kind: profile
+  status: to_create
+
+- name: MusicBrainz
+  kind: profile
+  status: to_create
+
+- name: Discogs
+  kind: profile
+  status: to_create
+
+- name: Wikidata
+  kind: profile
+  status: to_create
+  note: Once there are independent references

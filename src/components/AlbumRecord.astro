@@ -1,7 +1,7 @@
 ---
 /* The album sleeve with the record half out of it, spinning at 33⅓. */
 import { Image } from 'astro:assets';
-import cover from '../assets/photos/album-waiting-on-the-sun.jpg';
+import { image, media } from '../lib/load-content';
 ---
 
 <div class="album-art" data-album-art>
@@ -24,13 +24,7 @@ import cover from '../assets/photos/album-waiting-on-the-sun.jpg';
     </div>
     <div class="record-sheen"></div>
   </div>
-  <Image
-    src={cover}
-    width={900}
-    height={900}
-    quality={82}
-    alt="Waiting on the Sun album cover: Johnny seated by a window with a hollow-body guitar"
-  />
+  <Image src={image(media.album.cover)} width={900} height={900} quality={82} alt={media.album.coverAlt} />
 </div>
 
 <script>

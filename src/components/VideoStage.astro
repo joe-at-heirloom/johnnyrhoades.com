@@ -1,19 +1,8 @@
 ---
 import { Image } from 'astro:assets';
-import type { ImageMetadata } from 'astro';
-import L8NAkwVx35I from '../assets/video/L8NAkwVx35I.jpg';
-import zHVpoMl6I8c from '../assets/video/zHVpoMl6I8c.jpg';
-import Xvm2uMDesXU from '../assets/video/Xvm2uMDesXU.jpg';
-import R9b05orRWf8 from '../assets/video/R9b05orRWf8.jpg';
+import { media, videoThumb } from '../lib/load-content';
 
-// Phase 4 moves these into src/data/media.yaml.
-type Video = { id: string; title: string; label: string; context: string; thumb: ImageMetadata };
-const videos: Video[] = [
-  { id: 'L8NAkwVx35I', title: 'I Just Wanna Be Your Man', label: 'I Just Wanna Be Your Man', context: 'Live session', thumb: L8NAkwVx35I },
-  { id: 'zHVpoMl6I8c', title: 'Acoustic Compilation', label: 'Acoustic Compilation', context: 'Acoustic', thumb: zHVpoMl6I8c },
-  { id: 'Xvm2uMDesXU', title: 'Motor City Josh & The Big 3 on Live in the D', label: 'Motor City Josh & The Big 3', context: 'Live in the D, WDIV', thumb: Xvm2uMDesXU },
-  { id: 'R9b05orRWf8', title: 'Lucas Rhoades Band at Brighton Smokin’ Jazz & BBQ Blues Festival', label: 'Lucas Rhoades Band', context: 'Brighton Smokin’ Jazz & BBQ Blues Fest, 2022', thumb: R9b05orRWf8 },
-];
+const videos = media.videos;
 const first = videos[0]!;
 ---
 
@@ -27,7 +16,7 @@ const first = videos[0]!;
     <div class="video-stage">
       <div class="video-frame" data-video-frame>
         <button class="video-facade" type="button" data-video-play aria-label={`Play video: ${first.title}`}>
-          <Image src={first.thumb} widths={[640, 960, 1280]} sizes="(max-width: 900px) 100vw, 820px" quality={78} alt="" data-video-poster />
+          <Image src={videoThumb(first.id)} widths={[640, 960, 1280]} sizes="(max-width: 900px) 100vw, 820px" quality={78} alt="" data-video-poster />
           <span class="play-btn" aria-hidden="true"></span>
         </button>
       </div>
@@ -43,7 +32,7 @@ const first = videos[0]!;
                 data-video={v.id}
                 data-title={v.title}
               >
-                <Image src={v.thumb} widths={[320, 640]} sizes="(max-width: 900px) 45vw, 132px" quality={78} alt="" />
+                <Image src={videoThumb(v.id)} widths={[320, 640]} sizes="(max-width: 900px) 45vw, 132px" quality={78} alt="" />
                 <span class="video-text">
                   <span class="video-title">{v.label}</span>
                   <span class="video-src">{v.context}</span>

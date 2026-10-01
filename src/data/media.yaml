@@ -1,0 +1,96 @@
+# Album, videos and photos (PLAN.md section 6.5). Files are relative to src/assets/.
+
+album:
+  title: Waiting on the Sun
+  released: 2014-11-02
+  cover: photos/album-waiting-on-the-sun.jpg
+  coverAlt: "Waiting on the Sun album cover: Johnny seated by a window with a hollow-body guitar"
+  appleMusic: https://music.apple.com/us/album/waiting-on-the-sun/942326904
+  amazon: https://www.amazon.com/Waiting-Sun-Johnny-Rhoades/dp/B00PQ33NZK
+  tracks:
+    - { title: Two Way Street, length: "3:33", appleId: "942326908", slug: two-way-street }
+    - { title: It’s Always Better Together, length: "4:30", appleId: "942326909", slug: its-always-better-together }
+    - { title: I Just Wanna Be Your Man, length: "5:08", appleId: "942326910", slug: i-just-wanna-be-your-man }
+    - { title: Close to You, length: "4:15", appleId: "942326911", slug: close-to-you }
+    - { title: Girl You Must Be Crazy, length: "2:52", appleId: "942326912", slug: girl-you-must-be-crazy }
+    - { title: Heartbreakin’ Woman, length: "2:53", appleId: "942326913", slug: heartbreakin-woman }
+    - { title: Let Myself Go, length: "3:27", appleId: "942326914", slug: let-myself-go }
+    - { title: Summer Magic, length: "5:38", appleId: "942326915", slug: summer-magic }
+    - { title: I Can’t Win for Losin’, length: "2:00", appleId: "942326916", slug: i-cant-win-for-losin }
+    - { title: Walkin’ Blues, length: "5:08", appleId: "942326917", slug: walkin-blues }
+
+# uploadDate and duration (seconds) are from each video's YouTube page, 2026-09-30.
+videos:
+  - id: L8NAkwVx35I
+    title: I Just Wanna Be Your Man
+    label: I Just Wanna Be Your Man
+    context: Live session
+    uploadDate: 2022-11-16
+    duration: 255
+    channel: Johnny Rhoades
+    epk: true
+  - id: zHVpoMl6I8c
+    title: Acoustic Compilation
+    label: Acoustic Compilation
+    context: Acoustic
+    uploadDate: 2022-11-11
+    duration: 125
+    channel: Johnny Rhoades
+  - id: Xvm2uMDesXU
+    title: Motor City Josh & The Big 3 on Live in the D
+    label: Motor City Josh & The Big 3
+    context: Live in the D, WDIV
+    uploadDate: 2020-01-13
+    duration: 320
+    channel: Live In The D
+  - id: R9b05orRWf8
+    title: Lucas Rhoades Band at Brighton Smokin’ Jazz & BBQ Blues Festival
+    label: Lucas Rhoades Band
+    context: Brighton Smokin’ Jazz & BBQ Blues Fest, 2022
+    uploadDate: 2022-09-12
+    duration: 901
+    channel: Adam
+
+# use: where a photo may appear. gallery | epk | press (offered as a high-resolution download)
+# Press downloads need a confirmed credit and license (PLAN.md section 17).
+# Credits read from watermarks are marked as such until the photographer confirms.
+photos:
+  - file: photos/gallery/seated-studio.jpg
+    alt: Johnny seated with a hollow-body guitar in front of a wall of amplifiers, black and white
+    use: [gallery, epk]
+  - file: photos/gallery/blues-by-the-bay.jpg
+    alt: Johnny and another guitarist raising their fists onstage at a festival tent
+    credit: Jane Cassisi Photography (from the watermark)
+    use: [gallery]
+  - file: photos/gallery/outdoor-festival.jpg
+    alt: Johnny grinning mid-solo on an outdoor festival stage
+    use: [gallery, epk]
+  - file: photos/gallery/dueling-guitars.jpg
+    alt: Two guitarists playing side by side onstage at night
+    use: [gallery]
+  - file: photos/gallery/bookshelf.jpg
+    alt: Johnny sitting with his guitar in a room lined with books, black and white
+    use: [gallery, epk]
+  - file: photos/gallery/bar-stage.jpg
+    alt: Johnny and a bandmate playing a small bar stage under purple lights
+    use: [gallery]
+  - file: photos/gallery/mississippi-blues-trail.jpg
+    alt: Johnny and bandmates beside a Mississippi Blues Trail marker
+    use: [gallery]
+  - file: photos/gallery/festival-stage.jpg
+    alt: Johnny playing a Stratocaster beside a guitarist in a cream suit
+    credit: John Rocklin (from the watermark)
+    use: [gallery]
+  - file: photos/gallery/fence.jpg
+    alt: Johnny standing by a wooden fence holding his guitar, black and white
+    use: [gallery, epk]
+  - file: photos/gallery/backstage.jpg
+    alt: Johnny with his arm around a friend in an empty theater
+    use: [gallery]
+    gridWidth: 640
+  - file: photos/portrait.jpg
+    alt: Sepia portrait of Johnny Rhoades standing by a vine-covered fence, guitar at his side
+    use: [epk]
+  - file: photos/hero.jpg
+    alt: Johnny Rhoades onstage in a blue suit and sunglasses, playing a cream Stratocaster
+    use: [epk]

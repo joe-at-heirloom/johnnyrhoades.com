@@ -1,0 +1,133 @@
+# The facts ledger (PLAN.md section 6.4). Every biographical claim on the site
+# comes from here.
+#
+# status:
+#   verified             an independent source says it (link in `sources`)
+#   confirmed_by_johnny  Johnny's own word: his published bio, or him directly
+#   unverified           appears nowhere until resolved; `needs` says what would resolve it
+#
+# Where each status may appear (enforced by `npm run check` and the build):
+#   home page (Johnny's voice):  verified, confirmed_by_johnny
+#   press kit:                   verified, confirmed_by_johnny (with source links)
+#   structured data:             verified only
+#
+# Text fields:
+#   third: third person, for the press kit and bios
+#   first: Johnny's voice, for the home page (optional)
+#   *asterisks* mark a title, set in italics
+#   detect: for unverified facts, text that must not appear on any built page
+#
+# Sources for "Johnny's bio": the About text on his Bandzoogle site, captured
+# 2026-09-30, and the same bio on Cliff Bell's 2017 event page.
+
+- id: detroit-guitarist-singer
+  third: Johnny Rhoades is a blues guitarist and singer from Detroit, Michigan.
+  first: I’m a guitar player and singer from Detroit.
+  status: verified
+  sources:
+    - url: https://cliffbells.com/event/johnny-rhoades-band/
+      note: "Cliff Bell's, 2017: Detroit native, guitarist and vocalist"
+    - url: http://jbblues.blogspot.com/2010/11/motor-city-josh.html
+      note: "2010: guitar and vocals in Motor City Josh & the Big 3"
+    - note: Johnny's bio
+
+- id: started-with-motor-city-josh
+  third: He started out at 19 playing in Motor City Josh’s band.
+  first: I started out at 19 playing with Motor City Josh.
+  status: confirmed_by_johnny
+  sources:
+    - note: Johnny's bio (age 19)
+    - url: http://jbblues.blogspot.com/2010/11/motor-city-josh.html
+      note: "November 2010 post lists Johnny Rhoades on guitar and vocals in Motor City Josh & the Big 3"
+
+- id: toured-us-europe-mexico-caribbean
+  third: He has been on and off the road ever since, around the US and in Europe, Mexico and the Caribbean.
+  first: I’ve been on and off the road ever since, around the US and over to Europe, Mexico and the Caribbean.
+  status: confirmed_by_johnny
+  sources:
+    - note: Johnny's bio
+  needs: Where, when and with whom, for a longer bio (PLAN.md section 17)
+
+- id: influences
+  third: He grew up on B.B. King, Albert King, Albert Collins and Ray Charles.
+  first: I grew up on B.B. King, Albert King, Albert Collins and Ray Charles.
+  status: confirmed_by_johnny
+  sources:
+    - note: Johnny's bio
+
+- id: bb-king-memorial
+  third: He played B.B. King’s memorial celebration in Memphis.
+  first: I got to play B.B. King’s memorial celebration in Memphis.
+  status: confirmed_by_johnny
+  sources:
+    - note: Johnny's bio
+  needs: Date and venue (PLAN.md section 17)
+
+- id: played-with
+  third: He has played with Thornetta Davis, RJ Spangler, Brett Lucas, John Németh and Paul Carey, among others.
+  first: I’ve played with Thornetta Davis, RJ Spangler, Brett Lucas, John Németh and Paul Carey, among others.
+  status: confirmed_by_johnny
+  sources:
+    - note: Johnny's bio
+
+- id: covers-and-originals
+  third: He plays a mix of blues covers and his own songs.
+  first: I play a mix of blues covers and my own songs.
+  status: confirmed_by_johnny
+  sources:
+    - note: Johnny's bio
+
+- id: album-waiting-on-the-sun
+  third: His album *Waiting on the Sun* came out in 2014.
+  first: My album *Waiting on the Sun* came out in 2014.
+  status: verified
+  sources:
+    - url: https://music.apple.com/us/album/waiting-on-the-sun/942326904
+      note: Apple Music lists the release date as November 2, 2014
+
+- id: antifreeze-festival-2017
+  third: The Johnny Rhoades Band played the Detroit Blues Society’s 23rd Anti-Freeze Blues Festival at the Magic Bag in February 2017.
+  status: verified
+  tags: [festival, highlight]
+  sources:
+    - url: https://www.ferndalefriends.net/the-23rd-detroit-blues-society-anti-freeze-blues-festival/
+      note: Festival lineup, February 19, 2017
+
+- id: cliff-bells-2017
+  third: The Johnny Rhoades Band headlined Cliff Bell’s in Detroit in June 2017.
+  status: verified
+  tags: [highlight]
+  sources:
+    - url: https://cliffbells.com/event/johnny-rhoades-band/
+      note: Event listing, June 11, 2017
+
+- id: live-in-the-d-2020
+  third: He played with Motor City Josh & The Big 3 on WDIV’s *Live in the D* in January 2020.
+  status: confirmed_by_johnny
+  tags: [highlight]
+  sources:
+    - url: https://www.youtube.com/watch?v=Xvm2uMDesXU
+      note: Live in the D's own upload, January 13, 2020. The title names the band; Johnny lists the video on his site.
+
+- id: brighton-festival-2022
+  third: He played the Brighton Smokin’ Jazz & BBQ Blues Festival in September 2022 with the Lucas Rhoades Band.
+  status: confirmed_by_johnny
+  tags: [festival, highlight]
+  sources:
+    - url: https://www.youtube.com/watch?v=R9b05orRWf8
+      note: Festival video, September 10, 2022. Johnny lists it on his site.
+  needs: How the Lucas Rhoades Band should be billed (PLAN.md section 17)
+
+- id: detroit-music-award-nomination
+  third: He was nominated for a Detroit Music Award.
+  status: unverified
+  detect: Detroit Music Award
+  sources:
+    - note: Johnny's bio says "Detroit Music Award nominee"; no year, category or listing found
+  needs: Year and category from Johnny, plus a link to the listing
+
+- id: formats
+  third: He plays solo acoustic, as a trio and with a full band.
+  status: unverified
+  detect: solo acoustic, as a trio
+  needs: Confirmation from Johnny, with typical set lengths and who plays in each (PLAN.md section 17)

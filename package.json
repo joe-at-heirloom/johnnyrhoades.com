@@ -13,15 +13,17 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "check": "astro check",
+    "check": "astro check && npm run check:facts",
     "test": "vitest run",
     "test:e2e": "playwright test",
     "sync": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/sync-shows.ts",
-    "sync:fixtures": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/sync-shows.ts --fixtures tests/fixtures/bandsintown"
+    "sync:fixtures": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/sync-shows.ts --fixtures tests/fixtures/bandsintown",
+    "check:facts": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/check-facts.ts"
   },
   "dependencies": {
     "@resvg/resvg-js": "^2.6.2",
     "astro": "^7.3.5",
+    "fflate": "^0.8.3",
     "luxon": "^3.7.2",
     "opentype.js": "^2.0.0",
     "satori": "^0.33.5",

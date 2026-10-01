@@ -13,6 +13,9 @@ import BookingForm from '../components/BookingForm.astro';
 import MailingList from '../components/MailingList.astro';
 import Footer from '../components/Footer.astro';
 import NextShowsData from '../components/NextShowsData.astro';
+import JsonLd from '../components/JsonLd.astro';
+import { media } from '../lib/load-content';
+import { videoObject } from '../lib/schema';
 import { allShows, BUILD_NOW } from '../lib/load-shows';
 import { proofLine } from '../lib/shows-data';
 import { absolute } from '../lib/site';
@@ -32,6 +35,7 @@ const proof = proofLine(allShows, BUILD_NOW);
     imageHeight: 630,
   }}
 >
+  {media.videos.map((v) => <JsonLd slot="head" data={videoObject(v)} />)}
   <a class="skip-link" href="#main">Skip to content</a>
   <Header />
   <main id="main">
