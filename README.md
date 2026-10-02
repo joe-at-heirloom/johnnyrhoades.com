@@ -44,6 +44,7 @@ npm install
 | `npm run lint:html` | html-validate on the build in `dist/` |
 | `npm run lhci` | Build, then Lighthouse CI against the budgets in `lighthouserc.cjs` (reports in `.lighthouseci/`) |
 | `npm run indexnow -- plan` | Which show URLs IndexNow would be told about (run by the deploy workflow) |
+| `npm run previews` | Refresh the song clip URLs from Apple's lookup API (`-- --check` to test them) |
 | `npm run check:redirects` | After cutover: every old Bandzoogle URL in `docs/redirect-map.csv` answers 301 to its target |
 
 First time running end-to-end tests: `npx playwright install chromium`.

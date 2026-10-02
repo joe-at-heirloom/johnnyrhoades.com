@@ -91,6 +91,9 @@ jobs:
       - run: npm ci
       - run: npm run build
 
+      - name: Check the song clips still load (ADR 0016)
+        run: npm run previews -- --check
+
       - name: Check external links
         uses: lycheeverse/lychee-action@v2
         with:

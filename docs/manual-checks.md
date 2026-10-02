@@ -33,6 +33,8 @@ Set each ID as a GitHub Actions repository **variable** (not a secret; they're p
 - [ ] **Bandzoogle mailing list export.** Export before anything else changes on the old site, and record the count as the baseline (PLAN.md section 13).
 - [ ] **booking@johnnyrhoades.com** (Phase 7). The domain's email is Zoho Mail, so add `booking@` as an alias or group in Zoho, **not** Cloudflare Email Routing, which would replace Zoho's MX records (ADR 0013). Send a test, and point Web3Forms at it if Johnny wants.
 
+- [ ] **Song clips on real phones** (ADR 0016). On an iPhone (Safari) and an Android phone (Chrome), press play on two songs. Expect sound, the tonearm on the record, and pause working. *Automated now:* everything but the sound itself, with silent stand-ins.
+
 ## Waiting on Johnny's Bandsintown key
 
 - [ ] **Live sync** (Phase 1). Run `BANDSINTOWN_APP_ID=… npm run sync -- --capture`, compare the captured payloads with the mocks (`tests/fixtures/bandsintown/README.md`), fix any differences, and close ADR 0006.
@@ -41,4 +43,5 @@ Set each ID as a GitHub Actions repository **variable** (not a secret; they're p
 
 - [ ] **Press photo zip** (Phase 4). Once photographers and licenses are confirmed, add `credit` and `license` and the `press` use in `src/data/media.yaml`. The zip builds itself. *Automated now:* the zip route, and a test that it's absent without qualifying photos.
 - [ ] **Detroit Music Award line.** With a year, category and listing, move the fact to `confirmed_by_johnny` or `verified` in `facts.yaml` and add it back to `HOME_ABOUT` in `src/lib/copy.ts`.
+- [ ] **Johnny's own song clips** (ADR 0016). From the Bandzoogle audio export, cut 30-second clips (m4a or mp3) into `public/audio/<slug>.m4a`, point each track's `preview` at `/audio/<slug>.m4a`, set `previewSource: own`, and remove the Apple host from `media-src` in `src/lib/security-headers.ts` and `docs/security-headers.md`.
 - [ ] **Formats, long bio, booking email.** Each needs Johnny's answer first; the press kit leaves them out until then. Once there's a booking email, make it the form's error fallback in `src/scripts/forms.ts` (Facebook for now).

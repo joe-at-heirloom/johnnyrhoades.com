@@ -23,6 +23,10 @@ async function serveWithHeaders(page: Page) {
   await page.route('https://gateway.umami.is/**', (route) => route.fulfill({ json: {} }));
   await page.route('https://api.web3forms.com/submit', (route) => route.fulfill({ json: { success: true } }));
   await page.route('https://buttondown.com/**', (route) => route.fulfill({ body: '' }));
+  // Song clips: a valid empty WAV, so the request gets as far as the media-src check and past it.
+  await page.route(/audio-ssl\.itunes\.apple\.com/, (route) =>
+    route.fulfill({ contentType: 'audio/wav', body: Buffer.from('UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAIA+AAACABAAZGF0YQAAAAA=', 'base64') }),
+  );
   // Registered last, so it runs first: add the headers to the site's own pages.
   await page.route('**/*', async (route) => {
     const request = route.request();
@@ -51,6 +55,8 @@ test('the home page works under the policy: video, strum, lightbox, forms, analy
   await page.locator('[data-neck]').scrollIntoViewIfNeeded();
   await expect(page.locator('[data-neck] path.neck-string')).toHaveCount(6);
   await page.getByRole('switch', { name: 'Sound' }).click();
+
+  await page.getByRole('button', { name: 'Play a clip of Two Way Street' }).click();
 
   await page.locator('[data-gallery] button').first().click();
   await expect(page.locator('[data-lightbox]')).toBeVisible();

@@ -10,11 +10,20 @@ import { profiles } from '../lib/load-content';
 import { liveLinks } from '../lib/media';
 import { PUBLIC_CONFIG } from '../lib/public-config';
 import { absolute } from '../lib/site';
+import { allShows, BUILD_NOW } from '../lib/load-shows';
+import { upcomingShows } from '../lib/shows-data';
+import { localDate } from '../lib/time';
 
 const facebook = liveLinks(profiles).find((p) => p.name === 'Facebook');
 const key = PUBLIC_CONFIG.web3formsKey;
 const eventTypes = ['Bar / club', 'Festival', 'Private party', 'Wedding', 'Corporate', 'Something else'];
 const acts = ['Not sure yet', 'Solo acoustic', 'Trio', 'Full band'];
+// Public, not cancelled: the days the date check calls taken (src/lib/availability.ts).
+const bookedDays = upcomingShows(allShows, BUILD_NOW)
+  .filter((s) => s.status !== 'cancelled')
+  .map((s) => ({ day: localDate(s.start, s.venue.timeZone), venue: s.venue.name, city: s.venue.city }));
+const bookedJson = JSON.stringify(bookedDays).replace(/</g, '\\u003c');
+const today = localDate(BUILD_NOW.toISO() ?? '', 'America/Detroit');
 if (!key && process.env.CI) console.warn('PUBLIC_WEB3FORMS_KEY is not set: the booking form will not deliver.');
 ---
 
@@ -58,7 +67,8 @@ if (!key && process.env.CI) console.warn('PUBLIC_WEB3FORMS_KEY is not set: the b
         </div>
         <div class="field">
           <label for="b-date">Date</label>
-          <input id="b-date" name="date" type="date" />
+          <input id="b-date" name="date" type="date" min={today} aria-describedby="b-date-note" />
+          <p class="field-note" id="b-date-note" data-date-note aria-live="polite"></p>
         </div>
         <div class="field">
           <label for="b-venue">Where</label>
@@ -93,6 +103,9 @@ if (!key && process.env.CI) console.warn('PUBLIC_WEB3FORMS_KEY is not set: the b
   </div>
 </section>
 
+<script type="application/json" id="booked-days" set:html={bookedJson} />
+
 <script>
   import '../scripts/forms';
+  import '../scripts/booking-date';
 </script>

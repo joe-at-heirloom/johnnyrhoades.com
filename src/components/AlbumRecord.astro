@@ -1,5 +1,5 @@
 ---
-/* The album sleeve with the record half out of it, spinning at 33⅓. */
+/* The album sleeve with the record half out of it, spinning at 33⅓, and a tonearm that drops onto it while a clip plays (src/scripts/track-player.ts). */
 import { Image } from 'astro:assets';
 import { image, media } from '../lib/load-content';
 ---
@@ -23,6 +23,16 @@ import { image, media } from '../lib/load-content';
       </svg>
     </div>
     <div class="record-sheen"></div>
+  </div>
+  <div class="tonearm" aria-hidden="true">
+    <svg viewBox="0 0 40 300">
+      <rect class="tonearm-weight" x="12" y="2" width="16" height="17" rx="3"></rect>
+      <circle class="tonearm-base" cx="20" cy="30" r="13"></circle>
+      <line class="tonearm-arm" x1="20" y1="30" x2="20" y2="262"></line>
+      <circle class="tonearm-pivot" cx="20" cy="30" r="4.5"></circle>
+      <rect class="tonearm-head" x="13" y="258" width="14" height="28" rx="2"></rect>
+      <rect class="tonearm-cart" x="16" y="280" width="8" height="10" rx="1"></rect>
+    </svg>
   </div>
   <Image src={image(media.album.cover)} width={900} height={900} quality={82} alt={media.album.coverAlt} />
 </div>

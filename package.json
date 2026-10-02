@@ -22,7 +22,8 @@
     "lhci": "npm run build && lhci autorun",
     "lint:html": "html-validate \"dist/**/*.html\"",
     "indexnow": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/indexnow.ts",
-    "check:redirects": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/check-redirects.ts"
+    "check:redirects": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/check-redirects.ts",
+    "previews": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/fetch-previews.ts"
   },
   "dependencies": {
     "@resvg/resvg-js": "^2.6.2",

@@ -7,17 +7,19 @@ album:
   coverAlt: "Waiting on the Sun album cover: Johnny seated by a window with a hollow-body guitar"
   appleMusic: https://music.apple.com/us/album/waiting-on-the-sun/942326904
   amazon: https://www.amazon.com/Waiting-Sun-Johnny-Rhoades/dp/B00PQ33NZK
+  # Previews: Apple Music's clips until Johnny's own files arrive (ADR 0016). Refresh with npm run previews.
+  previewSource: apple
   tracks:
-    - { title: Two Way Street, length: "3:33", appleId: "942326908", slug: two-way-street }
-    - { title: It’s Always Better Together, length: "4:30", appleId: "942326909", slug: its-always-better-together }
-    - { title: I Just Wanna Be Your Man, length: "5:08", appleId: "942326910", slug: i-just-wanna-be-your-man }
-    - { title: Close to You, length: "4:15", appleId: "942326911", slug: close-to-you }
-    - { title: Girl You Must Be Crazy, length: "2:52", appleId: "942326912", slug: girl-you-must-be-crazy }
-    - { title: Heartbreakin’ Woman, length: "2:53", appleId: "942326913", slug: heartbreakin-woman }
-    - { title: Let Myself Go, length: "3:27", appleId: "942326914", slug: let-myself-go }
-    - { title: Summer Magic, length: "5:38", appleId: "942326915", slug: summer-magic }
-    - { title: I Can’t Win for Losin’, length: "2:00", appleId: "942326916", slug: i-cant-win-for-losin }
-    - { title: Walkin’ Blues, length: "5:08", appleId: "942326917", slug: walkin-blues }
+    - { title: Two Way Street, length: "3:33", appleId: "942326908", slug: two-way-street, preview: "https://audio-ssl.itunes.apple.com/itunes-assets/Music3/v4/b7/0f/6a/b70f6a17-2283-5b49-c3cf-6efc903432d9/mzaf_3883489516490300023.plus.aac.p.m4a" }
+    - { title: It’s Always Better Together, length: "4:30", appleId: "942326909", slug: its-always-better-together, preview: "https://audio-ssl.itunes.apple.com/itunes-assets/Music3/v4/fd/9c/8f/fd9c8f7d-9761-1342-8689-79a978989ae9/mzaf_3579392324872558871.plus.aac.p.m4a" }
+    - { title: I Just Wanna Be Your Man, length: "5:08", appleId: "942326910", slug: i-just-wanna-be-your-man, preview: "https://audio-ssl.itunes.apple.com/itunes-assets/Music3/v4/d8/6e/09/d86e09de-92b3-40d4-f779-6c06e67ac48f/mzaf_1355773147712438636.plus.aac.p.m4a" }
+    - { title: Close to You, length: "4:15", appleId: "942326911", slug: close-to-you, preview: "https://audio-ssl.itunes.apple.com/itunes-assets/Music3/v4/11/69/b2/1169b24c-dc6f-9075-c7f0-0ed57a07340b/mzaf_257069205660187377.plus.aac.p.m4a" }
+    - { title: Girl You Must Be Crazy, length: "2:52", appleId: "942326912", slug: girl-you-must-be-crazy, preview: "https://audio-ssl.itunes.apple.com/itunes-assets/Music5/v4/61/e6/aa/61e6aa25-f572-bd12-3d41-0ba91f7eaafc/mzaf_6619487374886092061.plus.aac.p.m4a" }
+    - { title: Heartbreakin’ Woman, length: "2:53", appleId: "942326913", slug: heartbreakin-woman, preview: "https://audio-ssl.itunes.apple.com/itunes-assets/Music3/v4/09/6c/c5/096cc52b-ecb7-9fc4-6563-ce7d6cf7d9b5/mzaf_3730577405095862803.plus.aac.p.m4a" }
+    - { title: Let Myself Go, length: "3:27", appleId: "942326914", slug: let-myself-go, preview: "https://audio-ssl.itunes.apple.com/itunes-assets/Music3/v4/dc/81/80/dc81806e-0a49-4314-4534-74453ce675c0/mzaf_1703455956397850330.plus.aac.p.m4a" }
+    - { title: Summer Magic, length: "5:38", appleId: "942326915", slug: summer-magic, preview: "https://audio-ssl.itunes.apple.com/itunes-assets/Music3/v4/53/24/c7/5324c7e8-4c3f-26a7-49f3-f238053330de/mzaf_1929738368713202723.plus.aac.p.m4a" }
+    - { title: I Can’t Win for Losin’, length: "2:00", appleId: "942326916", slug: i-cant-win-for-losin, preview: "https://audio-ssl.itunes.apple.com/itunes-assets/Music1/v4/2d/fd/22/2dfd227d-54aa-17d6-6df0-4a147b02b8fe/mzaf_2900847938472909891.plus.aac.p.m4a" }
+    - { title: Walkin’ Blues, length: "5:08", appleId: "942326917", slug: walkin-blues, preview: "https://audio-ssl.itunes.apple.com/itunes-assets/Music3/v4/05/3a/2a/053a2a14-4c8c-8faa-a793-41b746c3b398/mzaf_4699989344350848827.plus.aac.p.m4a" }
 
 # uploadDate and duration (seconds) are from each video's YouTube page, 2026-09-30.
 videos:

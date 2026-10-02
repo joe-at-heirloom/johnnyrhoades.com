@@ -6,8 +6,8 @@
   violation.
 
   The policy allows only what the site uses: its own files, YouTube's
-  privacy-enhanced player once someone presses play, the two form services,
-  and Umami. No inline scripts (astro.config.mjs keeps every script
+  privacy-enhanced player once someone presses play, Apple's song clips once
+  someone presses play on a track, the two form services, and Umami. No inline scripts (astro.config.mjs keeps every script
   external), so no hashes that change every build. JSON-LD and the Tonight
   data island are data blocks, which CSP doesn't apply to.
 */
@@ -17,6 +17,7 @@ const WEB3FORMS = 'https://api.web3forms.com';
 const BUTTONDOWN = 'https://buttondown.com';
 const UMAMI_SCRIPT = 'https://cloud.umami.is';
 const UMAMI_COLLECT = 'https://gateway.umami.is'; // where Umami Cloud's script sends events
+const APPLE_PREVIEWS = 'https://audio-ssl.itunes.apple.com'; // song clips for the record player (ADR 0016)
 
 export const CSP_DIRECTIVES: Record<string, string[]> = {
   'default-src': ["'self'"],
@@ -24,6 +25,7 @@ export const CSP_DIRECTIVES: Record<string, string[]> = {
   'style-src': ["'self'"],
   'img-src': ["'self'", 'data:'], // data: for the film-grain SVG in base.css
   'font-src': ["'self'"],
+  'media-src': ["'self'", APPLE_PREVIEWS],
   'connect-src': ["'self'", WEB3FORMS, BUTTONDOWN, UMAMI_COLLECT],
   'frame-src': [YOUTUBE],
   'form-action': ["'self'", WEB3FORMS, BUTTONDOWN],

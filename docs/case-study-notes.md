@@ -4,6 +4,19 @@ A running log for the portfolio write-up (PLAN.md section 16): numbers, screensh
 
 ---
 
+## 2026-10-01: Drop the needle, and "am I free that night?"
+
+**What changed.** You can hear the album now. Press play on a song and the tonearm swings onto the spinning record while a 30-second clip plays. And the booking form checks the date as you pick it: "I'm already playing The Fed Community in Clarkston that day." ADR 0016.
+
+**Worth telling**
+
+- *The record was always the right player.* It already spun on the page as decoration; giving it a tonearm made it the control people expect, without adding a new playful element.
+- *Honest copy in a small place.* The date check never says "you're in luck, he's free". Johnny plays gigs that never reach Bandsintown, so the most it can truthfully say is "I don't have anything listed that day."
+- *Zero bytes until asked.* No audio loads until someone presses play; the whole player is about 1.5 KB.
+- *Testing sound without sound.* Playwright's Chromium can't decode AAC, so the tests serve seconds of WAV silence in place of Apple's clips and check everything around the audio: play, pause, switching songs, the needle lifting, failures, and the security policy.
+
+---
+
 ## 2026-10-01: Print texture, after "needs texture"
 
 **What changed.** The site looks printed now: screen-printed black, poster-stock bone and red, worn letterpress ink in the big type, and a rough paper edge where the bone and red sections start. Four generated tiles (37 KB), one stylesheet, no new colors. ADR 0015.

@@ -5,6 +5,8 @@ import { media } from '../lib/load-content';
 
 const { album } = media;
 const trackUrl = (t: (typeof album.tracks)[number]) => `https://music.apple.com/us/album/${t.slug}/942326904?i=${t.appleId}`;
+const number = (i: number) => String(i + 1).padStart(2, '0');
+const hasPreviews = album.tracks.some((t) => t.preview);
 ---
 
 <section class="section music" id="music" aria-labelledby="music-title">
@@ -16,18 +18,33 @@ const trackUrl = (t: (typeof album.tracks)[number]) => `https://music.apple.com/
       <div class="album-info">
         <h2 class="display" id="music-title">{album.title}</h2>
         <p class="album-meta">{album.released.getUTCFullYear()} <span aria-hidden="true">·</span> {album.tracks.length} songs</p>
-        <ol class="tracklist">
+        <ol class="tracklist" data-tracklist>
           {
-            album.tracks.map((t) => (
-              <li>
-                <a href={trackUrl(t)} target="_blank" rel="noopener">
-                  <span class="t">{t.title}</span>
-                  <span class="d">{t.length}</span>
-                </a>
+            album.tracks.map((t, i) => (
+              <li class="track">
+                {t.preview ? (
+                  <button class="track-play" type="button" data-preview={t.preview} data-title={t.title} aria-pressed="false" aria-label={`Play a clip of ${t.title}`}>
+                    <span class="track-n" aria-hidden="true">{number(i)}</span>
+                    <svg class="track-icon icon-play" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 1.5v9l7.5-4.5z" fill="currentColor" /></svg>
+                    <svg class="track-icon icon-pause" viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 1.5h2.6v9H2.5zm4.4 0h2.6v9H6.9z" fill="currentColor" /></svg>
+                  </button>
+                ) : (
+                  <span class="track-n">{number(i)}</span>
+                )}
+                <a class="t" href={trackUrl(t)} target="_blank" rel="noopener">{t.title}</a>
+                <span class="d">{t.length}</span>
+                <span class="track-progress" aria-hidden="true"></span>
               </li>
             ))
           }
         </ol>
+        {
+          hasPreviews && (
+            <p class="album-hint" data-album-status aria-live="polite">
+              Press play on a song to hear 30 seconds of it.{album.previewSource === 'apple' && ' Clips from Apple Music.'}
+            </p>
+          )
+        }
         <div class="actions">
           <a class="btn btn-red" href={album.appleMusic} target="_blank" rel="noopener">Apple Music</a>
           <a class="btn btn-ghost" href={album.amazon} target="_blank" rel="noopener">Amazon</a>
@@ -36,3 +53,7 @@ const trackUrl = (t: (typeof album.tracks)[number]) => `https://music.apple.com/
     </div>
   </div>
 </section>
+
+<script>
+  import '../scripts/track-player';
+</script>

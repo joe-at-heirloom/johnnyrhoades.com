@@ -1,12 +1,15 @@
 /* Album, videos, photos (media.yaml) and official profiles (profiles.yaml), validated. */
 import { parse as parseYaml } from 'yaml';
 import { z } from 'zod';
+import { isAllowedPreview } from './previews.ts';
 
 const TrackSchema = z.strictObject({
   title: z.string().min(1),
   length: z.string().regex(/^\d+:\d{2}$/),
   appleId: z.string().regex(/^\d+$/),
   slug: z.string().regex(/^[a-z0-9-]+$/),
+  // A 30-second clip for the record player: Apple's stream, or a file under /audio/ (src/lib/previews.ts).
+  preview: z.string().refine(isAllowedPreview, 'preview must be an Apple Music clip or a file under /audio/').optional(),
 });
 
 const VideoSchema = z.strictObject({
@@ -39,6 +42,8 @@ export const MediaSchema = z
       coverAlt: z.string(),
       appleMusic: z.url(),
       amazon: z.url(),
+      // Where the previews come from, for the credit under the tracklist.
+      previewSource: z.enum(['apple', 'own']).optional(),
       tracks: z.array(TrackSchema).min(1),
     }),
     videos: z.array(VideoSchema).min(1),

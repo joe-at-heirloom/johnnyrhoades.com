@@ -42,23 +42,63 @@
 .album-meta { font-size: .82rem; letter-spacing: .2em; color: var(--muted); margin-top: 20px; }
 .album-info .display { font-size: clamp(2.9rem, 6vw, 5.25rem); }
 
-.tracklist { counter-reset: track; margin-top: 34px; border-top: 1px solid var(--line); }
-.tracklist li { counter-increment: track; border-bottom: 1px solid var(--line); }
-.tracklist a {
-  display: grid; grid-template-columns: 2.4rem 1fr auto; align-items: baseline; gap: 12px;
-  padding: 11px 4px;
-  text-decoration: none;
-  transition: background-color .2s, padding .3s var(--ease);
+.tracklist { margin-top: 34px; border-top: 1px solid var(--line); }
+.track {
+  position: relative;
+  display: grid; grid-template-columns: 2.75rem minmax(0, 1fr) auto; align-items: center; gap: 10px;
+  border-bottom: 1px solid var(--line);
+  transition: background-color .2s;
 }
-.tracklist a::before {
-  content: counter(track, decimal-leading-zero);
-  font-variant-numeric: tabular-nums; font-weight: 700; color: var(--muted); font-size: .9rem;
+.track:hover { background: rgba(239, 230, 211, .04); }
+.track-n { font-variant-numeric: tabular-nums; font-weight: 700; color: var(--muted); font-size: .9rem; text-align: center; }
+.track .t { padding: 11px 0; font-weight: 500; text-decoration: none; transition: color .2s; }
+.track .t:hover { color: var(--red-hi); }
+.track .d { font-variant-numeric: tabular-nums; color: var(--muted); font-size: .95rem; padding-right: 4px; }
+
+/* Play button: the track number, which turns into play on hover or focus, and pause while playing. */
+.track-play {
+  display: grid; place-items: center;
+  width: 2.75rem; height: 2.75rem; padding: 0;
+  border: 0; background: none; color: var(--bone);
 }
-.tracklist .t { font-weight: 500; }
-.tracklist .d { font-variant-numeric: tabular-nums; color: var(--muted); font-size: .95rem; }
-.tracklist a:hover { background: rgba(239, 230, 211, .04); padding-left: 12px; }
-.tracklist a:hover .t,
-.tracklist a:hover::before { color: var(--red-hi); }
+.track-play > * { grid-area: 1 / 1; }
+.track-icon { width: 13px; height: 13px; visibility: hidden; }
+.track:hover .track-play .track-n,
+.track-play:focus-visible .track-n,
+.track-play[aria-pressed="true"] .track-n { visibility: hidden; }
+.track:hover .track-play[aria-pressed="false"] .icon-play,
+.track-play[aria-pressed="false"]:focus-visible .icon-play { visibility: visible; }
+.track-play[aria-pressed="true"] .icon-pause { visibility: visible; color: var(--red-hi); }
+.track.is-playing .t { color: var(--red-hi); }
+@media (hover: none) {
+  .track-play .track-n { visibility: hidden; }
+  .track-play[aria-pressed="false"] .icon-play { visibility: visible; }
+}
+.track-progress {
+  position: absolute; left: 0; right: 0; bottom: -1px; height: 2px;
+  background: var(--red-hi);
+  transform: scaleX(var(--p, 0)); transform-origin: left;
+  transition: transform .25s linear;
+}
+.album-hint { margin-top: 14px; color: var(--muted); font-size: .92rem; }
+
+/* The tonearm: pivots off the record's edge, and drops onto it while a clip plays. */
+.album-art { container-type: inline-size; }
+.tonearm {
+  position: absolute; z-index: 2;
+  left: 96.35cqw; top: 1.8cqw;
+  width: 4.3cqw; height: 32.3cqw;
+  transform: rotate(-13deg); transform-origin: 50% 10%;
+  transition: transform .9s var(--ease);
+  filter: drop-shadow(0 6px 8px rgba(0, 0, 0, .55));
+  pointer-events: none;
+}
+.tonearm svg { display: block; width: 100%; height: 100%; }
+.tonearm-weight, .tonearm-base { fill: var(--ink-3); stroke: var(--line-strong); stroke-width: 1; }
+.tonearm-arm { stroke: var(--bone-2); stroke-width: 3; stroke-linecap: round; }
+.tonearm-pivot, .tonearm-head { fill: var(--bone-2); }
+.tonearm-cart { fill: var(--red); }
+.album-art.is-playing .tonearm { transform: rotate(16deg); }
 
 @media (max-width: 900px) {
   .album { grid-template-columns: 1fr; }
