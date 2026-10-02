@@ -9,6 +9,9 @@
   html, body { background: #fff !important; color: #000 !important; }
   body::after { display: none !important; }
   * { box-shadow: none !important; text-shadow: none !important; }
+  /* The flyer prints clean: no screen textures (texture.css) on paper that has its own. */
+  .poster { background-image: none !important; }
+  .display, .list-title, .show-at, .show-venue, .date-day, .hero-next-venue, .poster-venue { -webkit-mask: none !important; mask: none !important; }
 
   .site-header,
   .site-footer,

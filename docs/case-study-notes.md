@@ -4,6 +4,18 @@ A running log for the portfolio write-up (PLAN.md section 16): numbers, screensh
 
 ---
 
+## 2026-10-01: Print texture, after "needs texture"
+
+**What changed.** The site looks printed now: screen-printed black, poster-stock bone and red, worn letterpress ink in the big type, and a rough paper edge where the bone and red sections start. Four generated tiles (37 KB), one stylesheet, no new colors. ADR 0015.
+
+**Worth telling**
+
+- *The first draft was a gimmick.* Big blotchy voids in the type looked like a "distressed" font from a template shop. The version that works is roughly a tenth as strong: you see it up close, and from across the room it just feels made.
+- *Texture from code, not stock photos.* The tiles come from a seeded noise script, so they're seamless, reproducible, and free of licensing questions.
+- *A one-line bug worth remembering.* The torn edge first overlapped the section above by half its height, so wherever the tear dipped deep, a thin line of the page behind showed through. It now overlaps by the full strip.
+
+---
+
 ## 2026-10-01: Design pass, after "this website isn't world class"
 
 **What changed.** Same colors, same typeface, same record and strum; different layout. The hero now says where Johnny plays next. Show lists read like a gig listing, with a date block and a bone "ticket" on hover. No more half-empty columns. Booking is a bone section, the mailing list a flat red band, and the photo grid closes square. ADR 0014.

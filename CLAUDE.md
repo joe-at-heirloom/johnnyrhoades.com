@@ -34,6 +34,7 @@ Available now:
 - `npm run sync:fixtures`: the same, offline, from `tests/fixtures/bandsintown/` (mocks until the key arrives; ADR 0006)
 
 - `python3 scripts/make-poster-fonts.py`: regenerate the static poster fonts (needs fonttools; output is committed)
+- `node --experimental-strip-types scripts/make-textures.ts`: regenerate the print textures in `src/assets/textures/` (ADR 0015; output is committed). They're applied in `src/styles/texture.css`
 - `python3 scripts/trim-web-font.py`: regenerate the trimmed web font from `src/assets/fonts/source/` (needs fonttools and brotli)
 - `UPDATE_POSTER_SNAPSHOTS=1 npm test -- posters`: rewrite poster snapshots after an intended design change, then look at them and bump `TEMPLATE_VERSION` (ADR 0009)
 

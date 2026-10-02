@@ -1,0 +1,76 @@
+/*
+  Print texture (ADR 0015): the site printed rather than rendered. Screen-
+  printed black, poster-stock bone and red, worn letterpress ink on the big
+  type, and a rough paper edge where the bone and red sections begin. The
+  tiles come from scripts/make-textures.ts and use only the palette's own
+  colors. All of it lives here, so it can be tuned or switched off in one
+  place.
+*/
+
+/* ---------- Surfaces ---------- */
+
+/* Black: uneven ink, faint dust. Scrolls with the page, unlike the film grain. */
+body,
+.music,
+.photos,
+.about,
+.show-poster-wrap .poster {
+  background-image: url("../assets/textures/ink.webp");
+  background-size: 512px;
+}
+
+/* Bone and red: poster stock, with its fibers and flecks. */
+.book,
+.list-band,
+a.show-row-inner:is(:hover, :focus-visible) {
+  background-image: url("../assets/textures/paper.webp");
+  background-size: 512px;
+}
+
+/* ---------- Letterpress: the big type, printed from worn wood type ---------- */
+
+.display,
+.list-title,
+.show-at,
+.show-venue,
+.date-day,
+.hero-next-venue,
+.poster-venue {
+  -webkit-mask: url("../assets/textures/letterpress.webp") 0 0 / 384px;
+          mask: url("../assets/textures/letterpress.webp") 0 0 / 384px;
+}
+
+/* The hero logo already is a mask: intersect the two. */
+.hero-title .logo-mark {
+  -webkit-mask:
+    url("../assets/brand/logo.png") center / contain no-repeat,
+    url("../assets/textures/letterpress.webp") 0 0 / 384px;
+  -webkit-mask-composite: source-in;
+          mask:
+    url("../assets/brand/logo.png") center / contain no-repeat,
+    url("../assets/textures/letterpress.webp") 0 0 / 384px;
+          mask-composite: intersect;
+}
+
+/* ---------- A rough paper edge where bone and red begin ---------- */
+
+.book,
+.list-band {
+  --edge: 28px;
+  /* Overlap the section above by the whole strip, so the torn part always shows that section, never the page behind. */
+  margin-top: calc(var(--edge) * -1);
+  -webkit-mask:
+    url("../assets/textures/edge.webp") 0 0 / 1200px var(--edge) repeat-x,
+    linear-gradient(#000 0 0) 0 var(--edge) / 100% calc(100% - var(--edge)) no-repeat;
+          mask:
+    url("../assets/textures/edge.webp") 0 0 / 1200px var(--edge) repeat-x,
+    linear-gradient(#000 0 0) 0 var(--edge) / 100% calc(100% - var(--edge)) no-repeat;
+}
+
+/* ---------- Off where it gets in the way ---------- */
+
+@media (prefers-contrast: more) {
+  body, .music, .photos, .about, .book, .list-band, a.show-row-inner, .show-poster-wrap .poster { background-image: none; }
+  .display, .list-title, .show-at, .show-venue, .date-day, .hero-next-venue, .poster-venue { -webkit-mask: none; mask: none; }
+  .book, .list-band { margin-top: 0; -webkit-mask: none; mask: none; }
+}
