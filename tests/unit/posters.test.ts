@@ -18,7 +18,8 @@ import { duotone, pickPhoto } from '../../src/lib/posters/duotone.ts';
 import { fitText, lineBreaks, type Measure } from '../../src/lib/posters/fit.ts';
 import { DISPLAY_LADDER, measure } from '../../src/lib/posters/fonts.ts';
 import { FORMATS, formatByKey } from '../../src/lib/posters/formats.ts';
-import { cacheKey, CACHE_DIR, renderContent, renderPoster } from '../../src/lib/posters/render.ts';
+import { cacheKey, CACHE_DIR, renderCardContent, renderContent, renderPoster } from '../../src/lib/posters/render.ts';
+import { CARD_COLORS, cardFits, cardLayout, fillLine } from '../../src/lib/posters/show-card.ts';
 import { fitsWithin, layout, POSTER_COLORS } from '../../src/lib/posters/template.ts';
 import { parseShowsFile } from '../../src/lib/shows-file.ts';
 import type { Show } from '../../src/lib/shows-schema.ts';
@@ -95,19 +96,20 @@ describe('poster layout with the real fonts', () => {
   });
 });
 
+const channel = (v: number) => {
+  const s = v / 255;
+  return s <= 0.04045 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
+};
+const luminance = (hex: string) => {
+  const [r, g, b] = [1, 3, 5].map((i) => channel(parseInt(hex.slice(i, i + 2), 16)));
+  return 0.2126 * r! + 0.7152 * g! + 0.0722 * b!;
+};
+const ratio = (a: string, b: string) => {
+  const [x, y] = [luminance(a), luminance(b)].sort((m, n) => n - m);
+  return (x! + 0.05) / (y! + 0.05);
+};
+
 describe('poster contrast (WCAG AA)', () => {
-  const channel = (v: number) => {
-    const s = v / 255;
-    return s <= 0.04045 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
-  };
-  const luminance = (hex: string) => {
-    const [r, g, b] = [1, 3, 5].map((i) => channel(parseInt(hex.slice(i, i + 2), 16)));
-    return 0.2126 * r! + 0.7152 * g! + 0.0722 * b!;
-  };
-  const ratio = (a: string, b: string) => {
-    const [x, y] = [luminance(a), luminance(b)].sort((m, n) => n - m);
-    return (x! + 0.05) / (y! + 0.05);
-  };
   const c = POSTER_COLORS;
 
   it.each([
@@ -209,5 +211,60 @@ describe('duotone photos', () => {
     expect(sum[0]!).toBeGreaterThan(sum[1]! * 1.8);
     expect(sum[0]!).toBeGreaterThan(sum[2]! * 1.8);
     expect(maxGreenBlue).toBeLessThanOrEqual(100); // the ramp tops out at 46; JPEG chroma overshoots at red edges
+  });
+});
+
+describe('show card', () => {
+  const real = parseShowsFile(readFileSync('src/data/shows.json', 'utf8'));
+  const all = [...real, ...Object.values(FIXTURES)];
+
+  it('sets one line to fill the width, in whichever cut lands closest under the cap', () => {
+    const widths: Record<string, number> = { wide: 1.25, normal: 1, condensed: 0.62 };
+    const fake: Measure = (text, font) => [...text].length * 0.6 * (widths[font] ?? 1);
+    const fonts = ['wide', 'normal', 'condensed'];
+    // 6 letters across 900px: wide 200, normal 250, condensed 403. A cap of 260 takes normal, full width.
+    const line = fillLine('JOHNNY', 900, fonts, fake, 260);
+    expect(line.font).toBe('normal');
+    expect(line.size).toBeCloseTo(250);
+    expect(line.width).toBeCloseTo(900);
+    // Even the widest cut is too big for the cap: set at the cap, short of the width.
+    const capped = fillLine('JOHNNY', 900, fonts, fake, 100);
+    expect(capped).toMatchObject({ font: 'wide', size: 100 });
+    expect(capped.width).toBeLessThan(900);
+  });
+
+  it.each(FORMATS.map((f) => [f.key, f] as const))('fits every venue in %s, and bills the name biggest', (_key, format) => {
+    for (const show of all) {
+      const content = posterContent(show);
+      const l = cardLayout(content, format, measure, DISPLAY_LADDER);
+      expect(cardFits(l, measure), `${show.venue.name} in ${format.key}`).toBe(true);
+      const name = Math.min(...l.name.map((n) => n.size));
+      expect(name, `name vs venue, ${show.venue.name} in ${format.key}`).toBeGreaterThan(l.venue.size);
+      // Each line of the name runs the full width, give or take the 4% a line may come up short.
+      for (const line of l.name) expect(line.width / l.contentWidth).toBeGreaterThan(0.95);
+    }
+  });
+
+  it.each([
+    ['ink on bone', CARD_COLORS.ink, CARD_COLORS.paper],
+    ['red on bone (the act line)', CARD_COLORS.red, CARD_COLORS.paper],
+    ['bone on red (banner and date panel)', CARD_COLORS.paper, CARD_COLORS.red],
+    ['URL, ink-on-bone-2', CARD_COLORS.ink2, CARD_COLORS.paper],
+    ['cancelled, muted on bone and bone on muted', CARD_COLORS.muted, CARD_COLORS.paper],
+  ])('%s passes 4.5:1', (_label, fg, bg) => {
+    expect(ratio(fg, bg)).toBeGreaterThanOrEqual(4.5);
+  });
+
+  it('renders each format in under 150 ms once warm, print texture included', async () => {
+    const content = posterContent(FIXTURES.long!);
+    await renderCardContent(content, formatByKey('og')!);
+    const times: number[] = [];
+    for (const format of FORMATS) {
+      const t = performance.now();
+      const png = await renderCardContent(content, format);
+      times.push(performance.now() - t);
+      expect(png.subarray(1, 4).toString()).toBe('PNG');
+    }
+    expect([...times].sort((a, b) => a - b)[Math.floor(times.length / 2)]!).toBeLessThan(150);
   });
 });

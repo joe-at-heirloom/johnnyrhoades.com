@@ -15,6 +15,8 @@ import { DISPLAY_LADDER, loadFonts, measure } from './fonts.ts';
 import type { PosterFormat } from './formats.ts';
 import { duotone, pickPhoto, type PosterPhoto } from './duotone.ts';
 import { hasPhotoSlot, layout, photoSize, posterElement, TEMPLATE_VERSION } from './template.ts';
+import { cardElement, cardLayout } from './show-card.ts';
+import { printFinish } from './print.ts';
 import type { Show } from '../shows-schema.ts';
 
 export const CACHE_DIR = join(process.cwd(), '.cache/posters');
@@ -42,6 +44,18 @@ export async function renderContent(content: PosterContent, format: PosterFormat
     fonts: fonts.satori,
   });
   return new Resvg(svg, { fitTo: { mode: 'original' }, font: { loadSystemFonts: false } }).render().asPng();
+}
+
+/** The show card (show-card.ts) as a PNG. */
+export async function renderCardContent(content: PosterContent, format: PosterFormat): Promise<Buffer> {
+  const fonts = loadFonts();
+  const l = cardLayout(content, format, measure, DISPLAY_LADDER);
+  const svg = await satori(cardElement(content, format, l) as unknown as Parameters<typeof satori>[0], {
+    width: format.width,
+    height: format.height,
+    fonts: fonts.satori,
+  });
+  return printFinish(new Resvg(svg, { fitTo: { mode: 'original' }, font: { loadSystemFonts: false } }).render().asPng());
 }
 
 /**

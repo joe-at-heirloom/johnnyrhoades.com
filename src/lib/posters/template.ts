@@ -30,7 +30,7 @@ export const POSTER_COLORS = {
 
 export type Element = { type: string; props: Record<string, unknown> };
 
-const h = (type: string, style: Record<string, unknown>, ...children: unknown[]): Element => ({
+export const h = (type: string, style: Record<string, unknown>, ...children: unknown[]): Element => ({
   type,
   props: { style, children: children.length === 1 ? children[0] : children },
 });

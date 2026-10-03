@@ -14,6 +14,11 @@ export type PosterContent = {
   tags: string[];
   cancelled: boolean;
   alt: string;
+  /** For the show card, which bills Johnny by name and sets the act under it. */
+  act: string;
+  time: string;
+  town: string;
+  free: boolean;
 };
 
 export function posterContent(show: Show): PosterContent {
@@ -32,5 +37,9 @@ export function posterContent(show: Show): PosterContent {
     tags,
     cancelled,
     alt: `Poster: ${cancelled ? 'cancelled, ' : ''}${show.billing} at ${show.venue.name}, ${show.venue.city}, ${longDate(show.start, zone)}, ${time}.${tags.length ? ` ${tags.join('. ')}.` : ''}`,
+    act,
+    time,
+    town,
+    free: Boolean(show.tickets?.free),
   };
 }
