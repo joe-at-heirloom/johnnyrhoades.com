@@ -13,8 +13,7 @@
 body,
 .music,
 .photos,
-.about,
-.show-poster-wrap .poster {
+.about {
   background-image: url("../assets/textures/ink.webp");
   background-size: 512px;
 }
@@ -22,7 +21,8 @@ body,
 /* Bone and red: poster stock, with its fibers and flecks. */
 .book,
 .list-band,
-a.show-row-inner:is(:hover, :focus-visible) {
+a.show-row-inner:is(:hover, :focus-visible),
+.show-bill {
   background-image: url("../assets/textures/paper.webp");
   background-size: 512px;
 }
@@ -34,8 +34,7 @@ a.show-row-inner:is(:hover, :focus-visible) {
 .show-at,
 .show-venue,
 .date-day,
-.hero-next-venue,
-.poster-venue {
+.hero-next-venue {
   -webkit-mask: url("../assets/textures/letterpress.webp") 0 0 / 384px;
           mask: url("../assets/textures/letterpress.webp") 0 0 / 384px;
 }
@@ -70,7 +69,7 @@ a.show-row-inner:is(:hover, :focus-visible) {
 /* ---------- Off where it gets in the way ---------- */
 
 @media (prefers-contrast: more) {
-  body, .music, .photos, .about, .book, .list-band, a.show-row-inner, .show-poster-wrap .poster { background-image: none; }
-  .display, .list-title, .show-at, .show-venue, .date-day, .hero-next-venue, .poster-venue { -webkit-mask: none; mask: none; }
+  body, .music, .photos, .about, .book, .list-band, a.show-row-inner, .show-bill { background-image: none; }
+  .display, .list-title, .show-at, .show-venue, .date-day, .hero-next-venue { -webkit-mask: none; mask: none; }
   .book, .list-band { margin-top: 0; -webkit-mask: none; mask: none; }
 }

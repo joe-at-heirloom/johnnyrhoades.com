@@ -144,10 +144,9 @@ test('posters: link preview, event images, the poster on the page, and downloads
   const event = JSON.parse((await page.locator('script[type="application/ld+json"]').nth(1).textContent()) ?? '{}');
   expect(event.image).toEqual(['1x1', '4x3', '16x9'].map((f) => `https://johnnyrhoades.com/posters/${slug}/${f}.png`));
 
-  const img = page.locator('img.show-poster-img');
-  await expect(img).toBeVisible();
-  await expect(img).toHaveAttribute('alt', 'Poster: Johnny Rhoades at Blue Goose Inn, St. Clair Shores, Friday, October 23, 9 pm.');
-  expect(await img.evaluate((el: HTMLImageElement) => el.naturalWidth)).toBe(1080);
+  // The poster on the page is the inline card, not the PNG: same layout, a fraction of the bytes.
+  await expect(page.getByRole('img', { name: 'Poster: Johnny Rhoades at Blue Goose Inn, St. Clair Shores, Friday, October 23, 9 pm.' })).toBeVisible();
+  await expect(page.locator('img[src*="/posters/"]')).toHaveCount(0);
 
   const post = page.getByRole('link', { name: 'Download Instagram post' });
   await expect(post).toHaveAttribute('download', `johnny-rhoades-${slug}-instagram-post.png`);
@@ -162,7 +161,6 @@ test('posters: link preview, event images, the poster on the page, and downloads
 test('a past show keeps a link preview but no downloads', async ({ page, request }) => {
   const slug = '2026-09-26-three-blind-mice-irish-pub-mount-clemens';
   await page.goto(`/shows/${slug}/`);
-  await expect(page.locator('img.show-poster-img')).toHaveCount(0);
   await expect(page.locator('.show-bill .poster')).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Promote this show' })).toHaveCount(0);
   expect((await request.get(`/posters/${slug}/og.png`)).status()).toBe(200);
@@ -173,7 +171,7 @@ test('the printed flyer is the bill alone, on one page', async ({ page }) => {
   await page.goto(GOOSE);
   await page.emulateMedia({ media: 'print' });
   await expect(page.locator('.show-bill .poster')).toBeVisible();
-  for (const hidden of ['.site-header', '.site-footer', '.show-details', 'img.show-poster-img', '.promote']) {
+  for (const hidden of ['.site-header', '.site-footer', '.show-details', '.promote']) {
     await expect(page.locator(hidden).first()).toBeHidden();
   }
   const pdf = await page.pdf({ format: 'Letter', printBackground: true });

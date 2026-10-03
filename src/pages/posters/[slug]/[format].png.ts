@@ -3,7 +3,7 @@
   the link-preview poster; upcoming shows get every format.
 */
 import type { APIRoute, GetStaticPaths } from 'astro';
-import { allShows, BUILD_NOW, posterPhotos } from '../../../lib/load-shows';
+import { allShows, BUILD_NOW } from '../../../lib/load-shows';
 import { FORMATS, type PosterFormat } from '../../../lib/posters/formats';
 import { renderPoster } from '../../../lib/posters/render';
 import { hasPage, isUpcoming } from '../../../lib/shows-data';
@@ -18,6 +18,6 @@ export const getStaticPaths = (() =>
   )) satisfies GetStaticPaths;
 
 export const GET: APIRoute<{ show: Show; format: PosterFormat }> = async ({ props }) => {
-  const png = await renderPoster(props.show, props.format, { photos: posterPhotos });
+  const png = await renderPoster(props.show, props.format);
   return new Response(new Uint8Array(png), { headers: { 'Content-Type': 'image/png' } });
 };

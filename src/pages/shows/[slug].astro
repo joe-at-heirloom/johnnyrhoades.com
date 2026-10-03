@@ -142,13 +142,8 @@ const following = next[0] ? { url: showPath(next[0].slug), ...showSummary(next[0
               }
             </div>
             <div class="show-poster-wrap">
-              {
-                upcoming ? (
-                  <img class="show-poster-img" src={posterPath(show.slug, 'feed')} width="1080" height="1350" alt={poster.alt} fetchpriority="high" />
-                ) : null
-              }
-              {/* The HTML bill: shown for past shows, and always used for the printed flyer. */}
-              <div class:list={['show-bill', { 'is-print-only': upcoming }]}>
+              {/* The show card, inline: the poster on the page and the printed flyer. The PNGs are for posting. */}
+              <div class="show-bill">
                 <ShowPoster show={show} />
               </div>
             </div>

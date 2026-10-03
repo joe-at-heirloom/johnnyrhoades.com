@@ -1,7 +1,8 @@
 /*
-  Phase 3 acceptance (PLAN.md section 4.1): the longest venue name fits in
-  every format, text contrast passes WCAG AA, renders stay under 150 ms, and
-  snapshot tests cover five fixtures. Cached rebuilds skip unchanged posters.
+  Phase 3 acceptance (PLAN.md section 4.1), for the show card (ADR 0017): the
+  longest venue name fits in every format, the name is billed biggest, text
+  contrast passes WCAG AA, renders stay under 150 ms, and snapshot tests
+  cover five fixtures. Cached rebuilds skip unchanged posters.
 
   Update snapshots after an intended design change:
     UPDATE_POSTER_SNAPSHOTS=1 npm test -- posters
@@ -14,13 +15,12 @@ import sharp from 'sharp';
 import { describe, expect, it } from 'vitest';
 import { mergeShows } from '../../src/lib/merge.ts';
 import { posterContent } from '../../src/lib/posters/content.ts';
-import { duotone, pickPhoto } from '../../src/lib/posters/duotone.ts';
 import { fitText, lineBreaks, type Measure } from '../../src/lib/posters/fit.ts';
 import { DISPLAY_LADDER, measure } from '../../src/lib/posters/fonts.ts';
 import { FORMATS, formatByKey } from '../../src/lib/posters/formats.ts';
-import { cacheKey, CACHE_DIR, renderCardContent, renderContent, renderPoster } from '../../src/lib/posters/render.ts';
+import { printFinish } from '../../src/lib/posters/print.ts';
+import { cacheKey, CACHE_DIR, posterSvg, renderContent, renderPoster } from '../../src/lib/posters/render.ts';
 import { CARD_COLORS, cardFits, cardLayout, fillLine } from '../../src/lib/posters/show-card.ts';
-import { fitsWithin, layout, POSTER_COLORS } from '../../src/lib/posters/template.ts';
 import { parseShowsFile } from '../../src/lib/shows-file.ts';
 import type { Show } from '../../src/lib/shows-schema.ts';
 import { at, fresh } from './helpers.ts';
@@ -78,19 +78,37 @@ describe('poster layout with the real fonts', () => {
   const all = [...real, ...Object.values(FIXTURES)];
   const longest = [...all].sort((a, b) => b.venue.name.length - a.venue.name.length)[0]!;
 
-  it.each(FORMATS.map((f) => [f.key, f] as const))('every venue name fits in %s, including the longest', (_key, format) => {
+  it('sets one line to fill the width, in whichever cut lands closest under the cap', () => {
+    const widths: Record<string, number> = { wide: 1.25, normal: 1, condensed: 0.62 };
+    const fake: Measure = (text, font) => [...text].length * 0.6 * (widths[font] ?? 1);
+    const fonts = ['wide', 'normal', 'condensed'];
+    // 6 letters across 900px: wide 200, normal 250, condensed 403. A cap of 260 takes normal, full width.
+    const line = fillLine('JOHNNY', 900, fonts, fake, 260);
+    expect(line.font).toBe('normal');
+    expect(line.size).toBeCloseTo(250);
+    expect(line.width).toBeCloseTo(900);
+    // Even the widest cut is too big for the cap: set at the cap, short of the width.
+    const capped = fillLine('JOHNNY', 900, fonts, fake, 100);
+    expect(capped).toMatchObject({ font: 'wide', size: 100 });
+    expect(capped.width).toBeLessThan(900);
+  });
+
+  it.each(FORMATS.map((f) => [f.key, f] as const))('fits every venue in %s, and bills the name biggest', (_key, format) => {
     for (const show of all) {
-      const content = posterContent(show);
-      const l = layout(content, format, measure, DISPLAY_LADDER);
-      expect(fitsWithin(l, content, measure), `${show.venue.name} in ${format.key}`).toBe(true);
+      const l = cardLayout(posterContent(show), format, measure, DISPLAY_LADDER);
+      expect(cardFits(l, measure), `${show.venue.name} in ${format.key}`).toBe(true);
+      const name = Math.min(...l.name.map((n) => n.size));
+      expect(name, `name vs venue, ${show.venue.name} in ${format.key}`).toBeGreaterThan(l.venue.size);
+      // Each line of the name runs the full width, give or take the 4% a line may come up short.
+      for (const line of l.name) expect(line.width / l.contentWidth).toBeGreaterThan(0.95);
     }
     expect(longest.venue.name).toMatch(/Anti-Freeze/);
   });
 
-  it('runs short names wide and long names condensed', () => {
+  it('runs short venue names wide and long ones condensed', () => {
     const feed = formatByKey('feed')!;
-    const short = layout(posterContent(FIXTURES.short!), feed, measure, DISPLAY_LADDER);
-    const long = layout(posterContent(FIXTURES.long!), feed, measure, DISPLAY_LADDER);
+    const short = cardLayout(posterContent(FIXTURES.short!), feed, measure, DISPLAY_LADDER);
+    const long = cardLayout(posterContent(FIXTURES.long!), feed, measure, DISPLAY_LADDER);
     expect(DISPLAY_LADDER.indexOf(short.venue.font)).toBeLessThan(DISPLAY_LADDER.indexOf(long.venue.font));
     expect(short.venue.size).toBeGreaterThan(long.venue.size);
   });
@@ -110,13 +128,14 @@ const ratio = (a: string, b: string) => {
 };
 
 describe('poster contrast (WCAG AA)', () => {
-  const c = POSTER_COLORS;
+  const c = CARD_COLORS;
 
   it.each([
-    ['venue and details, bone on black', c.bone, c.ground],
-    ['billing and date, red on black', c.redHi, c.ground],
-    ['tags and URL, muted on black', c.muted, c.ground],
-    ['cancelled band, bone on red', c.bone, c.red],
+    ['name, venue and town, ink on bone', c.ink, c.paper],
+    ['act line, red on bone', c.red, c.paper],
+    ['band and date panel, bone on red', c.paper, c.red],
+    ['URL, ink-on-bone-2', c.ink2, c.paper],
+    ['cancelled, muted on bone and bone on muted', c.muted, c.paper],
   ])('%s passes 4.5:1', (_label, fg, bg) => {
     expect(ratio(fg, bg)).toBeGreaterThanOrEqual(4.5);
   });
@@ -128,14 +147,19 @@ describe('poster content', () => {
       'Poster: Johnny Rhoades at Octopus’ Beer Garden, Mount Clemens, Saturday, November 14, 2 pm. Solo acoustic. Free.',
     );
     expect(posterContent(FIXTURES.cancelled!).alt).toMatch(/^Poster: cancelled, Johnny Rhoades at Blue Goose Inn/);
-    expect(posterContent(FIXTURES.guest!).billing).toBe("Motor City Josh & The Big 3, with Johnny Rhoades");
+  });
+
+  it('bills Johnny first on a guest spot, as the card does, with the band under him', () => {
+    const content = posterContent(FIXTURES.guest!);
+    expect(content.act).toBe('With Motor City Josh & The Big 3');
+    expect(content.alt).toBe("Poster: Johnny Rhoades, with Motor City Josh & The Big 3, at Callahan's Music Hall, Auburn Hills, Saturday, December 12, 9 pm.");
   });
 });
 
 describe('rendering', () => {
-  it('renders each format in under 150 ms once warm', async () => {
+  it('renders each format in under 150 ms once warm, print texture included', async () => {
     const content = posterContent(FIXTURES.long!);
-    await renderContent(content, formatByKey('og')!); // load fonts
+    await renderContent(content, formatByKey('og')!); // load fonts and textures
     const times: number[] = [];
     for (const format of FORMATS) {
       const t = performance.now();
@@ -181,90 +205,26 @@ describe('rendering', () => {
   });
 });
 
-describe('duotone photos', () => {
-  const photos = [
-    { file: 'a.jpg', acts: 'all' as const },
-    { file: 'b.jpg', acts: ['band', 'trio'] as Show['act'][] },
-  ];
-
-  it('picks the same photo for the same show, from those that fit the act', () => {
-    expect(pickPhoto('108955500', 'unspecified', photos)?.file).toBe('a.jpg');
-    const band = new Set(Array.from({ length: 20 }, (_, i) => pickPhoto(String(i), 'band', photos)?.file));
-    expect(band).toEqual(new Set(['a.jpg', 'b.jpg']));
-    expect(pickPhoto('42', 'band', photos)).toEqual(pickPhoto('42', 'band', photos));
-    expect(pickPhoto('42', 'solo', [])).toBeNull();
-  });
-
-  it('maps a photo onto the black-to-red ramp at the requested size', async () => {
-    const uri = await duotone(readFileSync('src/assets/photos/hero.jpg'), { width: 120, height: 80 });
-    const img = sharp(Buffer.from(uri.split(',')[1]!, 'base64'));
-    const { data, info } = await img.raw().toBuffer({ resolveWithObject: true });
-    expect([info.width, info.height]).toEqual([120, 80]);
-    // The ramp runs from #0d0b0a to #c02e28: red leads overall, green and blue stay low
-    // (JPEG adds a few levels of noise near black, so this checks averages and ceilings).
-    const sum = [0, 0, 0];
-    let maxGreenBlue = 0;
-    for (let i = 0; i < data.length; i += info.channels) {
-      for (let c = 0; c < 3; c++) sum[c]! += data[i + c]!;
-      maxGreenBlue = Math.max(maxGreenBlue, data[i + 1]!, data[i + 2]!);
-    }
-    expect(sum[0]!).toBeGreaterThan(sum[1]! * 1.8);
-    expect(sum[0]!).toBeGreaterThan(sum[2]! * 1.8);
-    expect(maxGreenBlue).toBeLessThanOrEqual(100); // the ramp tops out at 46; JPEG chroma overshoots at red edges
+describe('print finish', () => {
+  it('wears big type but leaves thin strokes whole', async () => {
+    // Bone stock with a heavy block of ink and a 4px stroke, like a label's.
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="600" height="600"><rect width="600" height="600" fill="#efe6d3"/><rect x="40" y="40" width="300" height="500" fill="#0d0b0a"/><rect x="450" y="40" width="4" height="500" fill="#0d0b0a"/></svg>`;
+    const png = await printFinish(await sharp(Buffer.from(svg)).png().toBuffer());
+    const { data, info } = await sharp(png).greyscale().raw().toBuffer({ resolveWithObject: true });
+    const grey = (x: number, y: number) => data[(y * info.width + x) * info.channels]!;
+    let worn = 0;
+    for (let y = 60; y < 520; y++) for (let x = 60; x < 320; x++) if (grey(x, y) > 120) worn++;
+    expect(worn, 'voids in the heavy block').toBeGreaterThan(0);
+    for (let y = 40; y < 540; y++) for (let x = 450; x < 454; x++) expect(grey(x, y), `stroke at ${x},${y}`).toBeLessThan(60);
   });
 });
 
-describe('show card', () => {
-  const real = parseShowsFile(readFileSync('src/data/shows.json', 'utf8'));
-  const all = [...real, ...Object.values(FIXTURES)];
-
-  it('sets one line to fill the width, in whichever cut lands closest under the cap', () => {
-    const widths: Record<string, number> = { wide: 1.25, normal: 1, condensed: 0.62 };
-    const fake: Measure = (text, font) => [...text].length * 0.6 * (widths[font] ?? 1);
-    const fonts = ['wide', 'normal', 'condensed'];
-    // 6 letters across 900px: wide 200, normal 250, condensed 403. A cap of 260 takes normal, full width.
-    const line = fillLine('JOHNNY', 900, fonts, fake, 260);
-    expect(line.font).toBe('normal');
-    expect(line.size).toBeCloseTo(250);
-    expect(line.width).toBeCloseTo(900);
-    // Even the widest cut is too big for the cap: set at the cap, short of the width.
-    const capped = fillLine('JOHNNY', 900, fonts, fake, 100);
-    expect(capped).toMatchObject({ font: 'wide', size: 100 });
-    expect(capped.width).toBeLessThan(900);
-  });
-
-  it.each(FORMATS.map((f) => [f.key, f] as const))('fits every venue in %s, and bills the name biggest', (_key, format) => {
-    for (const show of all) {
-      const content = posterContent(show);
-      const l = cardLayout(content, format, measure, DISPLAY_LADDER);
-      expect(cardFits(l, measure), `${show.venue.name} in ${format.key}`).toBe(true);
-      const name = Math.min(...l.name.map((n) => n.size));
-      expect(name, `name vs venue, ${show.venue.name} in ${format.key}`).toBeGreaterThan(l.venue.size);
-      // Each line of the name runs the full width, give or take the 4% a line may come up short.
-      for (const line of l.name) expect(line.width / l.contentWidth).toBeGreaterThan(0.95);
-    }
-  });
-
-  it.each([
-    ['ink on bone', CARD_COLORS.ink, CARD_COLORS.paper],
-    ['red on bone (the act line)', CARD_COLORS.red, CARD_COLORS.paper],
-    ['bone on red (banner and date panel)', CARD_COLORS.paper, CARD_COLORS.red],
-    ['URL, ink-on-bone-2', CARD_COLORS.ink2, CARD_COLORS.paper],
-    ['cancelled, muted on bone and bone on muted', CARD_COLORS.muted, CARD_COLORS.paper],
-  ])('%s passes 4.5:1', (_label, fg, bg) => {
-    expect(ratio(fg, bg)).toBeGreaterThanOrEqual(4.5);
-  });
-
-  it('renders each format in under 150 ms once warm, print texture included', async () => {
-    const content = posterContent(FIXTURES.long!);
-    await renderCardContent(content, formatByKey('og')!);
-    const times: number[] = [];
-    for (const format of FORMATS) {
-      const t = performance.now();
-      const png = await renderCardContent(content, format);
-      times.push(performance.now() - t);
-      expect(png.subarray(1, 4).toString()).toBe('PNG');
-    }
-    expect([...times].sort((a, b) => a - b)[Math.floor(times.length / 2)]!).toBeLessThan(150);
+describe('the show page card', () => {
+  it('is the feed layout as inline SVG: vector paths, no fonts, no stock of its own, labeled with the alt text', async () => {
+    const svg = await posterSvg(FIXTURES.guest!);
+    expect(svg).toMatch(/^<svg class="poster" role="img" aria-label="Poster: Johnny Rhoades, with Motor City Josh &amp; The Big 3, at Callahan's Music Hall, [^"]+" viewBox="0 0 1080 1350"/);
+    expect(svg).not.toMatch(/<text|data:image\/(png|jpeg)/); // glyphs are paths; the only images are the vector stars
+    expect(svg).not.toContain('width="1080" height="1350" fill="#efe6d3"'); // the page supplies the stock
+    expect(svg).not.toMatch(/\d\.\d{2,}/); // rounded to a tenth of a pixel
   });
 });

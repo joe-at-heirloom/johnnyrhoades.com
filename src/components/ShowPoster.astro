@@ -1,32 +1,17 @@
 ---
 /*
-  The show's bill: venue as the hero, then date, time, town and act.
-  Rendered in HTML and CSS until Phase 3 generates poster images, and it
-  stays the reference design for them. Purely presentational: every fact
-  on it is also in the page text.
+  The show card as inline SVG (ADR 0017): the poster on every show page,
+  and the printed flyer. The same layout as the poster images, drawn as
+  vector paths, so it prints sharp at any size. Its label is the poster's
+  alt text; every fact on it is also in the page text.
 */
-import { actLabel } from '../lib/act';
+import { posterSvg } from '../lib/posters/render';
 import type { Show } from '../lib/shows-schema';
-import { clockTime, longDate } from '../lib/time';
 
 interface Props {
   show: Show;
 }
-const { show } = Astro.props;
-const zone = show.venue.timeZone;
-const act = actLabel(show.act, show.billing);
-// Long names step down so every bill fills its frame without overflowing.
-const size = show.venue.name.length > 24 ? 'is-long' : show.venue.name.length > 14 ? 'is-medium' : 'is-short';
+const svg = await posterSvg(Astro.props.show);
 ---
 
-<div class="poster" aria-hidden="true">
-  <p class="poster-top">{show.billing}</p>
-  <p class:list={['poster-venue', size]}>{show.venue.name}</p>
-  <p class="poster-date">{longDate(show.start, zone)}</p>
-  <p class="poster-time">{clockTime(show.start, zone)} · {show.venue.city}, {show.venue.region}</p>
-  {act && <p class="poster-act">{act}</p>}
-  <div class="poster-foot">
-    <span class="logo-mark"></span>
-    <span class="poster-url">johnnyrhoades.com</span>
-  </div>
-</div>
+<Fragment set:html={svg} />

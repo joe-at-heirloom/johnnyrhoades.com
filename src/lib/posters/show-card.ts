@@ -1,7 +1,8 @@
 /*
-  The show card: a second poster template, after the letterpress cards blues
-  acts toured on in the '50s and '60s. Bone card stock, black and red ink,
-  and the artist's name as big as the card allows.
+  The poster template (ADR 0017): a show card, after the letterpress cards
+  blues acts toured on in the '50s and '60s. Bone card stock, black and red
+  ink, and Johnny's name as big as the card allows, on every show, guest
+  spots included.
 
     ★ IN PERSON ★                  (red band, bone type)
     JOHNNY                         (each line fills the width; the cut is
@@ -17,15 +18,25 @@
     JOHNNYRHOADES.COM
 
   Wide formats (og, 16:9) put the venue and the date panel side by side
-  under a one-line name. Same palette as the site, same Archivo cuts as the
-  bill template; no new colors or typefaces.
+  under a one-line name. The site's palette and Archivo; no new colors or
+  typefaces.
+
+  Built as plain element objects for satori (no JSX toolchain needed).
+  Every size is computed here, so tests can check that nothing overflows.
 */
+import { ARTIST } from '../site.ts';
 import type { PosterContent } from './content.ts';
 import { fitText, lineWidth, type Fit, type Measure } from './fit.ts';
 import type { PosterFormat } from './formats.ts';
-import { h, type Element } from './template.ts';
 
-export const CARD_VERSION = 1; // bump when the layout changes, to invalidate cached renders
+export const TEMPLATE_VERSION = 6; // bump when the layout changes, to invalidate cached renders
+
+export type Element = { type: string; props: Record<string, unknown> };
+
+const h = (type: string, style: Record<string, unknown>, ...children: unknown[]): Element => ({
+  type,
+  props: { style, children: children.length === 1 ? children[0] : children },
+});
 
 /** Ink on bone stock. Contrast is checked in tests/unit/posters.test.ts. */
 export const CARD_COLORS = {
@@ -35,8 +46,6 @@ export const CARD_COLORS = {
   ink2: '#3a332c', // --ink-on-bone-2
   muted: '#5f574b', // --ink-on-bone-3, for a cancelled show
 } as const;
-
-const NAME = 'Johnny Rhoades';
 
 /** Wood type: one line set to fill `width`, in whichever cut lands closest under `maxSize`. */
 export type Line = { text: string; font: string; size: number; width: number };
@@ -61,7 +70,7 @@ export function fillLine(text: string, width: number, fonts: string[], measure: 
 
 /** The name as one line or two, whichever sets it bigger in the space it has. */
 export function nameLines(width: number, height: number, fonts: string[], measure: Measure, lineHeight: number, maxSize: number): Line[] {
-  const words = NAME.toUpperCase().split(' ');
+  const words = ARTIST.toUpperCase().split(' ');
   const options = [[words.join(' ')], words].map((lines) =>
     lines.map((text) => fillLine(text, width, fonts, measure, Math.min(maxSize, height / (lines.length * lineHeight)))),
   );
@@ -170,7 +179,7 @@ export function cardLayout(content: PosterContent, format: PosterFormat, measure
   };
 }
 
-/** True when every line of type stays inside its box (the same acceptance check as the bill). */
+/** True when every line of type stays inside its box (PLAN.md section 4.1's acceptance check). */
 export function cardFits(l: CardLayout, measure: Measure): boolean {
   const name = l.name.every((line) => line.width <= l.contentWidth + 0.5);
   const venueWidth = l.wide ? l.contentWidth - l.panel.width : l.contentWidth;
@@ -190,7 +199,11 @@ const star = (size: number, color: string): Element => ({
   },
 });
 
-export function cardElement(content: PosterContent, format: PosterFormat, l: CardLayout): Element {
+/**
+ * The card as satori elements. `paper: 'transparent'` leaves the stock to the page,
+ * for the show page's inline flyer (bone on screen, white when printed).
+ */
+export function cardElement(content: PosterContent, format: PosterFormat, l: CardLayout, { paper = CARD_COLORS.paper as string } = {}): Element {
   const c = CARD_COLORS;
   const tracking = (em: number, size: number) => `${(em * size).toFixed(2)}px`;
   const dim = content.cancelled ? c.muted : c.ink;
@@ -290,7 +303,7 @@ export function cardElement(content: PosterContent, format: PosterFormat, l: Car
       height: format.height,
       display: 'flex',
       flexDirection: 'column',
-      background: c.paper,
+      background: paper,
       padding: `${l.pad.top}px ${l.pad.x}px ${l.pad.bottom}px`,
       overflow: 'hidden',
     },
