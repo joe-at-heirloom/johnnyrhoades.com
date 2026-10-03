@@ -20,3 +20,4 @@ Short notes on choices that shape the code, so the reasoning survives. One file 
 | [0014](0014-design-pass.md) | Design pass: layout and rhythm, same visual language | Accepted |
 | [0015](0015-print-texture.md) | Print texture | Accepted |
 | [0016](0016-record-player-and-date-check.md) | Drop the needle, and "am I free that night?" | Accepted |
+| [0017](0017-show-card-poster.md) | The show card, a classic blues poster template | Proposed (prototype) |

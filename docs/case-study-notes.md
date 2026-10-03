@@ -4,6 +4,22 @@ A running log for the portfolio write-up (PLAN.md section 16): numbers, screensh
 
 ---
 
+## 2026-10-02: The show card, after "something classic blues"
+
+**What changed.** Joe wanted something classic blues on the site, "B.B. King or a velvet Jimi Hendrix poster." Rather than borrow their faces, the prototype borrows the form they toured on: the letterpress show card. It has IN PERSON across the top, JOHNNY RHOADES as big as the card allows, and the date in a solid red block, printed on bone stock. It's built from Johnny's real show data, like every other poster. ADR 0017, proposed.
+
+**Worth telling**
+
+- *Wood type, computed.* Each line of the name fills the full width, and each line picks its own Archivo width cut, the way a compositor pulled different type from the case. On the feed poster, JOHNNY comes out at 87.5% width and RHOADES at 75%, both about 224 px tall. Nobody chose those numbers; the space did.
+- *Texture can hurt legibility.* The first version wore every stroke, and a void across the I in "CLARKSTON, MI" made it read "MI!". The fix copies the site's own rule (wear on display type only) without knowing which text is which: blur the ink, keep only the deep interiors, and wear those. Thin strokes never qualify.
+- *Same speed.* A median of 86 ms per render with the texture, against 72 ms for the plain bill.
+
+**Screenshots:** `docs/case-study/show-card-prototype-feed.jpg` (before above, after below) and `show-card-prototype-formats.jpg`.
+
+**Verdict.** Joe, on seeing the prototype: "I like this aesthetic." Still open: which formats use it, and guest-spot billing (ADR 0017).
+
+---
+
 ## 2026-10-01: Drop the needle, and "am I free that night?"
 
 **What changed.** You can hear the album now. Press play on a song and the tonearm swings onto the spinning record while a 30-second clip plays. And the booking form checks the date as you pick it: "I'm already playing The Fed Community in Clarkston that day." ADR 0016.
