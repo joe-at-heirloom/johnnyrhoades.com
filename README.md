@@ -8,7 +8,7 @@ The website for Johnny Rhoades, a blues guitarist and singer from Detroit.
 
 | Phase | State |
 |---|---|
-| 0. Scaffold with visual parity | Done, except the deploy, which waits on Johnny's OK to make the repo public |
+| 0. Scaffold with visual parity | Done. Deploys to GitHub Pages; staging at `new.johnnyrhoades.com` once its DNS record exists |
 | 1. Show data pipeline | Done on mock data. Live sync waits on a Bandsintown `app_id` (ADR 0006) |
 | 2. Shows on the site | Done: shows rendered at build time, show pages, calendar, RSS, `/shows.json`, Tonight |
 | 3. Poster engine | Done: six formats per upcoming show, fit-to-width type, cached renders, print flyer. Photos off until credits are confirmed |

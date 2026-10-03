@@ -29,15 +29,16 @@ A public lookup can't see every record. The zone export in step 2 is the real li
 4. [ ] **Search Console.** Add a Domain property for johnnyrhoades.com and verify it with the TXT record it gives. Do it now: the baseline starts from verification. Add Bing Webmaster Tools too (it can import from Search Console).
 5. [ ] **DNS on an account Johnny owns.** Skip if it already is. Otherwise add johnnyrhoades.com to his Cloudflare account (free plan), import the zone export, check that the Zoho MX and TXT records came across exactly, lower every TTL to 5 minutes, then change the nameservers at Squarespace Domains to the pair Cloudflare gives. When `dig NS johnnyrhoades.com` shows the new pair, send Johnny a test email.
 6. [ ] **GitHub verified domain.** GitHub → Settings → Pages → Add a verified domain → johnnyrhoades.com, and add the `_github-pages-challenge-…` TXT record. This stops anyone else's Pages site from claiming the domain.
-7. [ ] **Johnny:** OK to make the repository public. Then, in the repo:
-   - Settings → Pages → Source: GitHub Actions.
-   - Secret `BANDSINTOWN_APP_ID` (from Bandsintown for Artists → Settings). Run `BANDSINTOWN_APP_ID=… npm run sync -- --capture` locally first and compare with the mocks (ADR 0006).
-   - Variables `PUBLIC_WEB3FORMS_KEY`, `PUBLIC_BUTTONDOWN_USER`, `PUBLIC_UMAMI_WEBSITE_ID` (ADR 0011), and `SITE_NOINDEX` = `true`.
+7. [x] Public repository: https://github.com/joe-at-heirloom/johnnyrhoades.com (2026-10-02). In the repo:
+   - [x] Settings → Pages → Source: GitHub Actions.
+   - [x] Variable `SITE_NOINDEX` = `true`.
+   - [ ] Secret `BANDSINTOWN_APP_ID` (from Bandsintown for Artists → Settings). Run `BANDSINTOWN_APP_ID=… npm run sync -- --capture` locally first and compare with the mocks (ADR 0006).
+   - [ ] Variables `PUBLIC_WEB3FORMS_KEY`, `PUBLIC_BUTTONDOWN_USER`, `PUBLIC_UMAMI_WEBSITE_ID` (ADR 0011).
 
 ## Staging
 
-8. [ ] DNS: `new` CNAME to `<github-user>.github.io`, DNS only (grey cloud). Pages custom domain: `new.johnnyrhoades.com`. Wait for the certificate, then tick Enforce HTTPS.
-9. [ ] Push to `main` (or run the Site workflow by hand) and watch it go green.
+8. [ ] DNS: `new` CNAME to `joe-at-heirloom.github.io`, DNS only (grey cloud). The Pages custom domain is already set to `new.johnnyrhoades.com`, so the site appears there as soon as the record exists. Wait for the certificate, then tick Enforce HTTPS.
+9. [x] Push to `main` and watch it go green. First deploy 2026-10-02: sync skipped (no key yet), build and deploy green, IndexNow quiet (staging).
 10. [ ] Review on real phones, and work through `docs/manual-checks.md` sections "Waiting on the staging deploy" and "Waiting on the service accounts". Every page should carry `noindex` (`SITE_NOINDEX`).
 
 ## Cutover
