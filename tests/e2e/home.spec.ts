@@ -85,6 +85,45 @@ test('strum code is not in the initial page; it loads and draws six strings near
   await expect(speaker).toHaveAttribute('aria-checked', 'false');
 });
 
+test('each strum plays the next bar of a 12-bar blues in E, and a held string bends', async ({ page }) => {
+  await page.clock.install(); // the sweep, the reset and the bend hold all run on timers
+  await page.goto('/');
+  const neck = page.locator('[data-neck]');
+  await neck.scrollIntoViewIfNeeded();
+  const strings = neck.locator('path.neck-string');
+  await expect(strings).toHaveCount(6);
+  const chord = page.locator('[data-chord]');
+  await expect(chord).toBeHidden(); // nothing to say until you play
+
+  await neck.focus();
+  const seen: string[] = [];
+  for (let k = 0; k < 4; k++) {
+    await page.keyboard.press('Enter');
+    await page.clock.runFor(400);
+    seen.push((await chord.textContent()) ?? '');
+  }
+  expect(seen).toEqual(['E7', 'E7', 'E7', 'A7']); // the chord you'll play next: four bars of E, then A
+  await page.clock.runFor(8000);
+  await expect(chord).toHaveText('E7'); // eight quiet seconds start it over
+
+  const kinked = /^M0 [\d.]+ L[\d.]+ [\d.]+ L/; // pushed by a fingertip
+  await page.keyboard.down('ArrowUp');
+  await expect(strings.nth(4)).toHaveAttribute('d', kinked);
+  await page.keyboard.up('ArrowUp');
+  await expect(strings.nth(4)).not.toHaveAttribute('d', kinked);
+
+  const box = (await neck.boundingBox())!;
+  const y = Number((await strings.nth(2).getAttribute('d'))!.split(' ')[1]);
+  await page.mouse.move(box.x + 200, box.y + y);
+  await page.mouse.down();
+  await page.clock.runFor(150); // held long enough to bend rather than strum
+  await page.mouse.move(box.x + 205, box.y + y + 12);
+  await expect(strings.nth(2)).toHaveAttribute('d', kinked);
+  await page.mouse.up();
+  await expect(strings.nth(2)).not.toHaveAttribute('d', kinked);
+  await expect(chord).toHaveText('E7'); // picking and bending one string doesn't move the bar on
+});
+
 test('booking form validates required fields before sending', async ({ page }) => {
   await page.goto('/');
   await page.getByRole('button', { name: 'Send booking request' }).click();

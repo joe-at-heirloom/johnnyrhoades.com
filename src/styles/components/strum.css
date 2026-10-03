@@ -33,7 +33,17 @@
 .neck-winding { fill: none; stroke: #0d0b0a; stroke-opacity: .55; stroke-dasharray: 1 2; }
 .neck-hot { fill: none; stroke: var(--red-hi); stroke-linecap: round; opacity: 0; }
 
-.strum-foot { display: flex; justify-content: flex-end; margin-top: 12px; }
+.strum-foot { display: flex; justify-content: flex-end; align-items: center; margin-top: 12px; }
+/* The chord you'll play next, quietly, once you've started (ADR 0018). */
+.strum-chord {
+  margin: 0 auto 0 0;
+  font-stretch: var(--stretch-display);
+  font-weight: 900;
+  font-size: 1.5rem;
+  line-height: 1;
+  letter-spacing: .02em;
+  color: var(--muted);
+}
 .speaker {
   display: inline-flex; align-items: center; gap: 10px;
   padding: 6px 4px; border: 0; background: none;

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { E7_TUNING, crossedStrings, fretPositions, karplusStrong } from '../../src/lib/strum';
+import { BLUES_IN_E, CHORDS, OPEN_STRINGS, bendCents, centsToRate, crossedStrings, fretPositions, isStrum, karplusStrong, midiToHz } from '../../src/lib/strum';
 
 /** Deterministic stand-in for Math.random (a small LCG), so sample tests are repeatable. */
 function seeded(seed = 1) {
@@ -16,12 +16,55 @@ const rms = (a: Float32Array, from: number, to: number) => {
   return Math.sqrt(sum / (to - from));
 };
 
-describe('E7_TUNING', () => {
-  it('is an open E7 voicing, low string first', () => {
-    expect(E7_TUNING).toHaveLength(6);
-    expect([...E7_TUNING]).toEqual([...E7_TUNING].sort((a, b) => a - b));
-    expect(E7_TUNING[0]).toBeCloseTo(82.41, 2); // low E
-    expect(E7_TUNING[5]).toBeCloseTo(E7_TUNING[0] * 4, 0); // high E, two octaves up
+describe('chords and the 12-bar', () => {
+  const pitchClasses = (notes: readonly (number | null)[]) => new Set(notes.filter((n): n is number => n !== null).map((n) => n % 12));
+
+  it('tunes to concert pitch', () => {
+    expect(midiToHz(69)).toBe(440);
+    expect(midiToHz(OPEN_STRINGS[0])).toBeCloseTo(82.41, 2); // low E
+    expect(midiToHz(OPEN_STRINGS[5])).toBeCloseTo(329.63, 2); // high E, two octaves up
+  });
+
+  it('voices each chord in open position: every note is fret 0 to 4 on its string', () => {
+    for (const [name, notes] of Object.entries(CHORDS)) {
+      expect(notes, name).toHaveLength(6);
+      notes.forEach((n, i) => {
+        if (n === null) return;
+        const fret = n - OPEN_STRINGS[i]!;
+        expect(fret, `${name}, string ${i}`).toBeGreaterThanOrEqual(0);
+        expect(fret, `${name}, string ${i}`).toBeLessThanOrEqual(4);
+      });
+    }
+  });
+
+  it('plays all four notes of each dominant seventh, and nothing else', () => {
+    // E7: E G# B D. A7: A C# E G. B7: B D# F# A.
+    expect(pitchClasses(CHORDS.E7)).toEqual(new Set([4, 8, 11, 2]));
+    expect(pitchClasses(CHORDS.A7)).toEqual(new Set([9, 1, 4, 7]));
+    expect(pitchClasses(CHORDS.B7)).toEqual(new Set([11, 3, 6, 9]));
+  });
+
+  it('runs the 12-bar in E from PLAN.md: four of E, two of A, two of E, then B, A, E, B', () => {
+    expect(BLUES_IN_E.join(' ')).toBe('E7 E7 E7 E7 A7 A7 E7 E7 B7 A7 E7 B7');
+  });
+
+  it('counts three strings or more as a strum, and picking as picking', () => {
+    expect([1, 2, 3, 6].map(isStrum)).toEqual([false, false, true, true]);
+  });
+});
+
+describe('bend', () => {
+  it('raises the pitch with the push, either way, up to a whole step', () => {
+    expect(bendCents(0, 20)).toBe(0);
+    expect(bendCents(10, 20)).toBe(100); // a half step halfway
+    expect(bendCents(-10, 20)).toBe(100); // pulling down bends up too
+    expect(bendCents(45, 20)).toBe(200);
+  });
+
+  it('turns cents into a playback rate', () => {
+    expect(centsToRate(0)).toBe(1);
+    expect(centsToRate(1200)).toBe(2);
+    expect(centsToRate(200)).toBeCloseTo(Math.pow(2, 2 / 12), 12);
   });
 });
 

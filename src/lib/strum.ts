@@ -3,8 +3,35 @@
   No DOM and no Web Audio here, so they can be unit tested.
 */
 
-/** Open E7, low string to high: E2 B2 D3 G#3 B3 E4 (Hz). */
-export const E7_TUNING = [82.41, 123.47, 146.83, 207.65, 246.94, 329.63] as const;
+/** Equal temperament, A4 = 440 Hz. */
+export const midiToHz = (midi: number) => 440 * Math.pow(2, (midi - 69) / 12);
+
+/** Standard tuning as MIDI notes, low string first: E2 A2 D3 G3 B3 E4. */
+export const OPEN_STRINGS = [40, 45, 50, 55, 59, 64] as const;
+
+export type ChordName = 'E7' | 'A7' | 'B7';
+
+/** Open-position voicings as MIDI notes, low string first. `null` is a muted string. */
+export const CHORDS: Record<ChordName, readonly (number | null)[]> = {
+  E7: [40, 47, 50, 56, 59, 64], // 0 2 0 1 0 0
+  A7: [null, 45, 52, 55, 61, 64], // x 0 2 0 2 0
+  B7: [null, 47, 51, 57, 59, 66], // x 2 1 2 0 2
+};
+
+/** A 12-bar blues in E, one chord per bar (PLAN.md section 4.4). Each strum plays the next bar. */
+export const BLUES_IN_E: readonly ChordName[] = ['E7', 'E7', 'E7', 'E7', 'A7', 'A7', 'E7', 'E7', 'B7', 'A7', 'E7', 'B7'];
+
+/** Three or more strings in one sweep is a strum; fewer is picking, which doesn't move the bar on. */
+export const isStrum = (stringsSounded: number) => stringsSounded >= 3;
+
+/**
+ * A string bend, B.B. King's signature move: pushing a string sideways raises its pitch.
+ * Up to a whole step (200 cents) at `maxPx` of push, either way, like a real string.
+ */
+export const bendCents = (px: number, maxPx: number) => 200 * Math.min(1, Math.abs(px) / maxPx);
+
+/** The playback rate that raises a note by `cents`. */
+export const centsToRate = (cents: number) => Math.pow(2, cents / 1200);
 
 /**
  * Karplus-Strong plucked string: a short burst of noise circulating through a

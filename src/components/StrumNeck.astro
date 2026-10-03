@@ -1,15 +1,18 @@
 ---
 /*
-  A guitar neck you can strum. The strings are drawn by src/scripts/strum.ts,
-  which only downloads when the neck gets near the viewport.
+  A guitar neck you can strum: each strum plays the next bar of a 12-bar
+  blues in E, and a pressed string bends (ADR 0018). The strings are drawn by
+  src/scripts/strum.ts, which only downloads when the neck gets near the
+  viewport. The chord name stays hidden until the first strum.
 */
 ---
 
 <div class="strum" data-strum>
-  <button class="neck" type="button" data-neck aria-label="Guitar strings. Press Enter to strum an E7 chord, or drag across them.">
+  <button class="neck" type="button" data-neck aria-label="Guitar strings. Each strum plays the next chord of a 12-bar blues in E. Press Enter to strum, or hold the up arrow to bend a note.">
     <svg class="neck-svg" aria-hidden="true" data-neck-svg></svg>
   </button>
   <div class="wrap strum-foot">
+    <p class="strum-chord" aria-live="polite" data-chord hidden></p>
     <button class="speaker" type="button" role="switch" aria-checked="false" aria-label="Sound" data-speaker>
       <svg class="speaker-icon" viewBox="0 0 24 24" aria-hidden="true">
         <path d="M3 9.5h4l5-4.5v14l-5-4.5H3z" fill="currentColor"></path>
