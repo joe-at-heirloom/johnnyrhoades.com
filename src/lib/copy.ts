@@ -8,8 +8,8 @@ import { BIOS } from './bios.ts';
 
 /** The home page About section, one array per paragraph, in Johnny's voice. */
 export const HOME_ABOUT = [
-  ['detroit-guitarist-singer', 'started-with-motor-city-josh', 'toured-us-europe-mexico-caribbean'],
-  ['influences', 'bb-king-memorial', 'played-with'],
+  ['detroit-guitarist-singer', 'started-with-motor-city-josh', 'toured-us-europe-mexico-caribbean', 'motor-city-josh-detroit-music-awards'],
+  ['influences', 'bb-king-memorial', 'nemeth-feelin-freaky', 'played-with'],
   ['covers-and-originals', 'album-waiting-on-the-sun'],
 ] as const;
 
@@ -34,7 +34,9 @@ export const LLMS_ABOUT = [
   'detroit-guitarist-singer',
   'started-with-motor-city-josh',
   'toured-us-europe-mexico-caribbean',
+  'motor-city-josh-detroit-music-awards',
   'covers-and-originals',
+  'nemeth-feelin-freaky',
   'played-with',
   'album-waiting-on-the-sun',
 ] as const;

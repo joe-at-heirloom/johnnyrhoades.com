@@ -7,13 +7,15 @@ import type { Ledger } from './facts.ts';
 import { plain } from './facts.ts';
 
 export const BIOS = {
-  short: ['detroit-guitarist-singer', 'started-with-motor-city-josh', 'covers-and-originals', 'album-waiting-on-the-sun'],
+  short: ['detroit-guitarist-singer', 'started-with-motor-city-josh', 'motor-city-josh-detroit-music-awards', 'album-waiting-on-the-sun'],
   medium: [
     'detroit-guitarist-singer',
     'started-with-motor-city-josh',
     'toured-us-europe-mexico-caribbean',
+    'motor-city-josh-detroit-music-awards',
     'influences',
     'bb-king-memorial',
+    'nemeth-feelin-freaky',
     'played-with',
     'covers-and-originals',
     'album-waiting-on-the-sun',

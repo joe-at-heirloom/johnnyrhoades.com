@@ -19,6 +19,9 @@
 #
 # Sources for "Johnny's bio": the About text on his Bandzoogle site, captured
 # 2026-09-30, and the same bio on Cliff Bell's 2017 event page.
+#
+# Notes from Joe (Johnny's cousin, who builds the site) are leads: they go in
+# `needs` or a source note, and never change a status on their own.
 
 - id: detroit-guitarist-singer
   third: Johnny Rhoades is a blues guitarist and singer from Detroit, Michigan.
@@ -46,7 +49,9 @@
   status: confirmed_by_johnny
   sources:
     - note: Johnny's bio
-  needs: Where, when and with whom, for a longer bio (PLAN.md section 17)
+  needs: >-
+    Where, when and with whom, for a longer bio (PLAN.md section 17). Joe, 2026-10-02: Europe was with
+    John Németh's band, which tours there. Still need years and countries, and Mexico and the Caribbean.
 
 - id: influences
   third: He grew up on B.B. King, Albert King, Albert Collins and Ray Charles.
@@ -61,14 +66,17 @@
   status: confirmed_by_johnny
   sources:
     - note: Johnny's bio
-  needs: Date and venue (PLAN.md section 17)
+  needs: >-
+    Date and venue (PLAN.md section 17). Lead: the city's tribute at W.C. Handy Park on May 27, 2015,
+    before the Beale Street procession, had John Németh on the bill (newsflare.com/video/46934).
+    Joe, 2026-10-02, thinks Johnny played it with Németh. Confirm with Johnny before it goes on a page.
 
 - id: played-with
-  third: He has played with Thornetta Davis, RJ Spangler, Brett Lucas, John Németh and Paul Carey, among others.
-  first: I’ve played with Thornetta Davis, RJ Spangler, Brett Lucas, John Németh and Paul Carey, among others.
+  third: He has played with Thornetta Davis, RJ Spangler, Brett Lucas and Paul Carey, among others.
+  first: I’ve played with Thornetta Davis, RJ Spangler, Brett Lucas and Paul Carey, among others.
   status: confirmed_by_johnny
   sources:
-    - note: Johnny's bio
+    - note: Johnny's bio. It also names John Németh, who has his own fact (nemeth-feelin-freaky).
 
 - id: covers-and-originals
   third: He plays a mix of blues covers and his own songs.
@@ -93,6 +101,19 @@
     - url: https://www.ferndalefriends.net/the-23rd-detroit-blues-society-anti-freeze-blues-festival/
       note: Festival lineup, February 19, 2017
 
+- id: nemeth-feelin-freaky
+  third: He was the guitarist in John Németh’s band, the Blue Dreamers, and plays on Németh’s 2017 album *Feelin’ Freaky*, produced by Luther Dickinson.
+  first: I was John Németh’s guitar player in the Blue Dreamers, and I’m on his 2017 album *Feelin’ Freaky*, produced by Luther Dickinson.
+  status: verified
+  tags: [highlight]
+  sources:
+    - url: https://www.bluesblastmagazine.com/john-nemeth-feelin-freaky-album-review/
+      note: "Blues Blast review, May 2017: the personnel lists Johnny Rhoades on guitar"
+    - url: https://www.americanbluesscene.com/2017/05/john-nemeth-feelin-freaky-new-release/
+      note: Released May 19, 2017 on Németh's Memphis Grease label, produced by Luther Dickinson at Zebra Ranch, Coldwater, Mississippi. Names Johnny in the Blue Dreamers and says he had since left the band.
+    - url: http://www.elmoremagazine.com/2017/04/premieres/john-nemeth-and-the-blue-dreamers-are-feelin-freaky-and-funky-in-their-new-video
+      note: Spells him "Johnny Rhodes". Recorded at Zebra Ranch and at Royal Studios in Memphis.
+
 - id: cliff-bells-2017
   third: The Johnny Rhoades Band headlined Cliff Bell’s in Detroit in June 2017.
   status: verified
@@ -109,6 +130,22 @@
     - url: https://www.youtube.com/watch?v=Xvm2uMDesXU
       note: Live in the D's own upload, January 13, 2020. The title names the band; Johnny lists the video on his site.
 
+- id: motor-city-josh-detroit-music-awards
+  third: He won Detroit Music Awards for Outstanding Blues Artist/Group in 2020 and 2023 with Motor City Josh & The Big 3, where he still plays guitar.
+  first: I won Detroit Music Awards in 2020 and 2023 with Motor City Josh & The Big 3, and I still play guitar in the band.
+  status: verified
+  tags: [highlight]
+  sources:
+    - url: https://www.detroitmusicawards.net/2023-winners
+      note: "2023 winner, Outstanding Blues Artist/Group: Motor City Josh & The Big 3"
+    - url: https://wrif.com/2020/04/20/see-the-full-list-of-detroit-music-awards-2020-winners/
+      note: "2020 winner, Outstanding Blues Artist/Group and Outstanding Live Performance: Motor City Josh & The Big 3"
+    - url: https://tallahasseearts.org/event/motor-city-josh-the-big-3/
+      note: The award lists name the band, not its members. This January 2023 show listing names "longtime guitarist Johnny Rhoades".
+    - url: https://www.youtube.com/watch?v=Xvm2uMDesXU
+      note: With the band on Live in the D in January 2020, three months before the 2020 awards
+    - note: Joe, 2026-10-02, says Johnny still plays in the band. His bio's "Detroit Music Award nominee" (2017) may be an earlier nomination; the wins supersede it on the site.
+
 - id: brighton-festival-2022
   third: He played the Brighton Smokin’ Jazz & BBQ Blues Festival in September 2022 with the Lucas Rhoades Band.
   status: confirmed_by_johnny
@@ -118,13 +155,18 @@
       note: Festival video, September 10, 2022. Johnny lists it on his site.
   needs: How the Lucas Rhoades Band should be billed (PLAN.md section 17)
 
-- id: detroit-music-award-nomination
-  third: He was nominated for a Detroit Music Award.
+- id: brett-lucas-soul-and-courage
+  third: He plays on Brett Lucas’s *Soul and Courage*, which won Outstanding Blues Recording at the 2020 Detroit Music Awards.
   status: unverified
-  detect: Detroit Music Award
+  detect: Courage
   sources:
-    - note: Johnny's bio says "Detroit Music Award nominee"; no year, category or listing found
-  needs: Year and category from Johnny, plus a link to the listing
+    - url: https://brettlucas.com/photos
+      note: 'Photo caption: "In the studio with Todd Glass, John Rhoades, and Alex Lyon."'
+    - url: https://wrif.com/2020/04/20/see-the-full-list-of-detroit-music-awards-2020-winners/
+      note: The 2020 winner is listed as "Soul & Courage, Vol. 2"
+  needs: >-
+    The album credits, or Johnny's word on which tracks he plays, and which volume. Joe, 2026-10-02, thinks
+    he's on it: he played with Brett in Motor City Josh's band and often plays with him in other lineups.
 
 - id: formats
   third: He plays solo acoustic, as a trio and with a full band.

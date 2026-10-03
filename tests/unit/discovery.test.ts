@@ -86,7 +86,6 @@ describe('llms.txt', () => {
     for (const f of parseFacts(readFileSync('src/data/facts.yaml', 'utf8')).filter((f) => f.status === 'unverified')) {
       expect(txt).not.toContain(f.third);
     }
-    expect(txt).not.toMatch(/Detroit Music Award/);
   });
 
   it('lists the next shows with dates in the venue’s time zone, and links to the canonical pages', () => {

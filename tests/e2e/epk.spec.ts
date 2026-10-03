@@ -26,9 +26,9 @@ test('the press kit has bios, facts with sources, highlights and booking', async
   await expect(page).toHaveTitle('Johnny Rhoades Press Kit | Detroit Blues Guitarist for Venues, Festivals and Events');
   await expect(page.getByRole('heading', { level: 1, name: 'Johnny Rhoades' })).toBeVisible();
   await expect(page.locator('#bio-short')).toContainText('Johnny Rhoades is a blues guitarist and singer from Detroit, Michigan.');
-  await expect(page.locator('#bio-medium cite')).toHaveText('Waiting on the Sun');
+  await expect(page.locator('#bio-medium cite')).toHaveText(['Feelin’ Freaky', 'Waiting on the Sun']);
   await expect(page.getByRole('heading', { name: 'Highlights' })).toBeVisible();
-  await expect(page.locator('.epk-highlights li')).toHaveCount(4);
+  await expect(page.locator('.epk-highlights li')).toHaveCount(6);
   await expect(page.locator('.epk-highlights li').first().getByRole('link', { name: 'Source' })).toHaveAttribute('href', /ferndalefriends/);
   await expect(page.getByRole('link', { name: 'Send a booking request' }).first()).toHaveAttribute('href', '/#book');
   expect(errors).toEqual([]);

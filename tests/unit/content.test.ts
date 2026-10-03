@@ -18,8 +18,8 @@ describe('facts ledger rules (PLAN.md section 6.4)', () => {
   });
 
   it('lets each context use only the statuses it allows', () => {
-    expect(() => facts.get('detroit-music-award-nomination', 'home')).toThrow(FactUseError);
-    expect(() => facts.get('detroit-music-award-nomination', 'epk')).toThrow(/unverified/);
+    expect(() => facts.get('formats', 'home')).toThrow(FactUseError);
+    expect(() => facts.get('formats', 'epk')).toThrow(/unverified/);
     expect(() => facts.get('bb-king-memorial', 'schema')).toThrow(/confirmed_by_johnny/);
     expect(facts.get('album-waiting-on-the-sun', 'schema').status).toBe('verified');
     expect(facts.first('played-with')).toMatch(/^I’ve played with/);
