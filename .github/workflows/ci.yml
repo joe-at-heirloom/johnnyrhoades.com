@@ -6,8 +6,6 @@
 #   Lighthouse CI against the budgets in lighthouserc.cjs.
 # - links (weekly, non-blocking): lychee on external links. Internal links
 #   are already covered by tests/e2e/discovery.spec.ts.
-#
-# Not yet run: the repo isn't on GitHub until Johnny OKs making it public.
 name: CI
 
 on:

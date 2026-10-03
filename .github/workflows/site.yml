@@ -14,7 +14,8 @@
 # secret exists, the sync step is skipped and the site builds from the
 # committed src/data/shows.json (ADR 0006).
 #
-# Not yet run: the repo isn't on GitHub until Johnny OKs making it public.
+# Staging lives at new.johnnyrhoades.com (Settings → Pages → custom domain)
+# until cutover; docs/runbook-launch.md.
 name: Site
 
 on:
@@ -38,6 +39,7 @@ jobs:
   sync:
     runs-on: ubuntu-latest
     outputs:
+      # Rebuild only when the shows changed, not for the weekly heartbeat commit (that's `changed`).
       changed: ${{ steps.sync.outputs.shows_changed }}
       sha: ${{ steps.commit.outputs.sha }}
     steps:
