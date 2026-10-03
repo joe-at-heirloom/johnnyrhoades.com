@@ -19,6 +19,8 @@ test('home lists upcoming shows from the data, with no Bandsintown widget', asyn
   page.on('request', (r) => {
     if (/bandsintown\.com\/.*\.js|widgetv3/.test(r.url())) widget.push(r.url());
   });
+  // The hero moves on once a show ends (src/scripts/tonight.ts), so hold the browser at the build's "now".
+  await page.clock.setFixedTime(new Date('2026-10-01T12:00:00-04:00'));
   await page.goto('/');
   const rows = page.locator('#shows .show-row');
   await expect(rows).toHaveCount(7);
