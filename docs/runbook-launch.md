@@ -37,7 +37,7 @@ A public lookup can't see every record. The zone export in step 2 is the real li
 
 ## Staging
 
-8. [x] DNS: `new` CNAME to `joe-at-heirloom.github.io`, DNS only (grey cloud), added 2026-10-02. Staging is live at http://new.johnnyrhoades.com. Then, once GitHub issues the certificate: Enforce HTTPS.
+8. [x] DNS: `new` CNAME to `joe-at-heirloom.github.io`, DNS only (grey cloud), added 2026-10-02. Staging is live at https://new.johnnyrhoades.com, with HTTPS enforced. Setting the custom domain before the DNS record existed meant GitHub never queued a certificate; removing and re-adding the domain got it approved at once. Do the DNS record first at cutover.
 9. [x] Push to `main` and watch it go green. First deploy 2026-10-02: sync skipped (no key yet), build and deploy green, IndexNow quiet (staging).
 10. [ ] Review on real phones, and work through `docs/manual-checks.md` sections "Waiting on the staging deploy" and "Waiting on the service accounts". Every page should carry `noindex` (`SITE_NOINDEX`).
 
