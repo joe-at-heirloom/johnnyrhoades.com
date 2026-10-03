@@ -119,7 +119,7 @@ Every public show gets a typographic gig poster, rendered at build time in the s
 
 **Why it's worth building.** Johnny plays well over a hundred dates a year, and every venue wants something to post. Today someone makes those graphics by hand, or nobody does. The same images also become each show page's link preview and the images Google asks for in event results.
 
-**Look.** A bill poster built from type. The venue name is the hero, set as large as it fits. Archivo's width axis lets short names run wide and long names run condensed, so every poster fills its frame; that fit-to-width behavior is the typographic signature. Date, time, town and act label ("Solo acoustic", "Trio", "Full band", "With Motor City Josh & The Big 3") sit in a strict hierarchy. Johnny's logo mark and `johnnyrhoades.com` anchor the bottom. An optional duotone photo is picked deterministically from a curated set for that act type, so a given show always gets the same image.
+**Look.** A letterpress show card, the kind blues acts toured on in the '50s and '60s (ADR 0017, which replaced the first, venue-first bill). It's bone stock printed in black and red. A red band reads ★ IN PERSON ★, and JOHNNY RHOADES is set as big as the card allows, on every show, guest spots included. Each line fills the width in whichever Archivo width cut sets it biggest, the way a printer pulled wood type; that fit-to-width behavior is the typographic signature. The act ("Solo acoustic", "Trio", "With Motor City Josh & The Big 3") sits under the name in red. Under a double rule come the venue (fit to width), the town, the date in a red block, and `johnnyrhoades.com`. The PNGs carry the site's paper grain and letterpress wear. There's no photo: no format had room for one without shrinking the name.
 
 **Formats**
 
@@ -131,7 +131,7 @@ Every public show gets a typographic gig poster, rendered at build time in the s
 | `story` | 1080×1920 | Stories | Upcoming shows |
 | Print flyer | US Letter | A print stylesheet on the show page ("Print a flyer") | Upcoming shows |
 
-**How.** `satori` (layout to SVG; templates are plain element objects, not JSX, per ADR 0009) plus `@resvg/resvg-js` (SVG to PNG) in an Astro static endpoint using `getStaticPaths`. Satori accepts TTF, OTF and WOFF but not WOFF2, and it doesn't reliably interpolate variable-font axes, so commit static Archivo instances (for example condensed 800, normal 800, expanded 900 and normal 500) generated with fonttools `varLib.instancer` into `src/assets/fonts/poster/`. Pre-process duotone photos with `sharp`. Cache each render by a hash of the template version, the fields it uses and the photo, and persist the cache with `actions/cache` so unchanged shows never re-render.
+**How.** `satori` (layout to SVG; templates are plain element objects, not JSX, per ADR 0009) plus `@resvg/resvg-js` (SVG to PNG) in an Astro static endpoint using `getStaticPaths`. Satori accepts TTF, OTF and WOFF but not WOFF2, and it doesn't reliably interpolate variable-font axes, so commit static Archivo instances (for example condensed 800, normal 800, expanded 900 and normal 500) generated with fonttools `varLib.instancer` into `src/assets/fonts/poster/`. Add the print texture with `sharp`. Cache each render by a hash of the template version, the fonts, the textures and the fields it uses, and persist the cache with `actions/cache` so unchanged shows never re-render.
 
 **Acceptance.** The longest venue name in the data fits without overflow in every format. Text contrast passes WCAG AA. Each render stays under 150 ms on a CI runner. Snapshot tests cover five fixtures: a short venue name, a very long one, a guest act, a free show and a cancelled show.
 
@@ -471,7 +471,7 @@ The v1 visual language is the brand. v2 documents it and tightens it, and adds n
 - **One thing to explore.** The hero photo's blue suit. A deep suit blue as a secondary color would tie the palette to Johnny himself and to the word "blues", and give the red a partner. Try it on the poster first, and adopt it only if it earns its place.
 - **Type.** Archivo, self-hosted as a variable font with weight and width axes, subset to Latin. Display headings wide and heavy, dates and times condensed, body text at normal width. Posters use static instances (section 4.1).
 - **Motion.** The record and the strum are the only playful motion. No scroll-triggered reveals and no hover animations on every card. Respect `prefers-reduced-motion` everywhere.
-- **Imagery.** Full-color photos on the site; duotone only on posters. Every photo has real alt text and a credit.
+- **Imagery.** Full-color photos on the site; posters are type only (ADR 0017). Every photo has real alt text and a credit.
 - **Components.** Header, Hero, TonightBar, ProofLine, ShowRow, ShowList, ShowPoster, AddToCalendar, AlbumRecord, StrumNeck, VideoStage, Gallery and Lightbox, BookingForm, MailingList, Breadcrumbs, JsonLd, Footer.
 
 ---

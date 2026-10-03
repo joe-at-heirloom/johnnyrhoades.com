@@ -1,6 +1,6 @@
 # 0009: The poster engine
 
-**Status:** Accepted, 2026-09-30 (Phase 3)
+**Status:** Accepted, 2026-09-30 (Phase 3). The look (the bill, venue as the hero) and the duotone photo slot are superseded by ADR 0017, the show card. The engine stands.
 
 ## Context
 

@@ -12,7 +12,7 @@ Short notes on choices that shape the code, so the reasoning survives. One file 
 | [0006](0006-bandsintown-mock-and-data-model.md) | Mock Bandsintown until the API key arrives; where the data model grew | Accepted (mock part temporary) |
 | [0007](0007-scripts-run-on-node-type-stripping.md) | Run TypeScript scripts with Node's built-in type stripping | Accepted |
 | [0008](0008-shows-on-the-site.md) | Shows on the site, built from data | Accepted |
-| [0009](0009-poster-engine.md) | The poster engine | Accepted |
+| [0009](0009-poster-engine.md) | The poster engine | Accepted (look superseded by 0017) |
 | [0010](0010-facts-ledger-and-press-kit.md) | The facts ledger, enforced; and the press kit built on it | Accepted |
 | [0011](0011-forms-list-and-analytics.md) | Forms, mailing list and analytics on a static host | Accepted |
 | [0012](0012-hardening.md) | Hardening: discovery files, security headers and quality gates | Accepted |
@@ -20,4 +20,4 @@ Short notes on choices that shape the code, so the reasoning survives. One file 
 | [0014](0014-design-pass.md) | Design pass: layout and rhythm, same visual language | Accepted |
 | [0015](0015-print-texture.md) | Print texture | Accepted |
 | [0016](0016-record-player-and-date-check.md) | Drop the needle, and "am I free that night?" | Accepted |
-| [0017](0017-show-card-poster.md) | The show card, a classic blues poster template | Proposed (prototype) |
+| [0017](0017-show-card-poster.md) | The show card, a classic blues poster template | Accepted |

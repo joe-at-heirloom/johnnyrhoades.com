@@ -6,7 +6,7 @@ A running log for the portfolio write-up (PLAN.md section 16): numbers, screensh
 
 ## 2026-10-02: The show card, after "something classic blues"
 
-**What changed.** Joe wanted something classic blues on the site, "B.B. King or a velvet Jimi Hendrix poster." Rather than borrow their faces, the prototype borrows the form they toured on: the letterpress show card. It has IN PERSON across the top, JOHNNY RHOADES as big as the card allows, and the date in a solid red block, printed on bone stock. It's built from Johnny's real show data, like every other poster. ADR 0017, proposed.
+**What changed.** Joe wanted something classic blues on the site, "B.B. King or a velvet Jimi Hendrix poster." Rather than borrow their faces, the prototype borrows the form they toured on: the letterpress show card. It has IN PERSON across the top, JOHNNY RHOADES as big as the card allows, and the date in a solid red block, printed on bone stock. It's built from Johnny's real show data, like every other poster. ADR 0017.
 
 **Worth telling**
 
@@ -16,7 +16,15 @@ A running log for the portfolio write-up (PLAN.md section 16): numbers, screensh
 
 **Screenshots:** `docs/case-study/show-card-prototype-feed.jpg` (before above, after below) and `show-card-prototype-formats.jpg`.
 
-**Verdict.** Joe, on seeing the prototype: "I like this aesthetic." Still open: which formats use it, and guest-spot billing (ADR 0017).
+**Verdict.** Joe, on seeing the prototype: "I like this aesthetic." He chose the card for every format, with Johnny's name biggest on guest spots too.
+
+**Shipping it**
+
+- *The texture tripled the PNG size, so the show page stopped loading the PNG.* Grain doesn't compress: the Instagram post went from 73 KB (the bill) to 171 KB, and palette PNG or WebP only got it to 85–100 KB. The page now inlines satori's own SVG of the same layout, about 16 KB gzipped. That one element is the poster on screen and the printed flyer: vector on white paper, one US Letter page. The textured PNGs stay for posting and link previews. A show page is now lighter than it was with the old poster.
+- *A sharp surprise.* `blur().threshold()` in one sharp pipeline runs the threshold first, so "keep only deep interiors" quietly wore every stroke near ink, the 4 px test stroke included. The cut now happens in code after the blur. A unit test draws a heavy block and a 4 px stroke and checks that only the block wears.
+- *Ink covers paper.* The first finish laid the paper grain over everything, so fibers showed through black type. Grain now goes on bare stock only, in the same pass as the wear.
+- *A flaky test, found by the clock.* The home-page e2e test pinned the build date but not the browser clock. Once tonight's show ended at 9 pm, the hero correctly moved on and the test failed. It now sets the browser clock the way the Tonight tests do.
+- *Removed:* the duotone photo slot. It had shipped empty, waiting on photographer credits, and the card has no room for a photo without shrinking the name.
 
 ---
 

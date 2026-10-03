@@ -1,6 +1,6 @@
 # 0017: The show card, a classic blues poster template
 
-**Status:** Proposed, 2026-10-02 (prototype on `feat/show-card-poster`; not wired into the site)
+**Status:** Accepted, 2026-10-02. Supersedes the look and the duotone photo slot in ADR 0009; the engine (satori, resvg, the cache, the formats) stays.
 
 ## Context
 
@@ -8,22 +8,24 @@ Joe felt the site was missing "something classic blues", along the lines of a B.
 
 What fits is the form those artists toured on: the letterpress show card. A band across the top says IN PERSON, the headliner's name is set as big as the card allows, every line is a different width of wood type, and heavy rules divide the card. The date sits in a solid block of ink. It's printed in black and one color on bone card stock.
 
-The current posters (ADR 0009) are clean and modern, with the venue as the hero. Joe asked for a prototype with the name big.
+The first posters (ADR 0009) were clean and modern, with the venue as the hero. A prototype of the card with the name big went up on 2026-10-02; Joe's verdict was "I like this aesthetic." He chose the card for every format, and Johnny's name biggest on guest spots too.
 
 ## Decisions
 
-- **A second template beside the bill, not a rewrite.** `src/lib/posters/show-card.ts` builds the card from the same `PosterContent`, fonts and fit-to-width code. `renderCardContent` in `render.ts` renders it. Nothing on the site uses it yet.
+- **One template, the card, for every format** (`src/lib/posters/show-card.ts`): the link preview, Google's three event image ratios, the Instagram post and Story, and the printed flyer. The bill template is gone.
 - **The name is the hero; the venue comes second.** JOHNNY / RHOADES is set on two lines, each filling the full width. Each line takes whichever Archivo width cut lands it at the biggest size the space allows (`fillLine`), the way a printer pulled different wood type for each line. On wide formats the name runs as one line. `nameLines` picks one line or two, whichever sets it bigger.
-- **The act sits under the name in red** ("Trio", "Solo acoustic", "With Motor City Josh & The Big 3"). It's left off when the act isn't known.
+- **The act sits under the name in red** ("Trio", "Solo acoustic"). It's left off when the act isn't known.
+- **Guest spots bill Johnny first** with the band under him: JOHNNY RHOADES / WITH MOTOR CITY JOSH & THE BIG 3. That's how his fans find the show. The alt text follows the card ("Poster: Johnny Rhoades, with Motor City Josh & The Big 3, at…"). The show page's heading still uses the Bandsintown billing, with the bandleader first.
 - **Bone stock, black and red ink.** These are the site's own tokens (`--bone`, `--ink`, `--red`, `--ink-on-bone-2`, `--ink-on-bone-3`). There are no new colors or typefaces. Every pairing passes 4.5:1 (tested). The logo is left off: the name in wood type does that job.
-- **Printed, not rendered.** The PNG gets the site's paper tile and the letterpress wear (ADR 0015). As on the site, only big type wears: voids land only well inside an inked area. The first version wore every stroke, and a void across the I in "MI" read as "MI!" (`src/lib/posters/print.ts`).
+- **Printed, not rendered.** The PNGs get the site's paper grain and letterpress wear (ADR 0015) in `src/lib/posters/print.ts`, in one overlay: grain only on bare stock (ink covers paper), wear only well inside heavy ink. The first version wore every stroke, and a void across the I in "MI" read as "MI!". As on the site, only big type wears. Regenerated textures change the cache key.
+- **On the show page, the card is inline SVG, not the PNG.** Grain doesn't compress: the textured Instagram post is 171 KB, where the bill's was 73 KB, and a palette PNG or WebP only got it to about 85–100 KB. The page instead inlines satori's own SVG of the same layout: vector paths, no fonts needed, about 16 KB gzipped. It sits on a bone frame with the paper texture and is labeled with the alt text. The same element is the printed flyer: white paper, sharp at any size, one US Letter page. The textured PNGs are for posting, link previews and event markup.
 - **Cancelled:** the band says CANCELLED, and the venue and date panel go gray.
 - **Stories keep clear of Instagram's own buttons** (11% top, 13% bottom).
-- **Tried and dropped: a halftone photo of Johnny.** Classic cards usually carried one, and a 45° dot screen of the hero shot looked right. But no format had room for it without shrinking the name, and poster photos wait on photographer credits anyway (PLAN.md section 17).
+- **Removed: the duotone photo slot** (`duotone.ts`, `poster-photos.yaml`). Classic cards often carried a photo, and a halftone of the hero shot looked right in the prototype. But no format had room for it without shrinking the name, and the slot had shipped empty, waiting on photographer credits. It's in git history if that changes.
 
 ## Consequences
 
-- Renders take a median 86 ms per format, texture included, under the 150 ms budget (the bill takes 72 ms). Every venue name in the data fits in every format, the longest included. The name is always the biggest type on the card, and each line of it runs at least 95% of the width (tested).
-- Comparison: `docs/case-study/show-card-prototype-feed.jpg` (today's posters above, cards below, Johnny's real upcoming shows) and `show-card-prototype-formats.jpg`.
-- **If accepted:** decide which formats use the card (all of them, or the downloads and print flyer while `og` stays the bill). Add the template to the cache key, add card snapshots for the five fixtures, update the HTML print flyer to match, and set this record to Accepted.
-- **Open question:** a guest spot puts Johnny's name biggest even when he's in someone else's band ("With Motor City Josh & The Big 3" sits under it). That's how his fans find the show, but the bandleader might expect top billing.
+- Renders take a median 86 ms per format, texture included, under the 150 ms budget (the bill took 72 ms). Every venue name in the data fits in every format, the longest included. The name is always the biggest type on the card, and each line of it runs at least 95% of the width (tested).
+- Snapshots for the five fixtures are the card now. `TEMPLATE_VERSION` is 6, so every cached render is redrawn once.
+- A show page is lighter than before (no poster PNG to load). Lighthouse on a show page: performance 98–99, accessibility 100, LCP about 2 s (the warning line), set by render delay rather than the download.
+- Comparison: `docs/case-study/show-card-prototype-feed.jpg` (the bill above, cards below, Johnny's real upcoming shows) and `show-card-prototype-formats.jpg`.
