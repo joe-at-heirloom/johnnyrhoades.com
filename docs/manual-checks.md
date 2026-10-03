@@ -42,6 +42,6 @@ Set each ID as a GitHub Actions repository **variable** (not a secret; they're p
 ## Waiting on Johnny's answers (PLAN.md section 17)
 
 - [ ] **Press photo zip** (Phase 4). Once photographers and licenses are confirmed, add `credit` and `license` and the `press` use in `src/data/media.yaml`. The zip builds itself. *Automated now:* the zip route, and a test that it's absent without qualifying photos.
-- [ ] **Detroit Music Award line.** With a year, category and listing, move the fact to `confirmed_by_johnny` or `verified` in `facts.yaml` and add it back to `HOME_ABOUT` in `src/lib/copy.ts`.
+- [x] **Detroit Music Award line.** Done 2026-10-02: the wins with Motor City Josh & The Big 3 (2020, 2023) are `verified` and on the home page, the bios and the press kit highlights.
 - [ ] **Johnny's own song clips** (ADR 0016). From the Bandzoogle audio export, cut 30-second clips (m4a or mp3) into `public/audio/<slug>.m4a`, point each track's `preview` at `/audio/<slug>.m4a`, set `previewSource: own`, and remove the Apple host from `media-src` in `src/lib/security-headers.ts` and `docs/security-headers.md`.
 - [ ] **Formats, long bio, booking email.** Each needs Johnny's answer first; the press kit leaves them out until then. Once there's a booking email, make it the form's error fallback in `src/scripts/forms.ts` (Facebook for now).

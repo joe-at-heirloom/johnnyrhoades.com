@@ -37,3 +37,5 @@ An end-to-end test scans the built pages for the same text.
 
 - Changing what the site says about Johnny is a data change in one file, reviewed against a rule, rather than a hunt through templates.
 - As Johnny answers the questions in PLAN.md section 17, sections switch on with no template work: formats, the long bio, press photos, the Detroit Music Award line.
+
+*Update, 2026-10-02:* the Detroit Music Award line came back as two wins rather than a nomination (`motor-city-josh-detroit-music-awards`, verified), and the unverified nomination was retired. Notes from Joe are recorded as leads in `needs` and don't change a status on their own.

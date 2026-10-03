@@ -4,6 +4,18 @@ A running log for the portfolio write-up (PLAN.md section 16): numbers, screensh
 
 ---
 
+## 2026-10-02: A second research pass, and the biggest credit wasn't on the site
+
+**What changed.** Searching outside Johnny's own bio found two things bigger than anything in the press kit: he was John Németh's guitarist in the Blue Dreamers and plays on *Feelin' Freaky* (2017, produced by Luther Dickinson), and the band he still plays in, Motor City Josh & The Big 3, won Detroit Music Awards in 2020 and 2023. Both are `verified` with links and now lead the home page About, the bios, the press kit highlights and /llms.txt.
+
+**Worth telling**
+
+- *The ledger paid for itself in reverse.* The "Detroit Music Award nominee" line was held back for having no source. The research didn't find the nomination; it found two wins. Bringing the line back was a data change plus tests, no template work.
+- *Spelling hides credits.* Elmore Magazine spells him "Johnny Rhodes", so searches on the right name miss it. Worth checking in the AI answer audit (docs/geo-audit-log.md).
+- *Leads stay leads.* The B.B. King memorial is probably the May 27, 2015 tribute at W.C. Handy Park with Németh, and he's probably on Brett Lucas's award-winning *Soul and Courage*. Both are recorded in the ledger as leads, off the page, until Johnny confirms.
+
+---
+
 ## 2026-10-02: The 12-bar strum, and the bend
 
 **What changed.** The neck used to play one E7 however you played it. Now each strum plays the next bar of a 12-bar blues in E, with the chord name quietly under the neck, and pressing a string and pushing bends it up to a whole step. ADR 0018.

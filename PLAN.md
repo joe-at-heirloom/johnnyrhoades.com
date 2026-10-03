@@ -690,9 +690,11 @@ Each phase is sized for one or two Claude Code sessions and ends with acceptance
 
 Nothing below ships as fact until he answers.
 
-- [ ] Detroit Music Award nomination: year and category.
-- [ ] B.B. King memorial celebration in Memphis: date and venue.
-- [ ] Touring in Europe, Mexico and the Caribbean: where, when and with whom.
+- [x] Detroit Music Award nomination: year and category. Resolved by research (2026-10-02): he won Outstanding Blues Artist/Group in 2020 and 2023 with Motor City Josh & The Big 3, and still plays in the band. His bio's older "nominee" line is superseded.
+- [ ] B.B. King memorial celebration in Memphis: date and venue. Lead: the May 27, 2015 tribute at W.C. Handy Park, with John Németh, as Joe thinks.
+- [ ] Touring in Europe, Mexico and the Caribbean: where, when and with whom. Europe was with John Németh's band, per Joe. Years?
+- [ ] John Németh's Blue Dreamers: which years, and any other records with Németh besides *Feelin' Freaky* (2017).
+- [ ] Brett Lucas's *Soul and Courage* (Detroit Music Award, 2020): is he on it, which volume and which tracks?
 - [ ] The Blue Goose story: did he start there washing dishes?
 - [ ] Lucas Rhoades Band: current or past, and how it should be billed.
 - [ ] Years in Motor City Josh's band, and which albums he's on.
@@ -844,7 +846,7 @@ That's it. The site picks the show up within three hours, builds its page and po
 
 *Medium (about 150 words)*
 
-> Johnny Rhoades is a blues guitarist and singer from Detroit. He started out at 19 playing in Motor City Josh's band and has been on and off the road ever since, around the US and in Europe, Mexico and the Caribbean. He grew up on B.B. King, Albert King, Albert Collins and Ray Charles, played B.B. King's memorial celebration in Memphis, and has shared stages with Thornetta Davis, RJ Spangler, Brett Lucas, John Németh and Paul Carey. He plays a mix of blues standards and his own songs, solo acoustic, as a trio or with a full band. His album *Waiting on the Sun* came out in 2014. TODO: add the Detroit Music Award line once it's verified.
+> Johnny Rhoades is a blues guitarist and singer from Detroit. He started out at 19 playing in Motor City Josh's band and has been on and off the road ever since, around the US and in Europe, Mexico and the Caribbean. He grew up on B.B. King, Albert King, Albert Collins and Ray Charles, played B.B. King's memorial celebration in Memphis, and has shared stages with Thornetta Davis, RJ Spangler, Brett Lucas, John Németh and Paul Carey. He plays a mix of blues standards and his own songs, solo acoustic, as a trio or with a full band. His album *Waiting on the Sun* came out in 2014. (The built bios now add the 2020 and 2023 Detroit Music Awards and John Németh's *Feelin' Freaky* from the ledger.)
 
 *Long (about 350 words): outline only, to write once Johnny answers*
 
