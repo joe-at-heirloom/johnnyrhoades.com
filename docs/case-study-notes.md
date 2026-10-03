@@ -4,6 +4,20 @@ A running log for the portfolio write-up (PLAN.md section 16): numbers, screensh
 
 ---
 
+## 2026-10-02: The 12-bar strum, and the bend
+
+**What changed.** The neck used to play one E7 however you played it. Now each strum plays the next bar of a 12-bar blues in E, with the chord name quietly under the neck, and pressing a string and pushing bends it up to a whole step. ADR 0018.
+
+**Worth telling**
+
+- *The idea came out of the music, not a feature list.* Asked for "something classic blues" that people could play with, the answer was in the form itself: the 12-bar progression and the string bend, B.B. King's move (one of the four players Johnny grew up on).
+- *Strum or bend? The finger tells you.* Both start with a press on a string. A press that moves off within 110 ms is a strum; one that stays put is a bend. No mode switch and no instructions.
+- *Still no audio files.* The chords are real open-position voicings from the same synthesized string, each note made once on first use. A muted string is a 50 ms dead thump. The bend is the playback rate gliding up to 2^(2/12), checked in the browser at 1.1223 against 1.1225.
+
+**Next, from Johnny:** a handful of short licks in E, so his guitar can answer the visitor's strums in the gaps, the way a blues verse does call and response.
+
+---
+
 ## 2026-10-02: The show card, after "something classic blues"
 
 **What changed.** Joe wanted something classic blues on the site, "B.B. King or a velvet Jimi Hendrix poster." Rather than borrow their faces, the prototype borrows the form they toured on: the letterpress show card. It has IN PERSON across the top, JOHNNY RHOADES as big as the card allows, and the date in a solid red block, printed on bone stock. It's built from Johnny's real show data, like every other poster. ADR 0017.

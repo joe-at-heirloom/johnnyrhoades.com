@@ -156,9 +156,11 @@ Computed from the show history at build time and shown as a plain sentence, not 
 
 It appears on the home page, `/shows/` and `/epk/`, and hides itself when the last year holds fewer than ten shows. `/epk/` also lists his most-played rooms and every festival, generated from the same data.
 
-### 4.4 The 12-bar strum (optional polish)
+### 4.4 The 12-bar strum (built, with the bend: ADR 0018)
 
 The strummable neck already plays E7. Let each strum advance through a 12-bar blues in E (E7 for four bars, A7 for two, E7 for two, then B7, A7, E7, B7), with the chord name shown quietly beside the neck. The progression resets after eight seconds without a strum. Sound stays off until the visitor turns it on, and the string vibration respects reduced motion. It's small and on-subject, and it's the kind of detail people send to friends.
+
+The bend: press a string, hold it a moment and push, and it bends up to a whole step, B.B. King's move; wiggle it for vibrato. Holding the up arrow does the same on the B string.
 
 **Rejected:** countdown timers, scroll-triggered animations, page transitions, a chatbot, setlist voting. Each costs attention and gives nothing back to a booker or a fan.
 
@@ -670,7 +672,7 @@ Each phase is sized for one or two Claude Code sessions and ends with acceptance
 **Phase 8: After launch (30, 60 and 90 days)**
 
 - The profile claims and database entries from section 10, monthly AI audits, metric check-ins and the case study.
-- Optional: the 12-bar strum, Pages CMS, the weekly RSS email, and a Cloudflare Worker for forms.
+- Optional: the 12-bar strum (done early, ADR 0018), Pages CMS, the weekly RSS email, and a Cloudflare Worker for forms.
 
 ---
 
