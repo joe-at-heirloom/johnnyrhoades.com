@@ -179,12 +179,16 @@ export function cardLayout(content: PosterContent, format: PosterFormat, measure
   };
 }
 
-/** True when every line of type stays inside its box (PLAN.md section 4.1's acceptance check). */
+/**
+ * True when every line of type stays inside its box (PLAN.md section 4.1's acceptance check).
+ * Half a pixel of slack: a line sized to fill its box exactly can measure 1e-13 px over in floating point.
+ */
 export function cardFits(l: CardLayout, measure: Measure): boolean {
-  const name = l.name.every((line) => line.width <= l.contentWidth + 0.5);
+  const SLACK = 0.5;
+  const name = l.name.every((line) => line.width <= l.contentWidth + SLACK);
   const venueWidth = l.wide ? l.contentWidth - l.panel.width : l.contentWidth;
-  const venue = l.venue.lines.every((line) => lineWidth(line, l.venue.font, l.venue.size, measure, 0) <= venueWidth);
-  const date = l.date.lines.every((line) => lineWidth(line, l.date.font, l.date.size, measure, 0) <= l.panel.width - l.panel.padX * 2);
+  const venue = l.venue.lines.every((line) => lineWidth(line, l.venue.font, l.venue.size, measure, 0) <= venueWidth + SLACK);
+  const date = l.date.lines.every((line) => lineWidth(line, l.date.font, l.date.size, measure, 0) <= l.panel.width - l.panel.padX * 2 + SLACK);
   return name && venue && date;
 }
 
