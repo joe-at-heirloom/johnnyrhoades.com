@@ -61,7 +61,7 @@ The current one-page prototype (`index.html`, `assets/css/styles.css`, `assets/j
 
 - The photography: the hero (blue suit, sunglasses, cream Stratocaster), the ten-photo gallery, the sepia portrait, the album cover.
 - The record-and-sleeve album treatment and the strummable guitar neck. They're the site's personality, and they stay the only playful moments on the page.
-- The first-person voice on the home page ("Where I'm playing next").
+- The first-person voice on the home page ("Where I'm playing next"). The About bio is the exception: it's in the third person at Johnny's request (ADR 0022).
 - The video stage with click-to-load facades and self-hosted thumbnails, the lightbox, the skip link, the honeypot fields, and the tracklist with durations and per-track Apple Music links.
 
 **Fix**
@@ -370,7 +370,7 @@ Every biographical claim on the site comes from here, with a status and, whereve
 
 Rules, enforced by a check script in CI:
 
-- The home page, written in Johnny's own voice, may use `verified` and `confirmed_by_johnny` facts.
+- The home page may use `verified` and `confirmed_by_johnny` facts.
 - `/epk/` may use `verified` and `confirmed_by_johnny` facts, and shows the source link when there is one.
 - Structured data may use `verified` facts only.
 - `unverified` facts appear nowhere until they're resolved.
@@ -396,7 +396,7 @@ The section order stays the same: hero, shows, music, videos, about, photos, boo
 | Shows | Replace the widget with the next eight shows rendered at build time: date, venue, town, act label and start time, each linking to its show page. Then "All shows", "Subscribe to the calendar" and "Follow on Bandsintown". |
 | Music | Keep the record and the strum. Point Apple Music at the artist page as well as the album. Add Spotify once it's claimed. Add `MusicAlbum` with `MusicRecording` tracks from `media.yaml`. |
 | Videos | Keep. Add `VideoObject` data for each video. |
-| About | Keep the voice. Pull claims from the ledger. Fix Németh. |
+| About | The running bio, in the third person (ADR 0022), the same text as the press kit's medium bio. Pull claims from the ledger. Fix Németh. |
 | Photos | Keep. Add photographer credits to the lightbox captions. |
 | Booking | Keep the form and move it to the new backend (section 11). Add an Act select and an optional budget range. Add "Booking agent or festival? See the press kit" linking to `/epk/`. Add a response-time promise once Johnny confirms one he can keep. |
 | Mailing list | Keep the copy and the ZIP field. Move it to the email service. |
@@ -693,22 +693,24 @@ Each phase is sized for one or two Claude Code sessions and ends with acceptance
 Nothing below ships as fact until he answers.
 
 - [x] Detroit Music Award nomination: year and category. Resolved by research (2026-10-02): he won Outstanding Blues Artist/Group in 2020 and 2023 with Motor City Josh & The Big 3, and still plays in the band. His bio's older "nominee" line is superseded.
-- [ ] B.B. King memorial celebration in Memphis: date and venue. Lead: the May 27, 2015 tribute at W.C. Handy Park, with John Németh, as Joe thinks.
-- [ ] Touring in Europe, Mexico and the Caribbean: where, when and with whom. Europe was with John Németh's band, per Joe. Years?
-- [ ] John Németh's Blue Dreamers: which years, and any other records with Németh besides *Feelin' Freaky* (2017).
-- [ ] Brett Lucas's *Soul and Courage* (Detroit Music Award, 2020): is he on it, which volume and which tracks?
-- [ ] The Blue Goose story: did he start there washing dishes?
-- [ ] Lucas Rhoades Band: current or past, and how it should be billed. Bandsintown has 19 shows billed that way, the latest at The Fed in August 2026; the site says "Lucas Rhoades Band, with Johnny Rhoades" for now.
-- [ ] Years in Motor City Josh's band, and which albums he's on.
-- [ ] Formats: who plays in the trio and the band, typical set lengths, and whether he brings his own PA, and for what size room.
+- [x] B.B. King memorial celebration in Memphis: date and venue. Answered 2026-10-05: the tribute at W.C. Handy Park on May 27, 2015, with John Németh's band.
+- [x] Touring in Europe, Mexico and the Caribbean: where, when and with whom. Answered 2026-10-05: Spain, Norway, Denmark and Scotland in 2015–16 and Mexico in 2016, with John Németh; the Caribbean with Thornetta Davis. Still open: the Caribbean year (he doesn't remember).
+- [x] John Németh's Blue Dreamers: which years, and any other records with Németh besides *Feelin' Freaky* (2017). Answered 2026-10-05: 2015–16. He didn't mention other records.
+- [x] Brett Lucas's *Soul and Courage* (Detroit Music Award, 2020): is he on it? Answered 2026-10-05: no. The lead is out of the ledger.
+- [x] The Blue Goose story: did he start there washing dishes? Answered 2026-10-05: yes (`blue-goose-dishes`, for the long bio).
+- [x] Lucas Rhoades Band: current or past, and how it should be billed. Answered 2026-10-05: current, once a month at The Fed in Clarkston; billed as "Lucas Rhoades Band" (Joe).
+- [x] Years in Motor City Josh's band, and which albums he's on. Answered 2026-10-05: since 2006; *Covered Up*, *Forty Four: A Tribute to Howlin' Wolf*, *It's a Good Life* and *Finding a New Gear*.
+- [x] Pat Smillie (about 85 shows together, 2022–2025): add him to the people he's played with? Answered 2026-10-05: yes.
+- [x] Larry McCray on the bill at the Magic Bag, 2015: what was that show? Answered 2026-10-05: he doesn't remember. Left out.
+- [x] Formats: who plays in the trio and the band, typical set lengths, and whether he brings his own PA, and for what size room. Answered 2026-10-05: the trio is him with bass and drums, the full band adds keys, and the players vary; two 75-minute sets with a half-hour break; a small PA for rooms of 50 to 100. Now the press kit's Formats section and the long bio.
 - [x] A default act for Bandsintown entries with no label. Not needed: unlabeled shows are billed as plain "Johnny Rhoades", and the act is read from the label he already types in front of the venue name (ADR 0020).
 - [x] Which booking email to publish. Answered 2026-10-05: `hello@johnnyrhoades.com`, his work email (ADR 0021).
-- [ ] Whether to publish a phone number, and a response time he can keep.
-- [ ] Original high-resolution files and photographer credits for every photo.
-- [ ] A stage plot and input list for each format.
-- [ ] Access to Spotify for Artists and Apple Music for Artists, and who distributed *Waiting on the Sun*.
+- [x] Whether to publish a phone number, and a response time he can keep. Answered 2026-10-05: no phone number; he replies "very quickly", which the booking form's "I'll get back to you soon" already says.
+- [ ] Original high-resolution files and photographer credits for every photo. Answered 2026-10-05: Kyla Pedraz took the posed portraits (credited in `media.yaml`). Still need her OK for press use and the original files.
+- [ ] A stage plot and input list for each format. Answered 2026-10-05: he'll make a stage plot and send it.
+- [ ] Access to Spotify for Artists and Apple Music for Artists, and who distributed *Waiting on the Sun*. Answered 2026-10-05: he doesn't use Spotify; CD Baby distributed the album. Still open: Apple Music for Artists, and claiming both profiles through CD Baby.
 - [ ] Registrar, Bandzoogle and Bandsintown logins, and any email currently running on the domain.
-- [ ] Two or three venue owners or bookers who'd give a one-line quote.
+- [ ] Two or three venue owners or bookers who'd give a one-line quote. Answered 2026-10-05: Cal Stone and Lisa Boitel. Joe asks them for a line; quotes go on the press kit only once they've sent one.
 - [ ] OK to make the repo public and to add a "Site by Joe" credit.
 
 ---
@@ -824,7 +826,7 @@ Add shows the way you always have. Three things help: pick the venue from Bandsi
 
 **Voice**
 
-- Home page: first person, Johnny talking, short sentences ("Where I'm playing next").
+- Home page: first person, Johnny talking, short sentences ("Where I'm playing next"). The About bio is third person (ADR 0022).
 - Press kit and structured data: third person, factual.
 - Sentence case for headings and buttons. Buttons say what happens: "Send booking request", "Download Instagram post".
 - Specific beats superlative: names, rooms, dates and counts. These words don't appear: soulful, electrifying, legendary, powerhouse, world-class, "Detroit's best".
@@ -838,7 +840,7 @@ Add shows the way you always have. Three things help: pick the venue from Bandsi
 
 *Medium (about 150 words)*
 
-> Johnny Rhoades is a blues guitarist and singer from Detroit. He started out at 19 playing in Motor City Josh's band and has been on and off the road ever since, around the US and in Europe, Mexico and the Caribbean. He grew up on B.B. King, Albert King, Albert Collins and Ray Charles, played B.B. King's memorial celebration in Memphis, and has shared stages with Thornetta Davis, RJ Spangler, Brett Lucas, John Németh and Paul Carey. He plays a mix of blues standards and his own songs, solo acoustic, as a trio or with a full band. His album *Waiting on the Sun* came out in 2014. (The built bios now add the 2020 and 2023 Detroit Music Awards and John Németh's *Feelin' Freaky* from the ledger.)
+> Johnny Rhoades is a blues guitarist and singer from Detroit. He started out at 19 playing in Motor City Josh's band and has been on and off the road ever since, around the US and in Europe, Mexico and the Caribbean. He grew up on B.B. King, Albert King, Albert Collins and Ray Charles, played B.B. King's memorial celebration in Memphis, and has shared stages with Thornetta Davis, RJ Spangler, Brett Lucas, John Németh and Paul Carey. He plays a mix of blues standards and his own songs, solo acoustic, as a trio or with a full band. His album *Waiting on the Sun* came out in 2014. (The built bios now add the 2020 and 2023 Detroit Music Awards, John Németh's *Feelin' Freaky*, and Jill Jack and Julianne Ankley from the ledger. The medium bio is also the home page About; ADR 0022.)
 
 *Long (about 350 words): outline only, to write once Johnny answers*
 

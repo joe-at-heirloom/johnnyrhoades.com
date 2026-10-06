@@ -1,6 +1,7 @@
 # Album, videos and photos (PLAN.md section 6.5). Files are relative to src/assets/.
 
 album:
+  # Distributed by CD Baby (Johnny, 2026-10-05).
   title: Waiting on the Sun
   released: 2014-11-02
   cover: photos/album-waiting-on-the-sun.jpg
@@ -56,11 +57,14 @@ videos:
 # use: where a photo may appear. gallery | epk | press (offered as a high-resolution download)
 # shape: portrait | landscape. Gallery photos need it: it decides their place in the grid (src/lib/gallery.ts).
 # Press downloads need a confirmed credit and license (PLAN.md section 17).
+# Johnny, 2026-10-05: "Kyla Pedraz took those photos"; Joe, the same day: the posed portraits. Credited below.
+# Her OK for press use (a license) and the original files are still to come, so none of them is `press` yet.
 # Credits read from watermarks are marked as such until the photographer confirms.
 photos:
   - file: photos/gallery/seated-studio.jpg
     shape: portrait
     alt: Johnny seated with a hollow-body guitar in front of a wall of amplifiers, black and white
+    credit: Kyla Pedraz
     use: [gallery, epk]
   - file: photos/gallery/blues-by-the-bay.jpg
     shape: landscape
@@ -78,6 +82,7 @@ photos:
   - file: photos/gallery/bookshelf.jpg
     shape: landscape
     alt: Johnny sitting with his guitar in a room lined with books, black and white
+    credit: Kyla Pedraz
     use: [gallery, epk]
   - file: photos/gallery/bar-stage.jpg
     shape: portrait
@@ -95,6 +100,7 @@ photos:
   - file: photos/gallery/fence.jpg
     shape: landscape
     alt: Johnny standing by a wooden fence holding his guitar, black and white
+    credit: Kyla Pedraz
     use: [gallery, epk]
   - file: photos/gallery/backstage.jpg
     shape: portrait
@@ -103,6 +109,7 @@ photos:
     gridWidth: 640
   - file: photos/portrait.jpg
     alt: Sepia portrait of Johnny Rhoades standing by a vine-covered fence, guitar at his side
+    credit: Kyla Pedraz
     use: [epk]
   - file: photos/hero.jpg
     alt: Johnny Rhoades onstage in a blue suit and sunglasses, playing a cream Stratocaster

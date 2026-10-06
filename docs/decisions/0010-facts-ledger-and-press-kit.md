@@ -39,3 +39,5 @@ An end-to-end test scans the built pages for the same text.
 - As Johnny answers the questions in PLAN.md section 17, sections switch on with no template work: formats, the long bio, press photos, the Detroit Music Award line.
 
 *Update, 2026-10-02:* the Detroit Music Award line came back as two wins rather than a nomination (`motor-city-josh-detroit-music-awards`, verified), and the unverified nomination was retired. Notes from Joe are recorded as leads in `needs` and don't change a status on their own.
+
+*Update, 2026-10-05:* Johnny asked for his bio in the third person. The home page About is now the same running bio as the press kit's medium bio, and the `first` field gave way to `bio` (ADR 0022).

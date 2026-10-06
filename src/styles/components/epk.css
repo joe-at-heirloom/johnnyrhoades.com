@@ -27,6 +27,7 @@
 .epk-bio-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 10px; }
 .epk-bio-head h3 { color: var(--bone); letter-spacing: .16em; }
 .epk-bio p { color: var(--bone-2); font-size: var(--text-lede); max-width: 40rem; }
+.epk-bio p + p { margin-top: 14px; }
 .copy-btn { min-height: 36px; padding: 0 14px; font-size: .75rem; }
 
 .epk-proof { font-size: clamp(1.3rem, 2.2vw, 1.7rem); margin-bottom: 18px; }
@@ -71,6 +72,7 @@
   .copy-btn,
   .epk-more,
   .epk-downloads,
+  .epk-bio-long,
   .epk-source { display: none !important; }
   .epk-head { margin-bottom: 10pt; }
   .epk-kicker { color: #c02e28 !important; }

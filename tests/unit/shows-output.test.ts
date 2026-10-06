@@ -189,6 +189,16 @@ describe('structured data', () => {
     ]);
   });
 
+  it('bills his own band under its name, with him in it', () => {
+    const [fed] = shows([{ id: '700', datetime: '2026-10-17T19:30:00', venue: { name: 'Lucas Rhoades Band @ The Fed', city: 'Clarkston' } }]);
+    expect(fed).toMatchObject({ act: 'unspecified', billing: 'Lucas Rhoades Band', venue: { name: 'The Fed' } });
+    expect(musicEvent(fed!, { images }).performer).toEqual({
+      '@type': 'MusicGroup',
+      name: 'Lucas Rhoades Band',
+      member: expect.objectContaining({ '@type': 'Person', name: 'Johnny Rhoades' }),
+    });
+  });
+
   it('marks cancelled shows EventCancelled', () => {
     expect(musicEvent({ ...t!, status: 'cancelled' }, { images }).eventStatus).toBe('https://schema.org/EventCancelled');
   });

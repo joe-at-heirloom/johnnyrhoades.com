@@ -1,8 +1,8 @@
 /* Phase 4: the facts ledger, bios, media and profiles. */
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { bio, wordCount } from '../../src/lib/bios.ts';
-import { FACT_USES } from '../../src/lib/copy.ts';
+import { BIOS, bio, longBio, wordCount } from '../../src/lib/bios.ts';
+import { FACT_USES, HOME_ABOUT } from '../../src/lib/copy.ts';
 import { FactUseError, ledger, parseFacts, plain, segments } from '../../src/lib/facts.ts';
 import { isoDuration, liveLinks, parseMedia, parseProfiles, sameAs } from '../../src/lib/media.ts';
 import { siteGraph, videoObject } from '../../src/lib/schema.ts';
@@ -18,11 +18,14 @@ describe('facts ledger rules (PLAN.md section 6.4)', () => {
   });
 
   it('lets each context use only the statuses it allows', () => {
-    expect(() => facts.get('formats', 'home')).toThrow(FactUseError);
-    expect(() => facts.get('formats', 'epk')).toThrow(/unverified/);
+    // The ledger has no unverified facts right now (Johnny confirmed the last one), so use a sample.
+    const sample = ledger(parseFacts('- { id: x, third: "Claim.", status: unverified, needs: "a source", detect: "Claim" }'));
+    expect(() => sample.get('x', 'home')).toThrow(FactUseError);
+    expect(() => sample.get('x', 'epk')).toThrow(/unverified/);
     expect(() => facts.get('bb-king-memorial', 'schema')).toThrow(/confirmed_by_johnny/);
     expect(facts.get('album-waiting-on-the-sun', 'schema').status).toBe('verified');
-    expect(facts.first('played-with')).toMatch(/^I’ve played with/);
+    expect(facts.bio('played-with', 'home')).toMatch(/^Along the way he’s shared stages with/);
+    expect(facts.bio('influences', 'home')).toBe(facts.third('influences'));
   });
 
   it('allows every use the site makes', () => {
@@ -60,17 +63,34 @@ describe('bios', () => {
     expect(wordCount(bio(facts, 'short'))).toBeLessThanOrEqual(60);
     expect(wordCount(bio(facts, 'medium'))).toBeGreaterThan(90);
     expect(wordCount(bio(facts, 'medium'))).toBeLessThanOrEqual(170);
+    // About 350 words; the show count from the data adds a dozen more.
+    expect(wordCount(bio(facts, 'long'))).toBeGreaterThan(260);
+    expect(wordCount(bio(facts, 'long'))).toBeLessThanOrEqual(380);
+  });
+
+  it('put the show count at the head of the long bio’s last paragraph, only when there is one', () => {
+    const played = 'The last 12 months brought 106 shows in 35 rooms across 26 towns.';
+    const withCount = longBio(facts, played);
+    expect(withCount.at(-1)!.startsWith(played)).toBe(true);
+    expect(longBio(facts, null).join(' ')).toBe(bio(facts, 'long'));
   });
 
   it('say nothing unverified', () => {
-    for (const length of ['short', 'medium'] as const) {
+    for (const length of ['short', 'medium', 'long'] as const) {
       const text = bio(facts, length).toLowerCase();
       for (const needle of unverified) expect(text).not.toContain(needle);
     }
   });
 
-  it('are in the third person', () => {
+  it('are in the third person, the home page About included', () => {
     expect(bio(facts, 'medium')).not.toMatch(/\b(I|I’m|I’ve|my)\b/);
+    expect(bio(facts, 'long')).not.toMatch(/\b(I|I’m|I’ve|my)\b/);
+    expect(HOME_ABOUT.flat()).toEqual(BIOS.medium);
+  });
+
+  it.each(['medium', 'long'] as const)('don’t open three sentences in a row the same way (%s)', (length) => {
+    const openings = BIOS[length].map((id) => facts.bio(id, 'epk').split(' ')[0]);
+    openings.forEach((word, i) => expect(word === openings[i + 1] && word === openings[i + 2], `${BIOS[length][i]}: three "${word}"`).toBe(false));
   });
 });
 

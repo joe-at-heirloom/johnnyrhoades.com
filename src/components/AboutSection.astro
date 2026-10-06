@@ -1,11 +1,11 @@
 ---
-/* About, in Johnny's voice. Every sentence is a fact from the ledger (src/data/facts.yaml), first-person wording. */
+/* About: the running bio, in the third person (ADR 0022). Every sentence is a fact from the ledger (src/data/facts.yaml). */
 import { Image } from 'astro:assets';
 import FactText from './FactText.astro';
 import { HOME_ABOUT } from '../lib/copy';
 import { facts, image } from '../lib/load-content';
 
-const paragraphs = HOME_ABOUT.map((ids) => ids.map((id) => facts.first(id)).join(' '));
+const paragraphs = HOME_ABOUT.map((ids) => ids.map((id) => facts.bio(id, 'home')).join(' '));
 ---
 
 <section class="about" id="about" aria-labelledby="about-title">

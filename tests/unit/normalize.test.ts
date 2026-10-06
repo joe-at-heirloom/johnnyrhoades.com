@@ -99,9 +99,10 @@ describe('normalizeEvent against the real capture (ADR 0020)', () => {
   });
 
   it('reads the act for nearly every show he labeled', () => {
-    const unread = shows.filter((s) => s.act === 'unspecified' && s.rawTitle);
+    const unread = shows.filter((s) => s.act === 'unspecified' && s.rawTitle && s.billing === ARTIST_NAME);
     expect(unread.length).toBeLessThan(15);
     expect(shows.filter((s) => s.billing === 'Motor City Josh & The Big 3, with Johnny Rhoades').length).toBeGreaterThan(150);
+    expect(shows.filter((s) => s.billing === 'Lucas Rhoades Band')).toHaveLength(19);
   });
 
   it('leaves new shows with no label billed as plain Johnny Rhoades', () => {

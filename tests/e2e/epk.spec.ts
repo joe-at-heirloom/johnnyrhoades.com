@@ -13,7 +13,8 @@ test.beforeEach(async ({ page }) => {
 });
 
 test('no built page states an unverified fact', async ({ request }) => {
-  expect(unverified.length).toBeGreaterThan(0);
+  // Skipped, not passed, when there's nothing to look for; it comes back with the next unverified fact.
+  test.skip(unverified.length === 0, 'The ledger has no unverified facts right now');
   for (const path of PAGES) {
     const html = (await (await request.get(path)).text()).toLowerCase();
     for (const fact of unverified) expect(html, `${path} mentions "${fact.detect}"`).not.toContain(fact.detect!.toLowerCase());
@@ -27,6 +28,10 @@ test('the press kit has bios, facts with sources, highlights and booking', async
   await expect(page.getByRole('heading', { level: 1, name: 'Johnny Rhoades' })).toBeVisible();
   await expect(page.locator('#bio-short')).toContainText('Johnny Rhoades is a blues guitarist and singer from Detroit, Michigan.');
   await expect(page.locator('#bio-medium cite')).toHaveText(['Feelin’ Freaky', 'Waiting on the Sun']);
+  await expect(page.locator('#bio-long p')).toHaveCount(5);
+  await expect(page.locator('#bio-long')).toContainText('Before he played the Blue Goose Inn in St. Clair Shores, he washed dishes there.');
+  await expect(page.getByRole('heading', { name: 'Formats' })).toBeVisible();
+  await expect(page.locator('#formats-title + p')).toContainText('A typical night is two 75-minute sets with a half-hour break.');
   await expect(page.getByRole('heading', { name: 'Highlights' })).toBeVisible();
   await expect(page.locator('.epk-highlights li')).toHaveCount(6);
   await expect(page.locator('.epk-highlights li').first().getByRole('link', { name: 'Source' })).toHaveAttribute('href', /ferndalefriends/);
@@ -82,5 +87,6 @@ test('home structured data: videos, album tracks and official profiles', async (
   expect(person.description).toBe('Johnny Rhoades is a blues guitarist and singer from Detroit, Michigan.');
   const album = graph.find((n) => n['@type'] === 'MusicAlbum') as { track: { numberOfItems: number } };
   expect(album.track.numberOfItems).toBe(10);
-  await expect(page.locator('#about')).toContainText('I started out at 19 playing with Motor City Josh.');
+  await expect(page.locator('#about')).toContainText('He joined Motor City Josh’s band in 2006, at 19.');
+  await expect(page.locator('#about')).toContainText('These days he also backs Michigan singer-songwriters Jill Jack and Julianne Ankley on guitar.');
 });

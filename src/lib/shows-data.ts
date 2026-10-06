@@ -40,15 +40,29 @@ export const isIndexable = (s: Show, now: DateTime) => hasPage(s) && dt(s.start)
 export const roomOf = (s: Show) =>
   s.venue.street ? `${s.venue.street.toLowerCase().replace(/[^a-z0-9]/g, '')}|${s.venue.city.toLowerCase()}` : s.venue.key;
 
-/** The proof sentence (PLAN.md section 4.3), or null when the last year has fewer than ten shows. */
-export function proofLine(shows: Show[], now: DateTime): string | null {
+/** Shows, rooms and towns in the last year, or null under ten shows (too few to be proof). */
+function lastYearCounts(shows: Show[], now: DateTime) {
   const yearAgo = now.minus({ years: 1 });
   const lastYear = pastShows(shows, now).filter((s) => dt(s.start) >= yearAgo);
   if (lastYear.length < 10) return null;
-  const rooms = new Set(lastYear.map(roomOf)).size;
-  const towns = new Set(lastYear.map((s) => `${s.venue.city}|${s.venue.region}`)).size;
   const n = (count: number, one: string, many: string) => `${count} ${count === 1 ? one : many}`;
-  return `${n(lastYear.length, 'show', 'shows')} in the last year, in ${n(rooms, 'room', 'rooms')} across ${n(towns, 'town', 'towns')}.`;
+  return {
+    shows: n(lastYear.length, 'show', 'shows'),
+    rooms: n(new Set(lastYear.map(roomOf)).size, 'room', 'rooms'),
+    towns: n(new Set(lastYear.map((s) => `${s.venue.city}|${s.venue.region}`)).size, 'town', 'towns'),
+  };
+}
+
+/** The proof sentence (PLAN.md section 4.3), or null when the last year has fewer than ten shows. */
+export function proofLine(shows: Show[], now: DateTime): string | null {
+  const c = lastYearCounts(shows, now);
+  return c && `${c.shows} in the last year, in ${c.rooms} across ${c.towns}.`;
+}
+
+/** The same counts, worded for the long bio. */
+export function proofForBio(shows: Show[], now: DateTime): string | null {
+  const c = lastYearCounts(shows, now);
+  return c && `The last 12 months brought ${c.shows} in ${c.rooms} across ${c.towns}.`;
 }
 
 /** "Johnny's played here 14 times since 2024." Only once it's more than once. */

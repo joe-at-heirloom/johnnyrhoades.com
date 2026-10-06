@@ -23,7 +23,7 @@ export const FactSchema = z
   .strictObject({
     id: z.string().regex(/^[a-z0-9-]+$/),
     third: z.string().min(1),
-    first: z.string().min(1).optional(),
+    bio: z.string().min(1).optional(),
     status: z.enum(STATUSES),
     tags: z.array(z.enum(['festival', 'highlight'])).optional(),
     sources: z.array(SourceSchema).default([]),
@@ -69,13 +69,13 @@ export function ledger(facts: Fact[]) {
   return {
     all: facts,
     get,
-    /** Johnny's voice for the home page. */
-    first: (id: string) => {
-      const f = get(id, 'home');
-      if (!f.first) throw new FactUseError(`Fact "${id}" has no first-person wording`);
-      return f.first;
-    },
+    /** The claim as a sentence that stands on its own. */
     third: (id: string, context: FactContext = 'epk') => get(id, context).third,
+    /** The claim as worded for its place in the running bio (src/lib/bios.ts). */
+    bio: (id: string, context: FactContext) => {
+      const f = get(id, context);
+      return f.bio ?? f.third;
+    },
     tagged: (tag: 'festival' | 'highlight', context: FactContext = 'epk') =>
       facts.filter((f) => f.tags?.includes(tag) && ALLOWED[context].includes(f.status)),
     allowed: (context: FactContext) => facts.filter((f) => ALLOWED[context].includes(f.status)),

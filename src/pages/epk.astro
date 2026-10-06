@@ -13,12 +13,12 @@ import FactText from '../components/FactText.astro';
 import Footer from '../components/Footer.astro';
 import Header from '../components/Header.astro';
 import ProofLine from '../components/ProofLine.astro';
-import { bio } from '../lib/bios';
-import { EPK_FAQ, EPK_FAST_FACTS } from '../lib/copy';
+import { bio, longBio } from '../lib/bios';
+import { EPK_FAQ, EPK_FAST_FACTS, EPK_FORMATS } from '../lib/copy';
 import { BOOKING_EMAIL } from '../lib/forms';
 import { facts, image, media, videoThumb } from '../lib/load-content';
 import { allShows, BUILD_NOW } from '../lib/load-shows';
-import { pastShows, proofLine, roomOf, upcomingShows } from '../lib/shows-data';
+import { pastShows, proofForBio, proofLine, roomOf, upcomingShows } from '../lib/shows-data';
 import { PRESS_ZIP, absolute } from '../lib/site';
 
 const video = media.videos.find((v) => v.epk) ?? media.videos[0]!;
@@ -31,6 +31,8 @@ const rooms = [
   ).values(),
 ].sort();
 const highlights = facts.tagged('highlight');
+const formats = EPK_FORMATS.map((id) => facts.third(id)).join(' ');
+const proof = proofLine(allShows, BUILD_NOW);
 const fastFacts = EPK_FAST_FACTS.map((id) => facts.get(id, 'epk'));
 const photos = media.photos.filter((p) => p.use.includes('epk')).slice(0, 6);
 const pressPhotos = media.photos.filter((p) => p.use.includes('press'));
@@ -76,6 +78,11 @@ const description = 'Press kit for Johnny Rhoades, blues guitarist and singer fr
         <p class="epk-caption">{video.title} · {video.context}</p>
       </section>
 
+      <section class="epk-section" aria-labelledby="formats-title">
+        <h2 class="epk-title" id="formats-title">Formats</h2>
+        <p class="epk-text"><FactText text={formats} /></p>
+      </section>
+
       <div class="epk-grid">
         <section class="epk-section" aria-labelledby="bios-title">
           <h2 class="epk-title" id="bios-title">Bios</h2>
@@ -93,11 +100,18 @@ const description = 'Press kit for Johnny Rhoades, blues guitarist and singer fr
             </div>
             <p id="bio-medium"><FactText text={bio(facts, 'medium')} /></p>
           </div>
+          <div class="epk-bio epk-bio-long">
+            <div class="epk-bio-head">
+              <h3>Long</h3>
+              <CopyButton target="bio-long" label="Copy long bio" />
+            </div>
+            <div id="bio-long">{longBio(facts, proofForBio(allShows, BUILD_NOW)).map((p) => <p><FactText text={p} /></p>)}</div>
+          </div>
         </section>
 
         <aside class="epk-section epk-side" aria-labelledby="facts-title">
           <h2 class="epk-title" id="facts-title">Fast facts</h2>
-          <ProofLine text={proofLine(allShows, BUILD_NOW)} class="epk-proof" />
+          <ProofLine text={proof} class="epk-proof" />
           <ul class="epk-facts">
             {
               fastFacts.map((f) => (

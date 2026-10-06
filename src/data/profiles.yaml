@@ -33,6 +33,7 @@
 - name: Spotify
   kind: profile
   status: to_claim
+  note: Johnny doesn't use Spotify (2026-10-05). CD Baby distributed the album, so the CD Baby account is where to start.
 
 - name: Instagram
   kind: profile

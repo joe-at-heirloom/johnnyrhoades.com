@@ -4,13 +4,24 @@ A running log for the portfolio write-up (PLAN.md section 16): numbers, screensh
 
 ---
 
+## 2026-10-05: Johnny reads his bio
+
+**What changed.** Johnny's first notes on his own About section: don't say "I", say "he"; and it sounds repetitive. Both came from the ledger. Every sentence was one fact, written to stand on its own, so every sentence started the same way. Facts now carry a second wording for their place in the running bio, which can lean on the sentence before ("Since then…", "Years later…"). The home page About and the press kit's medium bio became one text (ADR 0022). He also asked for his current work with Jill Jack and Julianne Ankley, which went in as a `verified` fact from a Local Spins profile and a venue listing.
+
+**Worth telling**
+
+- *The guardrail shaped the prose.* The rule that kept claims honest (one fact, one sentence) is also what made it read like a list. The fix kept the rule and changed the wording, not the facts.
+- *Test the complaint.* A unit test now fails if three sentences in a row open with the same word.
+
+---
+
 ## 2026-10-05: The first real Bandsintown data, and not asking Johnny to change
 
 **What changed.** The first live capture had 609 shows going back to 2015. Not one had a title, which the plan had been counting on to say whether a show was solo, trio or a guest spot. Johnny had been labeling every show anyway, in front of the venue name: "Solo Acoustic @ The Whiskey Six". The site now reads that, in his own wording, and the naming guide no longer asks him for anything new (ADR 0020).
 
 **Numbers.**
 
-- 586 of 609 shows now have an act: 239 solo, 309 sitting in with someone else, 21 trio, 15 hosting, 2 full band.
+- 586 of 609 shows are now billed from his own labels: 239 solo, 290 sitting in with someone else, 19 with the Lucas Rhoades Band, 21 trio, 15 hosting, 2 full band.
 - Counting rooms by name said 295 rooms. Stripping the labels brought that to 200, and counting by street address to 145, because he's typed some rooms up to eight ways.
 - The proof line from the real history: "106 shows in the last year, in 35 rooms across 26 towns." By name it would have said 47 rooms.
 

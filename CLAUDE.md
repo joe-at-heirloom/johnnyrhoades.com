@@ -58,7 +58,7 @@ Before calling any task done, run `npm run check && npm test && npm run build`. 
 
 ## Voice and copy
 
-- Home page: first person, Johnny talking. Press kit and structured data: third person.
+- Home page: first person, Johnny talking, except the About bio, which is third person at Johnny's request (ADR 0022). Press kit and structured data: third person.
 - Sentence case. Buttons name the action ("Send booking request").
 - Specific over superlative. Never use: soulful, electrifying, legendary, powerhouse, world-class, "Detroit's best".
 

@@ -4,7 +4,9 @@
   act is read from the title if he fills it in, or from the label he has put
   in front of the venue name for years ("Solo Acoustic @ The Whiskey Six").
   Anything unrecognized stays unspecified and is billed as plain "Johnny
-  Rhoades". Overrides in show-overrides.yaml win. ADR 0020.
+  Rhoades". A band of his own under another name (the Lucas Rhoades Band) is
+  billed by that name, with the format left unspecified. Overrides in
+  show-overrides.yaml win. ADR 0020.
 */
 import type { Act } from './shows-schema.ts';
 
@@ -26,6 +28,9 @@ const ALIASES: [RegExp, string][] = [
   [/^motor city josh$/i, 'Motor City Josh'],
 ];
 
+/** His own bands under another name: billed as the band, not as a guest spot in it (Joe, 2026-10-05). */
+const NAMED_BANDS: [RegExp, string][] = [[/^(?:the\s+)?lucas rhoades band$/i, 'Lucas Rhoades Band']];
+
 const squash = (s: string) => s.replace(/\s+/g, ' ').trim();
 /** Drops "(open jam)", "(with horns!)" and trailing punctuation. */
 const tidy = (s: string) => squash(s.replace(/\([^)]*\)/g, ' ').replace(/[!.,;:]+\s*$/, ''));
@@ -45,7 +50,13 @@ const isAlias = (s: string) => ALIASES.some(([re]) => re.test(squash(withoutNigh
 const isFormatOnly = (s: string) => squash(s.replace(FORMAT_WORDS, ' ').replace(/[&+,/-]|\band\b/gi, ' ')) === '';
 const escape = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
-export type Label = { act: Act; leader?: string; jam?: boolean };
+export type Label = { act: Act; leader?: string; jam?: boolean; name?: string };
+
+/** A guest spot, unless the "leader" is one of his own bands. */
+function guestOf(leader: string): Label {
+  const own = NAMED_BANDS.find(([re]) => re.test(leader))?.[1];
+  return own ? { act: 'unspecified', name: own } : { act: 'guest', leader };
+}
 
 /** Reads a free-text label: a Bandsintown title, or the part of a venue name before "@". */
 export function readLabel(label: string, artistName: string): Label {
@@ -54,9 +65,9 @@ export function readLabel(label: string, artistName: string): Label {
   if (HOST.test(raw)) return { act: 'host', jam: /\bjam\b/i.test(raw) };
 
   const guest = raw.match(GUEST);
-  if (guest) return { act: 'guest', leader: canonicalLeader(guest[1]!) };
+  if (guest) return guestOf(canonicalLeader(guest[1]!));
   const tail = raw.match(WITH_TAIL);
-  if (tail && isFormatOnly(tail[1]!)) return { act: 'guest', leader: canonicalLeader(tail[2]!) };
+  if (tail && isFormatOnly(tail[1]!)) return guestOf(canonicalLeader(tail[2]!));
   // "Motor City Josh and the Big 3 w/horns": the tail qualifies the act, it doesn't name it.
   const text = tail ? tail[1]! : raw;
 
@@ -65,13 +76,13 @@ export function readLabel(label: string, artistName: string): Label {
     const rest = stripConnectors(squash(text.replace(mine, ' ')));
     // "Pat Smillie & Johnny Rhoades Acoustic": a shared bill with someone else.
     const other = stripConnectors(squash(withoutNight(rest).replace(FORMAT_WORDS, ' ')));
-    if (other) return { act: 'guest', leader: canonicalLeader(other) };
+    if (other) return guestOf(canonicalLeader(other));
     return { act: ownFormat(rest) };
   }
   if (isFormatOnly(withoutNight(text))) return { act: ownFormat(text) };
 
   const leader = squash(withoutNight(text));
-  if (isAlias(leader) || ACT_SUFFIX.test(leader)) return { act: 'guest', leader: canonicalLeader(leader) };
+  if (isAlias(leader) || ACT_SUFFIX.test(leader)) return guestOf(canonicalLeader(leader));
   return { act: 'unspecified' };
 }
 
@@ -126,7 +137,7 @@ export function billingFor({ act, title, lineup, artistName }: { act: Act; title
     case 'host':
       return `${label.jam ? 'Open jam' : 'Open mic'} hosted by ${artistName}`;
     default:
-      return artistName;
+      return label.name ?? artistName;
   }
 }
 

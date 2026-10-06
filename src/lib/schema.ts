@@ -94,7 +94,8 @@ function performer(s: Show): Node | Node[] {
       return leader && leader !== ARTIST ? [{ '@type': 'MusicGroup', name: leader }, johnny()] : johnny();
     }
     default:
-      return johnny();
+      // A band of his own under another name (the Lucas Rhoades Band) is still a group he's in.
+      return s.billing !== ARTIST ? { '@type': 'MusicGroup', name: s.billing, member: johnny() } : johnny();
   }
 }
 

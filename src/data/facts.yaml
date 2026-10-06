@@ -7,25 +7,28 @@
 #   unverified           appears nowhere until resolved; `needs` says what would resolve it
 #
 # Where each status may appear (enforced by `npm run check` and the build):
-#   home page (Johnny's voice):  verified, confirmed_by_johnny
-#   press kit:                   verified, confirmed_by_johnny (with source links)
-#   structured data:             verified only
+#   home page:        verified, confirmed_by_johnny
+#   press kit:        verified, confirmed_by_johnny (with source links)
+#   structured data:  verified only
 #
-# Text fields:
-#   third: third person, for the press kit and bios
-#   first: Johnny's voice, for the home page (optional)
+# Text fields, all third person (ADR 0022):
+#   third: the claim as a sentence that stands on its own (fast facts, FAQ,
+#          short bio, /llms.txt, structured data)
+#   bio:   the same claim worded for its place in the running bio, the home page
+#          About and the press kit's medium bio (src/lib/bios.ts). It can lean on
+#          the sentence before it. Optional; without it the bio uses `third`.
 #   *asterisks* mark a title, set in italics
 #   detect: for unverified facts, text that must not appear on any built page
 #
 # Sources for "Johnny's bio": the About text on his Bandzoogle site, captured
-# 2026-09-30, and the same bio on Cliff Bell's 2017 event page.
+# 2026-09-30, and the same bio on Cliff Bell's 2017 event page. "Johnny,
+# 2026-10-05" is his written answers to PLAN.md section 17, passed on by Joe.
 #
 # Notes from Joe (Johnny's cousin, who builds the site) are leads: they go in
 # `needs` or a source note, and never change a status on their own.
 
 - id: detroit-guitarist-singer
   third: Johnny Rhoades is a blues guitarist and singer from Detroit, Michigan.
-  first: I’m a guitar player and singer from Detroit.
   status: verified
   sources:
     - url: https://cliffbells.com/event/johnny-rhoades-band/
@@ -35,59 +38,102 @@
     - note: Johnny's bio
 
 - id: started-with-motor-city-josh
-  third: He started out at 19 playing in Motor City Josh’s band.
-  first: I started out at 19 playing with Motor City Josh.
+  third: He joined Motor City Josh’s band in 2006, at 19.
   status: confirmed_by_johnny
   sources:
     - note: Johnny's bio (age 19)
+    - note: Johnny, 2026-10-05 (in the band since 2006)
     - url: http://jbblues.blogspot.com/2010/11/motor-city-josh.html
       note: "November 2010 post lists Johnny Rhoades on guitar and vocals in Motor City Josh & the Big 3"
 
 - id: toured-us-europe-mexico-caribbean
   third: He has been on and off the road ever since, around the US and in Europe, Mexico and the Caribbean.
-  first: I’ve been on and off the road ever since, around the US and over to Europe, Mexico and the Caribbean.
+  bio: Since then he’s been on and off the road, around the US and over to Europe, Mexico and the Caribbean.
   status: confirmed_by_johnny
   sources:
     - note: Johnny's bio
-  needs: >-
-    Where, when and with whom, for a longer bio (PLAN.md section 17). Joe, 2026-10-02: Europe was with
-    John Németh's band, which tours there. Still need years and countries, and Mexico and the Caribbean.
+    - note: >-
+        Johnny, 2026-10-05: Europe (Spain, Norway, Denmark, Scotland) in 2015–16 and Mexico in 2016, both with
+        John Németh's band; the Caribbean with Thornetta Davis. Details in nemeth-tours and caribbean-thornetta-davis.
+
+- id: motor-city-josh-albums
+  third: "He plays on four Motor City Josh albums, *Covered Up* (2008), *Forty Four: A Tribute to Howlin’ Wolf* (2008), *It’s a Good Life* (2010) and *Finding a New Gear* (2021)."
+  bio: "Four of the band’s albums feature him: *Covered Up* and *Forty Four: A Tribute to Howlin’ Wolf* (both 2008), *It’s a Good Life* (2010) and *Finding a New Gear* (2021)."
+  status: confirmed_by_johnny
+  sources:
+    - note: Johnny, 2026-10-05 (the four albums he's on)
+    - url: https://music.apple.com/us/artist/motor-city-josh/60645004
+      note: Apple Music lists Covered Up and Forty Four (both 2008) and It's a Good Life (2010). No musician credits.
+    - url: https://motorcityjosh.hearnow.com/
+      note: The band's release page for Finding a New Gear says 2021 (July 21). Discogs says 2020; the band's own page wins.
 
 - id: influences
   third: He grew up on B.B. King, Albert King, Albert Collins and Ray Charles.
-  first: I grew up on B.B. King, Albert King, Albert Collins and Ray Charles.
   status: confirmed_by_johnny
   sources:
     - note: Johnny's bio
 
 - id: bb-king-memorial
-  third: He played B.B. King’s memorial celebration in Memphis.
-  first: I got to play B.B. King’s memorial celebration in Memphis.
+  third: He played B.B. King’s memorial celebration in Memphis, at W.C. Handy Park in May 2015, with John Németh’s band.
+  bio: Years later, in 2015, he was onstage at B.B. King’s memorial celebration in Memphis with John Németh’s band.
   status: confirmed_by_johnny
   sources:
     - note: Johnny's bio
-  needs: >-
-    Date and venue (PLAN.md section 17). Lead: the city's tribute at W.C. Handy Park on May 27, 2015,
-    before the Beale Street procession, had John Németh on the bill (newsflare.com/video/46934).
-    Joe, 2026-10-02, thinks Johnny played it with Németh. Confirm with Johnny before it goes on a page.
+    - note: >-
+        Johnny, 2026-10-05, confirmed the date, venue and band: the city's tribute at W.C. Handy Park on
+        May 27, 2015, before the Beale Street procession, with Németh on the bill (newsflare.com/video/46934).
 
 - id: played-with
-  third: He has played with Thornetta Davis, RJ Spangler, Brett Lucas and Paul Carey, among others.
-  first: I’ve played with Thornetta Davis, RJ Spangler, Brett Lucas and Paul Carey, among others.
+  third: He has played with Thornetta Davis, RJ Spangler, Brett Lucas, Pat Smillie and Paul Carey, among others.
+  bio: Along the way he’s shared stages with Thornetta Davis, RJ Spangler, Brett Lucas, Pat Smillie and Paul Carey, among others.
   status: confirmed_by_johnny
   sources:
     - note: Johnny's bio. It also names John Németh, who has his own fact (nemeth-feelin-freaky).
+    - note: Johnny, 2026-10-05, added Pat Smillie. His Bandsintown has about 85 shows with him, 2022–2025.
+
+- id: nemeth-tours
+  third: With John Németh’s band he toured Spain, Norway, Denmark and Scotland in 2015 and 2016, and Mexico in 2016.
+  bio: The Blue Dreamers took him to Spain, Norway, Denmark and Scotland in 2015 and 2016, and to Mexico in 2016.
+  status: confirmed_by_johnny
+  sources:
+    - note: Johnny, 2026-10-05 (in the Blue Dreamers 2015–16; the countries and years)
+
+- id: caribbean-thornetta-davis
+  third: He has played in the Caribbean with Thornetta Davis.
+  status: confirmed_by_johnny
+  sources:
+    - note: Johnny, 2026-10-05 (he doesn't remember the year)
+
+- id: blue-goose-dishes
+  third: He washed dishes at the Blue Goose Inn in St. Clair Shores before he played there.
+  bio: Before he played the Blue Goose Inn in St. Clair Shores, he washed dishes there.
+  status: confirmed_by_johnny
+  sources:
+    - note: Johnny, 2026-10-05 ("did he start there washing dishes?" "Yes i did"). For the long bio (PLAN.md Appendix C).
+    - note: His Bandsintown has 13 shows at the Blue Goose Inn since 2022.
+
+- id: jill-jack-julianne-ankley
+  third: He currently plays guitar with Michigan singer-songwriters Jill Jack and Julianne Ankley.
+  bio: These days he also backs Michigan singer-songwriters Jill Jack and Julianne Ankley on guitar.
+  status: verified
+  sources:
+    - url: https://localspins.com/metro-detroits-jill-jack-coloring-outside-the-lines-for-diverse-new-album-project-local-spins/
+      note: "Local Spins, June 5, 2026: names guitarist Johnny Rhoades in Jill Jack's full band"
+    - url: https://www.trinityhousetheatre.org/event/julianne-ankley-w-laura-creamer-and-johnny-rhodes-march-21-2026/
+      note: Trinity House Theatre, Livonia, March 21, 2026, spelled "Johnny Rhodes". Johnny lists the same show on Bandsintown.
+    - note: >-
+        Johnny's Bandsintown has the Julianne Ankley show in March 2026 and three with Jill Jack in June and July 2026.
+        Joe, 2026-10-05, says he's working with both now. "Currently" dates: recheck it whenever the bio changes.
 
 - id: covers-and-originals
   third: He plays a mix of blues covers and his own songs.
-  first: I play a mix of blues covers and my own songs.
+  bio: Live, he mixes blues covers with songs of his own.
   status: confirmed_by_johnny
   sources:
     - note: Johnny's bio
 
 - id: album-waiting-on-the-sun
   third: His album *Waiting on the Sun* came out in 2014.
-  first: My album *Waiting on the Sun* came out in 2014.
   status: verified
   sources:
     - url: https://music.apple.com/us/album/waiting-on-the-sun/942326904
@@ -95,6 +141,7 @@
 
 - id: antifreeze-festival-2017
   third: The Johnny Rhoades Band played the Detroit Blues Society’s 23rd Anti-Freeze Blues Festival at the Magic Bag in February 2017.
+  bio: In February 2017 the Johnny Rhoades Band was on the bill at the Detroit Blues Society’s 23rd Anti-Freeze Blues Festival at the Magic Bag.
   status: verified
   tags: [festival, highlight]
   sources:
@@ -103,7 +150,7 @@
 
 - id: nemeth-feelin-freaky
   third: He was the guitarist in John Németh’s band, the Blue Dreamers, and plays on Németh’s 2017 album *Feelin’ Freaky*, produced by Luther Dickinson.
-  first: I was John Németh’s guitar player in the Blue Dreamers, and I’m on his 2017 album *Feelin’ Freaky*, produced by Luther Dickinson.
+  bio: As Németh’s guitarist in the Blue Dreamers, he recorded the 2017 album *Feelin’ Freaky* with producer Luther Dickinson.
   status: verified
   tags: [highlight]
   sources:
@@ -116,6 +163,7 @@
 
 - id: cliff-bells-2017
   third: The Johnny Rhoades Band headlined Cliff Bell’s in Detroit in June 2017.
+  bio: That June it headlined Cliff Bell’s in Detroit.
   status: verified
   tags: [highlight]
   sources:
@@ -132,7 +180,7 @@
 
 - id: motor-city-josh-detroit-music-awards
   third: He won Detroit Music Awards for Outstanding Blues Artist/Group in 2020 and 2023 with Motor City Josh & The Big 3, where he still plays guitar.
-  first: I won Detroit Music Awards in 2020 and 2023 with Motor City Josh & The Big 3, and I still play guitar in the band.
+  bio: He’s still with Motor City Josh & The Big 3, and won Outstanding Blues Artist/Group with them at the Detroit Music Awards in 2020 and 2023.
   status: verified
   tags: [highlight]
   sources:
@@ -153,23 +201,33 @@
   sources:
     - url: https://www.youtube.com/watch?v=R9b05orRWf8
       note: Festival video, September 10, 2022. Johnny lists it on his site.
-  needs: How the Lucas Rhoades Band should be billed (PLAN.md section 17)
 
-- id: brett-lucas-soul-and-courage
-  third: He plays on Brett Lucas’s *Soul and Courage*, which won Outstanding Blues Recording at the 2020 Detroit Music Awards.
-  status: unverified
-  detect: Courage
+- id: lucas-rhoades-band-the-fed
+  third: He plays once a month at The Fed in Clarkston with the Lucas Rhoades Band.
+  bio: There’s also the Lucas Rhoades Band, which has a monthly night at The Fed in Clarkston.
+  status: confirmed_by_johnny
   sources:
-    - url: https://brettlucas.com/photos
-      note: 'Photo caption: "In the studio with Todd Glass, John Rhoades, and Alex Lyon."'
-    - url: https://wrif.com/2020/04/20/see-the-full-list-of-detroit-music-awards-2020-winners/
-      note: The 2020 winner is listed as "Soul & Courage, Vol. 2"
-  needs: >-
-    The album credits, or Johnny's word on which tracks he plays, and which volume. Joe, 2026-10-02, thinks
-    he's on it: he played with Brett in Motor City Josh's band and often plays with him in other lineups.
+    - note: Johnny, 2026-10-05 ("we play once a month at the fed in clarkston")
+    - note: His Bandsintown has 19 Lucas Rhoades Band shows, all at The Fed, the latest in August 2026. Recheck "once a month" when the bio changes.
 
 - id: formats
-  third: He plays solo acoustic, as a trio and with a full band.
-  status: unverified
-  detect: solo acoustic, as a trio
-  needs: Confirmation from Johnny, with typical set lengths and who plays in each (PLAN.md section 17)
+  third: He plays solo acoustic, as a trio with bass and drums, and with a full band that adds keyboards.
+  bio: Under his own name he can be booked solo acoustic, as a trio with bass and drums, or with a full band that adds keyboards.
+  status: confirmed_by_johnny
+  sources:
+    - note: >-
+        Johnny, 2026-10-05: "a trio consists of myself a bassist and drummer. Full band would just add a keyboard."
+        The players change: "Its not really a set band all the time."
+    - note: Solo acoustic is his own billing on 235 shows in his Bandsintown, 2022–2026.
+
+- id: set-lengths
+  third: A typical night is two 75-minute sets with a half-hour break.
+  status: confirmed_by_johnny
+  sources:
+    - note: Johnny, 2026-10-05 ("two 75 min sets with a half hr break between"). Some daytime shows are shorter.
+
+- id: small-pa
+  third: He can bring a small PA for rooms of about 50 to 100 people.
+  status: confirmed_by_johnny
+  sources:
+    - note: Johnny, 2026-10-05 ("I can provide small PA. For about 50-100 person room.")
