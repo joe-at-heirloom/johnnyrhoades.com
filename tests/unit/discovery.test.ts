@@ -7,6 +7,7 @@ import { describe, expect, it } from 'vitest';
 import { LLMS_ABOUT } from '../../src/lib/copy.ts';
 import { AI_CRAWLERS, llmsTxt, robotsTxt, sitemapEntries, sitemapIndexXml, sitemapXml } from '../../src/lib/discovery.ts';
 import { ledger, parseFacts } from '../../src/lib/facts.ts';
+import { BOOKING_EMAIL } from '../../src/lib/forms.ts';
 import { asSnapshot, changedUrls, indexNowBody, type ShowsSnapshot } from '../../src/lib/indexnow.ts';
 import { CSP, CSP_DIRECTIVES, PERMISSIONS_POLICY, SECURITY_HEADERS } from '../../src/lib/security-headers.ts';
 import { parseShowsFile } from '../../src/lib/shows-file.ts';
@@ -74,7 +75,7 @@ describe('robots.txt', () => {
 describe('llms.txt', () => {
   const facts = ledger(parseFacts(readFileSync('src/data/facts.yaml', 'utf8')));
   const about = LLMS_ABOUT.map((id) => facts.third(id, 'epk'));
-  const txt = llmsTxt({ about, shows, now: NOW, links: [{ name: 'Bandsintown', url: 'https://www.bandsintown.com/a/11869348' }] });
+  const txt = llmsTxt({ about, shows, now: NOW, links: [{ name: 'Bandsintown', url: 'https://www.bandsintown.com/a/11869348' }], email: BOOKING_EMAIL });
 
   it('follows the llmstxt.org shape: a title, a summary line, then sections', () => {
     expect(txt.startsWith('# Johnny Rhoades\n\n> Johnny Rhoades is a blues guitarist and singer from Detroit, Michigan.\n')).toBe(true);
@@ -92,8 +93,14 @@ describe('llms.txt', () => {
     expect(txt).toContain('- [Fri, Oct 23, 2026, 9 pm: Johnny Rhoades at Blue Goose Inn, St. Clair Shores, MI](https://johnnyrhoades.com/shows/2026-10-23-blue-goose-inn-st-clair-shores/)');
     expect(txt).toContain('- [Press kit](https://johnnyrhoades.com/epk/)');
     expect(txt).toContain('(https://johnnyrhoades.com/shows.json)');
-    const quiet = llmsTxt({ about, shows: [], now: NOW, links: [] });
+    const quiet = llmsTxt({ about, shows: [], now: NOW, links: [], email: BOOKING_EMAIL });
     expect(quiet).toContain('No public shows are announced right now.');
+  });
+
+  it('says how to book: the form, and Johnny’s email', () => {
+    const booking = txt.split('## Booking\n')[1]!.split('\n## ')[0]!;
+    expect(booking).toContain('- [Booking form](https://johnnyrhoades.com/#book)');
+    expect(booking).toContain('- [hello@johnnyrhoades.com](mailto:hello@johnnyrhoades.com): his email, for booking and press');
   });
 });
 

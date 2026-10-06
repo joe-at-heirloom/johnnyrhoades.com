@@ -5,16 +5,13 @@
   /thanks/; with JavaScript it sends in place and builds a subject line Johnny
   can triage from his phone.
 */
-import { WEB3FORMS_ENDPOINT } from '../lib/forms';
-import { profiles } from '../lib/load-content';
-import { liveLinks } from '../lib/media';
+import { BOOKING_EMAIL, WEB3FORMS_ENDPOINT } from '../lib/forms';
 import { PUBLIC_CONFIG } from '../lib/public-config';
 import { absolute } from '../lib/site';
 import { allShows, BUILD_NOW } from '../lib/load-shows';
 import { upcomingShows } from '../lib/shows-data';
 import { localDate } from '../lib/time';
 
-const facebook = liveLinks(profiles).find((p) => p.name === 'Facebook');
 const key = PUBLIC_CONFIG.web3formsKey;
 const eventTypes = ['Bar / club', 'Festival', 'Private party', 'Wedding', 'Corporate', 'Something else'];
 const acts = ['Not sure yet', 'Solo acoustic', 'Trio', 'Full band'];
@@ -35,7 +32,7 @@ if (!key && process.env.CI) console.warn('PUBLIC_WEB3FORMS_KEY is not set: the b
         <p class="book-lede">Bars, festivals, private parties, you name it. Send me the date and where it is and I’ll get back to you.</p>
       </div>
       <div class="book-alts">
-        {facebook && <p>Or message me on <a href={facebook.url} target="_blank" rel="noopener">Facebook</a>.</p>}
+        <p>Or email me at <a href={`mailto:${BOOKING_EMAIL}`} data-umami-event="email_click" data-umami-event-from="home">{BOOKING_EMAIL}</a>.</p>
         <p>Booking agent or festival? See the <a href="/epk/">press kit</a>.</p>
       </div>
     </header>

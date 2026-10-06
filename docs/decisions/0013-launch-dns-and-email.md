@@ -13,7 +13,7 @@ PLAN.md section 14 assumes DNS still has to move to Cloudflare, and section 11 r
 
 ## Decisions
 
-- **`booking@` is a Zoho alias, not Cloudflare Email Routing.** Email Routing replaces a domain's MX records; turning it on would cut off Johnny's Zoho mailbox. An alias or group in Zoho delivers to the same inbox with no DNS change. Web3Forms delivers booking requests to whichever address Johnny picks.
+- **`booking@` is a Zoho alias, not Cloudflare Email Routing.** Email Routing replaces a domain's MX records; turning it on would cut off Johnny's Zoho mailbox. An alias or group in Zoho delivers to the same inbox with no DNS change. Web3Forms delivers booking requests to whichever address Johnny picks. *Superseded by ADR 0021: the site publishes his existing work address, `hello@`, so no alias is needed.*
 - **DNS step 5 becomes "make sure the zone is on an account Johnny owns."** If it's his, nothing moves. If it's Bandzoogle's, the zone is exported and recreated on his own free Cloudflare account before anything else changes.
 - **The redirect map lists what exists**, not what might: `/home` → `/`, and the five `/track/<id>/<slug>` pages → `/#music`. Cloudflare implements the tracks with one wildcard rule, so slug variants are covered too. `npm run check:redirects` holds the live site to the map after cutover; an end-to-end test checks every target exists in the build.
 - **Rollback is DNS-only.** The Bandzoogle `A`/`AAAA` values are recorded in `docs/runbook-launch.md`, TTLs are lowered before cutover, and Bandzoogle stays paid for 30 days.

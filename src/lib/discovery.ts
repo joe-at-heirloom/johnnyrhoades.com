@@ -73,11 +73,12 @@ export type LlmsInput = {
   shows: Show[];
   now: DateTime;
   links: { name: string; url: string }[]; // live profiles and stores (profiles.yaml)
+  email: string; // Johnny's work email (ADR 0021)
   limit?: number;
 };
 
 /** An llms.txt (llmstxt.org): who Johnny is, where things are, and how to book. */
-export function llmsTxt({ about, shows, now, links, limit = 12 }: LlmsInput): string {
+export function llmsTxt({ about, shows, now, links, email, limit = 12 }: LlmsInput): string {
   const link = (text: string, path: string, note?: string) => `- [${text}](${absolute(path)})${note ? `: ${note}` : ''}`;
   const upcoming = upcomingShows(shows, now).slice(0, limit);
   const showLines = upcoming.map((s) => {
@@ -114,7 +115,8 @@ export function llmsTxt({ about, shows, now, links, limit = 12 }: LlmsInput): st
     '',
     '## Booking',
     '',
-    link('Booking form', '/#book', 'the way to reach him for gigs, private events and festivals'),
+    link('Booking form', '/#book', 'for gigs, private events and festivals'),
+    `- [${email}](mailto:${email}): his email, for booking and press`,
     '',
     '## Profiles and music',
     '',

@@ -16,7 +16,7 @@ How johnnyrhoades.com moves from Bandzoogle to this site (PLAN.md section 14), w
 
 A public lookup can't see every record. The zone export in step 2 is the real list.
 
-**Email changes the plan.** PLAN.md section 11 routes `booking@johnnyrhoades.com` through Cloudflare Email Routing. Email Routing needs its own MX records, which would replace Zoho's and cut off Johnny's mailbox. Make `booking@` an alias (or a group) in Zoho instead, which costs nothing on the free plan (ADR 0013).
+**Email changes the plan.** PLAN.md section 11 first routed a new `booking@` address through Cloudflare Email Routing. Email Routing needs its own MX records, which would replace Zoho's and cut off Johnny's mailbox (ADR 0013). No new address is needed anyway: the site publishes his existing work email, `hello@johnnyrhoades.com` (ADR 0021).
 
 ## Before launch
 
@@ -33,7 +33,7 @@ A public lookup can't see every record. The zone export in step 2 is the real li
    - [x] Settings → Pages → Source: GitHub Actions.
    - [x] Variable `SITE_NOINDEX` = `true`.
    - [ ] Secret `BANDSINTOWN_APP_ID` (from Bandsintown for Artists → Settings). Run `BANDSINTOWN_APP_ID=… npm run sync -- --capture` locally first and compare with the mocks (ADR 0006).
-   - [ ] Variables `PUBLIC_WEB3FORMS_KEY`, `PUBLIC_BUTTONDOWN_USER`, `PUBLIC_UMAMI_WEBSITE_ID` (ADR 0011).
+   - [ ] Variables `PUBLIC_WEB3FORMS_KEY` (create the key with `hello@johnnyrhoades.com`), `PUBLIC_BUTTONDOWN_USER`, `PUBLIC_UMAMI_WEBSITE_ID` (ADR 0011).
 
 ## Staging
 
@@ -65,7 +65,7 @@ Pick a quiet weekday morning, not the day before a gig.
 
 18. [ ] `npm run check:redirects`: every row of the redirect map answers 301 to its target, and the target loads.
 19. [ ] `curl -sI https://johnnyrhoades.com/ | grep -iE "content-security|strict-transport|permissions"`: headers present. After a clean week in report-only, enforce the CSP, then raise HSTS from 300 to a year.
-20. [ ] The rest of `docs/manual-checks.md`: Rich Results Test on two show pages, calendar subscriptions, a test booking (should arrive at `booking@` via Zoho), a test signup with its region tag, Umami events.
+20. [ ] The rest of `docs/manual-checks.md`: Rich Results Test on two show pages, calendar subscriptions, a test booking (should arrive at `hello@`), an email to `hello@` from an outside address (mail still flows), a test signup with its region tag, Umami events.
 21. [ ] **Johnny:** keep Bandzoogle paid for 30 days as the rollback. Cancel it only after the exports are safe and email has worked for a month. Make sure cancelling Bandzoogle doesn't touch the domain registration (it's at Squarespace).
 22. [ ] Day 28: Core Web Vitals in Search Console; first AI answer audit after launch (`docs/geo-audit-log.md`).
 

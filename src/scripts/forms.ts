@@ -3,11 +3,10 @@
   what happened; without it they post straight to the service (the booking
   form then lands on /thanks/). Delivery details live in src/lib/forms.ts.
 */
-import { sendBooking, sendSignup, type BookingRequest, type FormsConfig } from '../lib/forms';
+import { BOOKING_EMAIL, sendBooking, sendSignup, type BookingRequest, type FormsConfig } from '../lib/forms';
 import { $, $$ } from './dom';
 import { track } from './track';
 
-const FALLBACK = 'or message me on Facebook';
 const MESSAGES = {
   booking: 'Thanks, got it. I’ll get back to you soon.',
   signup: 'Thanks, you’re on the list.',
@@ -17,6 +16,14 @@ const value = (form: HTMLFormElement, name: string) => {
   const el = form.elements.namedItem(name);
   return el && 'value' in el ? String(el.value).trim() : '';
 };
+
+/** An error message that ends by offering the email, as a link. */
+function sayWithEmail(status: HTMLElement, before: string, after: string) {
+  const link = document.createElement('a');
+  link.href = `mailto:${BOOKING_EMAIL}`;
+  link.textContent = BOOKING_EMAIL;
+  status.replaceChildren(before, link, after);
+}
 
 function configFor(form: HTMLFormElement): FormsConfig {
   return {
@@ -69,7 +76,8 @@ for (const form of $$<HTMLFormElement>('[data-form]')) {
       if (kind === 'booking') track('booking_error');
       const notConnected = err instanceof Error && /not connected/.test(err.message);
       status.classList.add('is-error');
-      status.textContent = notConnected ? `${(err as Error).message} Message me on Facebook for now.` : `That didn’t go through. Try again, ${FALLBACK}.`;
+      if (notConnected) sayWithEmail(status, `${(err as Error).message} Email me at `, ' for now.');
+      else sayWithEmail(status, 'That didn’t go through. Try again, or email me at ', '.');
     } finally {
       button.disabled = false;
     }

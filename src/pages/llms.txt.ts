@@ -6,6 +6,7 @@
 import type { APIRoute } from 'astro';
 import { LLMS_ABOUT } from '../lib/copy';
 import { llmsTxt } from '../lib/discovery';
+import { BOOKING_EMAIL } from '../lib/forms';
 import { facts, profiles } from '../lib/load-content';
 import { allShows, BUILD_NOW } from '../lib/load-shows';
 import { liveLinks } from '../lib/media';
@@ -17,6 +18,7 @@ export const GET: APIRoute = () =>
       shows: allShows,
       now: BUILD_NOW,
       links: liveLinks(profiles),
+      email: BOOKING_EMAIL,
     }),
     { headers: { 'Content-Type': 'text/plain; charset=utf-8' } },
   );

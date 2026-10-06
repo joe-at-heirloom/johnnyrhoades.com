@@ -30,7 +30,7 @@ The v1 forms used `data-netlify`, which only works on Netlify. On GitHub Pages, 
 - They come from `PUBLIC_*` environment variables (`.env.example`), set as GitHub Actions repository *variables*, not secrets. Nothing is committed.
 - Without them the site still builds: the forms say they aren't connected yet and point to Facebook, Umami is left out, and CI prints a warning.
 
-**Errors point to Facebook for now.** PLAN.md wants the booking email as the fallback, but which address to publish is one of Johnny's open questions (section 17). When he answers, the fallback changes in one place, `src/scripts/forms.ts`.
+**Errors point to Facebook for now.** PLAN.md wants the booking email as the fallback, but which address to publish is one of Johnny's open questions (section 17). When he answers, the fallback changes in one place, `src/scripts/forms.ts`. *Superseded by ADR 0021: the fallback is `hello@johnnyrhoades.com`.*
 
 ## Consequences
 

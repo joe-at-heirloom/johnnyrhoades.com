@@ -55,6 +55,7 @@ test('robots.txt allows crawling and points to the sitemap; llms.txt and the Ind
   expect(llms.ok()).toBe(true);
   const text = await llms.text();
   expect(text).toMatch(/^# Johnny Rhoades\n\n> /);
+  expect(text).toContain('[hello@johnnyrhoades.com](mailto:hello@johnnyrhoades.com)');
   for (const [, url] of text.matchAll(/\]\((https:\/\/johnnyrhoades\.com[^)]*)\)/g)) {
     const path = url!.replace(ORIGIN, '').replace(/#.*$/, '');
     expect(existsSync(join('dist', path.endsWith('/') ? `${path}index.html` : path)), path).toBe(true);

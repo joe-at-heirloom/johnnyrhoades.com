@@ -53,14 +53,26 @@ test('a booking request reaches Web3Forms with a subject Johnny can triage', asy
   await expect(page.locator('#b-name')).toHaveValue(''); // reset after sending
 });
 
-test('a failed booking says so and offers Facebook', async ({ page }) => {
+test('a failed booking says so and offers Johnny’s email', async ({ page }) => {
   await page.route('https://api.web3forms.com/submit', (route) => route.fulfill({ status: 500, json: { success: false } }));
   await page.goto('/#book');
   await fillBooking(page);
   await page.getByRole('button', { name: 'Send booking request' }).click();
-  await expect(page.locator('#book [data-form-status]')).toHaveText('That didn’t go through. Try again, or message me on Facebook.');
+  const status = page.locator('#book [data-form-status]');
+  await expect(status).toHaveText('That didn’t go through. Try again, or email me at hello@johnnyrhoades.com.');
+  await expect(status.getByRole('link', { name: 'hello@johnnyrhoades.com' })).toHaveAttribute('href', 'mailto:hello@johnnyrhoades.com');
   expect((await events(page)).map(([e]) => e)).toContain('booking_error');
   await expect(page.locator('#b-name')).toHaveValue('Pat Booker'); // nothing lost
+});
+
+test('the booking section and the press kit give Johnny’s email, and count the clicks', async ({ page }) => {
+  for (const [path, from] of [['/', 'home'], ['/epk/', 'epk']] as const) {
+    await page.goto(path);
+    const email = page.getByRole('link', { name: 'hello@johnnyrhoades.com' }).first();
+    await expect(email).toHaveAttribute('href', 'mailto:hello@johnnyrhoades.com');
+    await expect(email).toHaveAttribute('data-umami-event', 'email_click');
+    await expect(email).toHaveAttribute('data-umami-event-from', from);
+  }
 });
 
 test('the honeypot stops bots without telling them', async ({ page }) => {

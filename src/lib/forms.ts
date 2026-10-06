@@ -11,6 +11,13 @@
 */
 import { regionForZip } from './regions.ts';
 
+/**
+ * Johnny's work email, a Zoho Mail inbox (ADR 0021): the fallback when a form
+ * fails, and the contact line on the press kit and in llms.txt. It lives here
+ * rather than in site.ts so the form script can import it without luxon.
+ */
+export const BOOKING_EMAIL = 'hello@johnnyrhoades.com';
+
 export type FormsConfig = {
   web3formsKey?: string;
   buttondownUser?: string;

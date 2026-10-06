@@ -51,7 +51,7 @@ test('logos download; the press photo zip waits for confirmed credits', async ({
     expect(res.status()).toBe(200);
     expect(res.headers()['content-type']).toBe('image/png');
   }
-  await expect(page.getByText('High-resolution photos are available on request.')).toBeVisible();
+  await expect(page.getByText('High-resolution photos are available on request from hello@johnnyrhoades.com.')).toBeVisible();
   expect((await request.get('/press/johnny-rhoades-press-photos.zip')).status()).toBe(404);
 });
 
@@ -62,7 +62,7 @@ test('the press kit prints to two pages', async ({ page }) => {
   const pages = pdf.toString('latin1').match(/\/Type\s*\/Page[^s]/g) ?? [];
   expect(pages.length).toBeLessThanOrEqual(2);
   await expect(page.locator('.epk-video')).toBeHidden();
-  await expect(page.locator('.epk-print-url')).toBeVisible();
+  await expect(page.locator('.epk-print-url')).toHaveText('hello@johnnyrhoades.com · johnnyrhoades.com/epk');
 });
 
 test('the press kit has no serious accessibility violations', async ({ page }) => {

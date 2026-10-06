@@ -539,7 +539,7 @@ Answer engines describe the artists they can identify with confidence and verify
 
 **Email address**
 
-- `booking@johnnyrhoades.com` forwards to Johnny's inbox through Cloudflare Email Routing (free). Replies come from his own address unless he later adds a paid mailbox.
+- `hello@johnnyrhoades.com`, Johnny's work email on Zoho Mail, is the booking email: in the booking section, the form's error messages, the press kit and `llms.txt` (ADR 0021). No new address, and no Cloudflare Email Routing, which would replace Zoho's MX records (ADR 0013).
 
 **Mailing list**
 
@@ -592,7 +592,7 @@ Capture the baseline before launch. The portfolio case study depends on it.
 | Core Web Vitals | Lighthouse on the current Bandzoogle site | All green | Search Console, Lighthouse CI |
 | Mailing list size | Bandzoogle export count | Growing | Email service |
 
-Custom events: `booking_submit`, `booking_error`, `list_signup`, `poster_download` (with format), `calendar_add`, `calendar_subscribe`, `directions_click`, `rsvp_click`, `ticket_click`, `video_play`, `strum_sound_on`.
+Custom events: `booking_submit`, `booking_error`, `list_signup`, `poster_download` (with format), `calendar_add`, `calendar_subscribe`, `directions_click`, `rsvp_click`, `ticket_click`, `video_play`, `strum_sound_on`, `email_click` (with where; ADR 0021).
 
 ---
 
@@ -658,7 +658,7 @@ Each phase is sized for one or two Claude Code sessions and ends with acceptance
 
 **Phase 5: Forms, email, list and analytics**
 
-- Move both forms off Netlify, set up booking email routing, connect the email service with ZIP tags, and add Umami with the custom events.
+- Move both forms off Netlify, deliver bookings to Johnny's work email, connect the email service with ZIP tags, and add Umami with the custom events.
 - Acceptance: a test booking reaches Johnny's inbox with the right subject line. A signup lands in the email service with its region tag. Events show up in Umami.
 
 **Phase 6: Hardening**
@@ -702,7 +702,8 @@ Nothing below ships as fact until he answers.
 - [ ] Years in Motor City Josh's band, and which albums he's on.
 - [ ] Formats: who plays in the trio and the band, typical set lengths, and whether he brings his own PA, and for what size room.
 - [x] A default act for Bandsintown entries with no label. Not needed: unlabeled shows are billed as plain "Johnny Rhoades", and the act is read from the label he already types in front of the venue name (ADR 0020).
-- [ ] Which booking email and phone number to publish, and a response time he can keep.
+- [x] Which booking email to publish. Answered 2026-10-05: `hello@johnnyrhoades.com`, his work email (ADR 0021).
+- [ ] Whether to publish a phone number, and a response time he can keep.
 - [ ] Original high-resolution files and photographer credits for every photo.
 - [ ] A stage plot and input list for each format.
 - [ ] Access to Spotify for Artists and Apple Music for Artists, and who distributed *Waiting on the Sun*.
