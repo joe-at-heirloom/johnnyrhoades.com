@@ -1,6 +1,6 @@
 # 0006: Mock Bandsintown until the API key arrives, and where the data model grew
 
-**Status:** Accepted, 2026-09-30 (Phase 1). The real capture arrived on 2026-10-05; ADR 0020 records what it changed. The mocks stay until the older tests move to the capture.
+**Status:** Accepted, 2026-09-30 (Phase 1). Closed 2026-10-05: the real capture arrived (ADR 0020 records what it changed), it replaced the mocks as the test fixtures, and the live sync runs in the Site workflow.
 
 ## Context
 

@@ -46,10 +46,11 @@ describe('sync-shows', () => {
   it('builds a valid shows.json from the fixtures', () => {
     const r = sync('2026-09-30T21:00:00-04:00');
     expect(r.code).toBe(0);
-    expect(r.outputs).toMatchObject({ changed: 'true', shows_changed: 'true', commit_message: 'chore(shows): sync +9 new' });
+    // The fixtures are the real capture from 2026-10-05: 5 upcoming shows and 604 past ones, back to 2015.
+    expect(r.outputs).toMatchObject({ changed: 'true', shows_changed: 'true', commit_message: 'chore(shows): sync +609 new' });
     const shows = parseShowsFile(read('shows.json'));
-    expect(shows).toHaveLength(9);
-    expect(JSON.parse(read('sync-meta.json'))).toMatchObject({ source: 'fixtures', counts: { upcoming: 7, past: 2, total: 9 } });
+    expect(shows).toHaveLength(609);
+    expect(JSON.parse(read('sync-meta.json'))).toMatchObject({ source: 'fixtures', counts: { total: 609 } });
   });
 
   it('writes nothing when nothing changed', () => {
@@ -84,7 +85,8 @@ describe('sync-shows', () => {
     writeFileSync(join(fixtures, 'upcoming.json'), '[]');
     const r = sync('2026-10-01T09:00:00-04:00', '--force');
     expect(r.code).toBe(0);
-    expect(r.outputs.summary).toBe('7 removed');
+    // The five upcoming shows go; Oct 2 and 4 stay, since the capture lists them as past.
+    expect(r.outputs.summary).toBe('5 removed');
   });
 
   it('fails on a Bandsintown error body', () => {

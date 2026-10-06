@@ -4,8 +4,18 @@
   (2026-10-01, noon in Detroit; see playwright.config.ts).
 */
 import AxeBuilder from '@axe-core/playwright';
+import { readFileSync } from 'node:fs';
 import { expect, test } from '@playwright/test';
+import { DateTime } from 'luxon';
+import { SITE_NOW } from '../../playwright.config';
+import { parseShowsFile } from '../../src/lib/shows-file';
+import { pastShows, upcomingShows } from '../../src/lib/shows-data';
 import { blockThirdParties, collectConsoleErrors } from './helpers';
+
+// The real show data, synced from Bandsintown every three hours. Counts are worked out from it, not written in,
+// so the tests hold as shows are added; the shows named below are history, which the sync never deletes.
+const NOW = DateTime.fromISO(SITE_NOW, { setZone: true });
+const SHOWS = parseShowsFile(readFileSync('src/data/shows.json', 'utf8'));
 
 const TAVERN = '/shows/2026-10-02-15th-street-tavern-clarkston/';
 const GOOSE = '/shows/2026-10-23-blue-goose-inn-st-clair-shores/';
@@ -73,7 +83,8 @@ test('Tonight bar shows on a show day and goes away when the show ends', async (
   await expect(heroNext).toHaveAttribute('href', TAVERN);
   await expect(heroNext).toContainText('Tonight');
 
-  await page.clock.setFixedTime(new Date('2026-10-02T21:30:00-04:00')); // the tavern show ends at 9
+  // Bandsintown has no end time for the tavern show, so it counts as over four hours after its 6 pm start (LIVE_HOURS).
+  await page.clock.setFixedTime(new Date('2026-10-02T22:30:00-04:00'));
   await page.reload();
   await expect(bar).toBeHidden();
   await expect(heroNext).toHaveAttribute('href', '/shows/2026-10-04-the-token-lounge-westland/');
@@ -97,11 +108,14 @@ test('/shows/ groups upcoming shows by month and keeps an archive', async ({ pag
   await page.goto('/shows/');
   await expect(page.getByRole('heading', { level: 1, name: 'Shows' })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'October 2026' })).toBeVisible();
+  const past = pastShows(SHOWS, NOW);
+  const years = [...new Set(past.map((s) => DateTime.fromISO(s.start, { setZone: true }).setZone(s.venue.timeZone).year))];
+  const thisYear = past.filter((s) => DateTime.fromISO(s.start, { setZone: true }).setZone(s.venue.timeZone).year === 2026).length;
   const archive = page.locator('details.archive-year');
-  await expect(archive).toHaveCount(1);
-  await expect(archive.locator('summary')).toContainText('2026 2 shows');
-  await archive.locator('summary').click();
-  await expect(archive.locator('.show-row')).toHaveCount(2);
+  await expect(archive).toHaveCount(years.length);
+  await expect(archive.first().locator('summary')).toContainText(`2026 ${thisYear} shows`);
+  await archive.first().locator('summary').click();
+  await expect(archive.first().locator('.show-row')).toHaveCount(thisYear);
 });
 
 test('shows pages have no serious accessibility violations', async ({ page }) => {
@@ -116,7 +130,9 @@ test('shows pages have no serious accessibility violations', async ({ page }) =>
 test('feeds: calendar, RSS and open data', async ({ request }) => {
   const cal = await request.get('/shows.ics');
   const text = await cal.text();
-  expect(text.match(/BEGIN:VEVENT/g)).toHaveLength(9);
+  // Upcoming shows plus the last two months (src/pages/shows.ics.ts).
+  const since = NOW.minus({ days: 60 });
+  expect(text.match(/BEGIN:VEVENT/g)).toHaveLength(SHOWS.filter((s) => s.public && DateTime.fromISO(s.start, { setZone: true }) >= since).length);
 
   const rss = await request.get('/shows/feed.xml');
   // Static hosts (and GitHub Pages) pick the type from the extension: text/xml or application/xml.
@@ -124,7 +140,7 @@ test('feeds: calendar, RSS and open data', async ({ request }) => {
   expect(await rss.text()).toContain('<title>Johnny Rhoades at Blue Goose Inn, St. Clair Shores: Friday, October 23 at 9 pm</title>');
 
   const data = await (await request.get('/shows.json')).json();
-  expect(data.upcoming).toHaveLength(7);
+  expect(data.upcoming).toHaveLength(upcomingShows(SHOWS, NOW).length);
   expect(data.upcoming[0]).toMatchObject({ id: '108955466', start: '2026-10-02T18:00:00-04:00', venue: { name: '15th Street Tavern' } });
   expect(JSON.stringify(data)).not.toMatch(/firstSeen|sequence|aliases/);
 });

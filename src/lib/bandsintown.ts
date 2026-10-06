@@ -1,7 +1,7 @@
 /*
   The parts of a Bandsintown event we use, validated loosely: Bandsintown
   adds fields over time, and empty strings are common for missing values.
-  Modeled on a real response from 2026-09-30 (tests/fixtures/bandsintown/README.md).
+  Checked against the real capture in tests/fixtures/bandsintown/ (ADR 0020).
 */
 import { z } from 'zod';
 

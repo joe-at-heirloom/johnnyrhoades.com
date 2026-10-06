@@ -16,7 +16,7 @@ Joe's call: don't make Johnny change how he works.
 2. **Read his words, and don't guess.** The reader knows his formats ("Solo Acoustic", "Johnny Rhoades Trio", "Hosting open jam") and treats a label as someone else's act only on a strong signal: "w/ …" or "with …", a name ending in Band, Duo or Trio, another name next to his, or Motor City Josh under any of his spellings. Anything else, like "Joe Cocker Tribute", is `unspecified` and billed as plain "Johnny Rhoades", which is always true. The tests run the reader over every show in the capture, and pin 26 of his wordings.
 3. **No default act.** PLAN.md section 17 asked for one. An unlabeled show is billed "Johnny Rhoades" with no format tag, which is what the site already did for `unspecified`.
 4. **Rooms are counted by street address.** He has typed the same room up to eight ways ("Cadieux Cafe", "The Cadiuex Cafe" and so on). Bandsintown has a street address for 594 of the 609 shows, so the proof line, venue history and most-played rooms count by address, falling back to the venue key (`roomOf` in `src/lib/shows-data.ts`). Display names for the most-played rooms come from `venues.yaml` match lists where his spelling wanders.
-5. **The capture is a fixture.** `captured-2026-10-05-*.json` is committed, with the app_id redacted (it's echoed into every event URL), and the label tests run against it.
+5. **The capture is a fixture.** It's committed as `tests/fixtures/bandsintown/upcoming.json` and `past.json`, with the app_id redacted (it's echoed into every event URL), and the label tests run against it.
 
 ## Numbers
 
@@ -33,4 +33,4 @@ The proof line from the real history: "106 shows in the last year, in 35 rooms a
 - New shows picked from Bandsintown's venue list show no format until he types one. That's honest, and an override in `show-overrides.yaml` can label one by hand.
 - The Lucas Rhoades Band is his own band under another name, so it's billed as "Lucas Rhoades Band", not as a guest spot, with the format left unspecified (Joe, 2026-10-05). Its structured data is a `MusicGroup` with him as a member.
 - Four old shows have an event name where the venue should be ("Opening for Chris Cain w/ Brendon Linsley"). They predate the page cutoff, so they're archive rows only; fix them in `show-overrides.yaml` if they matter.
-- The hand-written mocks still drive the older normalizer tests. Moving those tests to the capture and deleting the mocks finishes ADR 0006.
+- The hand-written mocks are gone: every test now runs on the capture, which closes ADR 0006.
