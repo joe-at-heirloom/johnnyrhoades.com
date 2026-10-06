@@ -50,15 +50,18 @@ cite { font-style: italic; }
 
 /* ---------- Logo (used as a mask so it can take any color) ---------- */
 
-/* logo.webp is logo.png (the master) re-encoded lossless with only its alpha kept: the same mask at 27 KB
-   instead of 59 KB, and it loads with the hero, so the saving lands on the first paint. */
+/* logo.webp is logo.png (the master) re-encoded lossless, pixel for pixel: 27 KB instead of 59 KB, and it
+   loads with the hero, so the saving lands on the first paint.
+   The mask fills the box exactly (100% 100%, not contain). The box has the logo's proportions, so nothing
+   stretches, but contain left a sliver of a pixel at each side, and the logo's ink touches its left and
+   right edges: Safari smeared those edge pixels into thin lines beside the logo. */
 .logo-mark {
   display: block;
   aspect-ratio: 1400 / 434;
   width: 100%;
   background: var(--bone);
-  -webkit-mask: url("../assets/brand/logo.webp") center / contain no-repeat;
-          mask: url("../assets/brand/logo.webp") center / contain no-repeat;
+  -webkit-mask: url("../assets/brand/logo.webp") 0 0 / 100% 100% no-repeat;
+          mask: url("../assets/brand/logo.webp") 0 0 / 100% 100% no-repeat;
 }
 
 /* ---------- Type ---------- */
