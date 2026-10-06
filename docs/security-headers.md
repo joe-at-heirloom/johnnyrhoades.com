@@ -10,7 +10,7 @@ Cloudflare dashboard → the johnnyrhoades.com zone → Rules → Overview → C
 
 | Header | Value |
 |---|---|
-| `Content-Security-Policy` | `default-src 'self'; script-src 'self' https://cloud.umami.is; style-src 'self'; img-src 'self' data:; font-src 'self'; media-src 'self' https://audio-ssl.itunes.apple.com; connect-src 'self' https://api.web3forms.com https://buttondown.com https://gateway.umami.is; frame-src https://www.youtube-nocookie.com; form-action 'self' https://api.web3forms.com https://buttondown.com; base-uri 'self'; object-src 'none'; frame-ancestors 'none'` |
+| `Content-Security-Policy` | `default-src 'self'; script-src 'self' https://www.googletagmanager.com; style-src 'self'; img-src 'self' data: https://*.google-analytics.com https://*.googletagmanager.com; font-src 'self'; media-src 'self' https://audio-ssl.itunes.apple.com; connect-src 'self' https://formspree.io https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; frame-src https://www.youtube-nocookie.com; form-action 'self' https://formspree.io; base-uri 'self'; object-src 'none'; frame-ancestors 'none'` |
 | `Strict-Transport-Security` | `max-age=31536000; includeSubDomains` |
 | `Referrer-Policy` | `strict-origin-when-cross-origin` |
 | `X-Content-Type-Options` | `nosniff` |
@@ -18,12 +18,12 @@ Cloudflare dashboard → the johnnyrhoades.com zone → Rules → Overview → C
 
 What each part of the policy is for:
 
-- **`script-src`**: the site's own bundles and the Umami script. No inline scripts anywhere: `astro.config.mjs` sets `assetsInlineLimit: 0`, so Astro never inlines a small script, and the policy needs no hashes that change every build. JSON-LD and the Tonight data island are data blocks, which CSP doesn't apply to.
-- **`connect-src`**: the booking form (Web3Forms), the signup (Buttondown) and Umami, whose cloud script sends events to `gateway.umami.is`, not to the host it's loaded from.
-- **`form-action`**: the same two form services, for the no-JavaScript posts.
+- **`script-src`**: the site's own bundles and Google's `gtag.js`, which the site loads after the page is idle, on the real domain only (ADR 0023). No inline scripts anywhere: `astro.config.mjs` sets `assetsInlineLimit: 0`, so Astro never inlines a small script, and the policy needs no hashes that change every build. JSON-LD and the Tonight data island are data blocks, which CSP doesn't apply to.
+- **`connect-src`**: both forms (Formspree), and the hosts Google Analytics sends hits to. The wildcards are Google's own documented policy for GA4, which picks a regional collection host (`region1.google-analytics.com` and the like).
+- **`form-action`**: Formspree, for the no-JavaScript posts.
 - **`frame-src`**: YouTube's privacy-enhanced player, loaded only after someone presses play.
 - **`media-src`**: Apple Music's 30-second song clips for the record player, streamed only after someone presses play on a track (ADR 0016). Drop the Apple host once the clips are Johnny's own files under `/audio/`.
-- **`img-src data:`**: the film-grain texture in `base.css` is an inline SVG.
+- **`img-src`**: `data:` for the film-grain texture in `base.css`, an inline SVG; and Google Analytics, which can fall back to an image pixel.
 - **`Permissions-Policy`**: everything off, except what the YouTube player asks for in its iframe `allow` attribute (`src/scripts/video-stage.ts`; a unit test keeps the two in step).
 
 ### Rolling it out

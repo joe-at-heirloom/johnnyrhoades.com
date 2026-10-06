@@ -1,8 +1,8 @@
 import type { Page } from '@playwright/test';
 
-/** Block third parties so tests never depend on the network: YouTube (after a click) and analytics. */
+/** Block third parties so tests never depend on the network: YouTube (after a click) and Google Analytics. */
 export async function blockThirdParties(page: Page): Promise<void> {
-  await page.route(/youtube(-nocookie)?\.com|ytimg\.com|umami\.is/, (route) => route.abort());
+  await page.route(/youtube(-nocookie)?\.com|ytimg\.com|googletagmanager\.com|google-analytics\.com/, (route) => route.abort());
 }
 
 /** Scroll through the page so lazy images and the strum load, then return to the top and settle. */
@@ -31,3 +31,19 @@ export function collectConsoleErrors(page: Page): string[] {
   });
   return errors;
 }
+
+/**
+ * Records analytics events instead of sending them. It defines window.gtag before the page's own
+ * scripts run, so the Google Analytics loader (src/scripts/analytics.ts) stands aside.
+ */
+export async function fakeAnalytics(page: Page): Promise<void> {
+  await page.addInitScript(() => {
+    const w = window as unknown as { gtag: (...args: unknown[]) => void; __events: [string, unknown][] };
+    w.__events = [];
+    w.gtag = (command, name, params) => {
+      if (command === 'event') w.__events.push([name as string, params]);
+    };
+  });
+}
+
+export const analyticsEvents = (page: Page) => page.evaluate(() => (window as unknown as { __events: [string, unknown][] }).__events);

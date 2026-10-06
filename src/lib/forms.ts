@@ -1,13 +1,13 @@
 /*
-  Form delivery (PLAN.md section 11). GitHub Pages has no server, so forms
-  post to hosted services:
-  - Booking requests: Web3Forms, which emails them to Johnny.
-  - Mailing list: Buttondown, with a region tag from the ZIP code.
+  Form delivery (PLAN.md section 11, ADR 0023). GitHub Pages has no server,
+  so both forms post to Formspree, which emails each submission to Johnny:
+  - Booking requests, with a subject line he can triage from his phone.
+  - Mailing list signups, with the region their ZIP code falls in.
 
-  Everything provider-specific lives here, behind two small functions, so a
-  Cloudflare Worker can replace either service later without touching the
-  markup. The IDs are public by design (they only allow sending to Johnny),
-  and come from PUBLIC_* build variables (.env.example).
+  Everything provider-specific lives here, behind two small functions, so
+  another service (or a Cloudflare Worker) can replace Formspree later
+  without touching the markup. The form IDs are public by design: they only
+  let the site send to Johnny.
 */
 import { regionForZip } from './regions.ts';
 
@@ -19,13 +19,12 @@ import { regionForZip } from './regions.ts';
 export const BOOKING_EMAIL = 'hello@johnnyrhoades.com';
 
 export type FormsConfig = {
-  web3formsKey?: string;
-  buttondownUser?: string;
-  siteUrl: string;
+  /** Formspree form IDs, the part after /f/ in the endpoint. */
+  bookingForm?: string;
+  signupForm?: string;
 };
 
-export const WEB3FORMS_ENDPOINT = 'https://api.web3forms.com/submit';
-export const buttondownEndpoint = (user: string) => `https://buttondown.com/api/emails/embed-subscribe/${encodeURIComponent(user)}`;
+export const formspreeEndpoint = (form: string) => `https://formspree.io/f/${encodeURIComponent(form)}`;
 
 export type BookingRequest = {
   name: string;
@@ -49,15 +48,15 @@ export function bookingSubject(b: BookingRequest): string {
   return `Booking: ${[date, b.venue?.trim() || 'place not given', b.eventType?.trim() || 'event type not given'].join(', ')}`;
 }
 
-/** The JSON body Web3Forms expects. Field names become labels in Johnny's email. */
-export function bookingPayload(b: BookingRequest, config: FormsConfig): Record<string, string> {
+/**
+ * The JSON body for Formspree. `_subject` sets the email's subject, and the
+ * `email` field becomes its Reply-To. Other keys become labels in the email.
+ */
+export function bookingPayload(b: BookingRequest): Record<string, string> {
   return {
-    access_key: config.web3formsKey ?? '',
-    subject: bookingSubject(b),
-    from_name: 'johnnyrhoades.com',
-    replyto: b.email,
+    _subject: bookingSubject(b),
     Name: b.name,
-    Email: b.email,
+    email: b.email,
     Phone: b.phone || '-',
     Date: b.date || '-',
     'Venue and town': b.venue || '-',
@@ -68,29 +67,33 @@ export function bookingPayload(b: BookingRequest, config: FormsConfig): Record<s
   };
 }
 
-/** Form fields for Buttondown's embed subscribe endpoint. */
-export function signupPayload({ email, zip }: { email: string; zip?: string }): URLSearchParams {
-  const body = new URLSearchParams({ email });
+/** A signup, with the region its ZIP code falls in, so show announcements can go to people nearby. */
+export function signupPayload({ email, zip }: { email: string; zip?: string }): Record<string, string> {
   const region = zip ? regionForZip(zip) : null;
-  if (region) body.append('tag', region);
-  if (zip?.trim()) body.append('metadata__zip', zip.trim());
-  return body;
+  return {
+    _subject: `Mailing list signup${region ? `: ${region}` : ''}`,
+    email,
+    ZIP: zip?.trim() || '-',
+    Region: region ?? '-',
+  };
+}
+
+async function post(form: string, body: Record<string, string>): Promise<void> {
+  const res = await fetch(formspreeEndpoint(form), {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+    body: JSON.stringify(body),
+  });
+  const data = (await res.json().catch(() => ({}))) as { ok?: boolean; errors?: { message?: string }[] };
+  if (!res.ok || data.ok === false) throw new Error(data.errors?.[0]?.message || `HTTP ${res.status}`);
 }
 
 export async function sendBooking(b: BookingRequest, config: FormsConfig): Promise<void> {
-  if (!config.web3formsKey) throw new Error('The booking form is not connected yet.');
-  const res = await fetch(WEB3FORMS_ENDPOINT, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-    body: JSON.stringify(bookingPayload(b, config)),
-  });
-  const data = (await res.json().catch(() => ({}))) as { success?: boolean; message?: string };
-  if (!res.ok || data.success === false) throw new Error(data.message || `HTTP ${res.status}`);
+  if (!config.bookingForm) throw new Error('The booking form is not connected yet.');
+  await post(config.bookingForm, bookingPayload(b));
 }
 
 export async function sendSignup(fields: { email: string; zip?: string }, config: FormsConfig): Promise<void> {
-  if (!config.buttondownUser) throw new Error('The mailing list is not connected yet.');
-  // Buttondown's embed endpoint doesn't send CORS headers; no-cors posts still deliver,
-  // we just can't read the response, so success means "sent without a network error".
-  await fetch(buttondownEndpoint(config.buttondownUser), { method: 'POST', mode: 'no-cors', body: signupPayload(fields) });
+  if (!config.signupForm) throw new Error('The mailing list is not connected yet.');
+  await post(config.signupForm, signupPayload(fields));
 }

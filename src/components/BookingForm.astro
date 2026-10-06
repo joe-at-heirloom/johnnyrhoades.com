@@ -1,18 +1,17 @@
 ---
 /*
-  Booking request form (PLAN.md sections 7.1 and 11). Delivered by Web3Forms
-  (src/lib/forms.ts). Without JavaScript it posts straight there and lands on
-  /thanks/; with JavaScript it sends in place and builds a subject line Johnny
-  can triage from his phone.
+  Booking request form (PLAN.md sections 7.1 and 11). Delivered by Formspree
+  (src/lib/forms.ts, ADR 0023). Without JavaScript it posts straight there and
+  Formspree shows its thank-you page; with JavaScript it sends in place and
+  builds a subject line Johnny can triage from his phone.
 */
-import { BOOKING_EMAIL, WEB3FORMS_ENDPOINT } from '../lib/forms';
+import { BOOKING_EMAIL, formspreeEndpoint } from '../lib/forms';
 import { PUBLIC_CONFIG } from '../lib/public-config';
-import { absolute } from '../lib/site';
 import { allShows, BUILD_NOW } from '../lib/load-shows';
 import { upcomingShows } from '../lib/shows-data';
 import { localDate } from '../lib/time';
 
-const key = PUBLIC_CONFIG.web3formsKey;
+const form = PUBLIC_CONFIG.formspreeBooking;
 const eventTypes = ['Bar / club', 'Festival', 'Private party', 'Wedding', 'Corporate', 'Something else'];
 const acts = ['Not sure yet', 'Solo acoustic', 'Trio', 'Full band'];
 // Public, not cancelled: the days the date check calls taken (src/lib/availability.ts).
@@ -21,7 +20,7 @@ const bookedDays = upcomingShows(allShows, BUILD_NOW)
   .map((s) => ({ day: localDate(s.start, s.venue.timeZone), venue: s.venue.name, city: s.venue.city }));
 const bookedJson = JSON.stringify(bookedDays).replace(/</g, '\\u003c');
 const today = localDate(BUILD_NOW.toISO() ?? '', 'America/Detroit');
-if (!key && process.env.CI) console.warn('PUBLIC_WEB3FORMS_KEY is not set: the booking form will not deliver.');
+if (!form && process.env.CI) console.warn('No Formspree booking form: the booking form will not deliver.');
 ---
 
 <section class="section book" id="book" aria-labelledby="book-title">
@@ -32,22 +31,14 @@ if (!key && process.env.CI) console.warn('PUBLIC_WEB3FORMS_KEY is not set: the b
         <p class="book-lede">Bars, festivals, private parties, you name it. Send me the date and where it is and I’ll get back to you.</p>
       </div>
       <div class="book-alts">
-        <p>Or email me at <a href={`mailto:${BOOKING_EMAIL}`} data-umami-event="email_click" data-umami-event-from="home">{BOOKING_EMAIL}</a>.</p>
+        <p>Or email me at <a href={`mailto:${BOOKING_EMAIL}`} data-event="email_click" data-event-from="home">{BOOKING_EMAIL}</a>.</p>
         <p>Booking agent or festival? See the <a href="/epk/">press kit</a>.</p>
       </div>
     </header>
 
-    <form class="form" method="POST" action={key ? WEB3FORMS_ENDPOINT : '#book'} data-form="booking" data-web3forms-key={key}>
-      {
-        key && (
-          <>
-            <input type="hidden" name="access_key" value={key} />
-            <input type="hidden" name="subject" value="Booking request from johnnyrhoades.com" />
-            <input type="hidden" name="redirect" value={absolute('/thanks/')} />
-          </>
-        )
-      }
-      <p class="hp" aria-hidden="true"><label>Leave this unchecked <input type="checkbox" name="botcheck" tabindex="-1" /></label></p>
+    <form class="form" method="POST" action={form ? formspreeEndpoint(form) : '#book'} data-form="booking" data-booking-form={form}>
+      <input type="hidden" name="_subject" value="Booking request from johnnyrhoades.com" />
+      <p class="hp" aria-hidden="true"><label>Leave this empty <input type="text" name="_gotcha" tabindex="-1" autocomplete="off" /></label></p>
 
       <div class="form-grid">
         <div class="field">

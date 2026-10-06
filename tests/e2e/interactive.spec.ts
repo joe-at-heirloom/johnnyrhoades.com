@@ -4,7 +4,7 @@
   no AAC, and tests never touch the network.
 */
 import { expect, test, type Page } from '@playwright/test';
-import { blockThirdParties } from './helpers';
+import { analyticsEvents, blockThirdParties, fakeAnalytics } from './helpers';
 
 /** A mono 8 kHz WAV of silence. */
 function silence(seconds: number): Buffer {
@@ -26,20 +26,12 @@ function silence(seconds: number): Buffer {
   return b;
 }
 
-async function fakeUmami(page: Page) {
-  await page.addInitScript(() => {
-    const w = window as unknown as { umami: { track: (e: string, d?: unknown) => void }; __events: [string, unknown][] };
-    w.__events = [];
-    w.umami = { track: (event, data) => w.__events.push([event, data]) };
-  });
-}
-
 test.beforeEach(async ({ page }) => {
   await blockThirdParties(page);
 });
 
 test('pressing play on a song plays its clip, drops the needle, and pauses on a second press', async ({ page }) => {
-  await fakeUmami(page);
+  await fakeAnalytics(page);
   const requested: string[] = [];
   await page.route(/audio-ssl\.itunes\.apple\.com/, (route) => {
     requested.push(route.request().url());
@@ -55,7 +47,7 @@ test('pressing play on a song plays its clip, drops the needle, and pauses on a 
   await expect(page.locator('[data-album-art]')).toHaveClass(/is-playing/);
   await expect(page.locator('.track').first()).toHaveClass(/is-playing/);
   expect(requested[0]).toMatch(/^https:\/\/audio-ssl\.itunes\.apple\.com\//);
-  await expect.poll(() => page.evaluate(() => (window as unknown as { __events: [string, unknown][] }).__events)).toContainEqual(['track_preview', { track: 'Two Way Street' }]);
+  await expect.poll(() => analyticsEvents(page)).toContainEqual(['track_preview', { track: 'Two Way Street' }]);
 
   await pause.click();
   await expect(play).toHaveAttribute('aria-pressed', 'false');

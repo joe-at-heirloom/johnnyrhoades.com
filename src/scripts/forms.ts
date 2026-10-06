@@ -1,7 +1,7 @@
 /*
   Booking and mailing-list forms. With JavaScript they submit in place and say
-  what happened; without it they post straight to the service (the booking
-  form then lands on /thanks/). Delivery details live in src/lib/forms.ts.
+  what happened; without it they post straight to Formspree, which shows its
+  own thank-you page. Delivery details live in src/lib/forms.ts.
 */
 import { BOOKING_EMAIL, sendBooking, sendSignup, type BookingRequest, type FormsConfig } from '../lib/forms';
 import { $, $$ } from './dom';
@@ -27,9 +27,8 @@ function sayWithEmail(status: HTMLElement, before: string, after: string) {
 
 function configFor(form: HTMLFormElement): FormsConfig {
   return {
-    web3formsKey: form.dataset.web3formsKey || undefined,
-    buttondownUser: form.dataset.buttondownUser || undefined,
-    siteUrl: location.origin,
+    bookingForm: form.dataset.bookingForm || undefined,
+    signupForm: form.dataset.signupForm || undefined,
   };
 }
 
@@ -42,8 +41,8 @@ for (const form of $$<HTMLFormElement>('[data-form]')) {
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     if (!form.reportValidity()) return;
-    // Honeypot: people never see this box; bots fill everything in.
-    if ((form.elements.namedItem('botcheck') as HTMLInputElement | null)?.checked) return;
+    // Honeypot: people never see this field; bots fill everything in. Formspree drops these too.
+    if (value(form, '_gotcha')) return;
 
     status.className = 'form-status';
     status.textContent = 'Sending…';
@@ -64,9 +63,9 @@ for (const form of $$<HTMLFormElement>('[data-form]')) {
           message: value(form, 'message'),
         };
         await sendBooking(request, config);
-        track('booking_submit', { eventType: request.eventType || 'unknown' });
+        track('booking_submit', { event_type: request.eventType || 'unknown' });
       } else {
-        await sendSignup({ email: value(form, 'email'), zip: value(form, 'metadata__zip') }, config);
+        await sendSignup({ email: value(form, 'email'), zip: value(form, 'zip') }, config);
         track('list_signup');
       }
       form.reset();

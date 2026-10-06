@@ -1,5 +1,5 @@
-import { describe, expect, it } from 'vitest';
-import { bookingPayload, bookingSubject, signupPayload } from '../../src/lib/forms.ts';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import { bookingPayload, bookingSubject, sendBooking, sendSignup, signupPayload } from '../../src/lib/forms.ts';
 import { regionForZip } from '../../src/lib/regions.ts';
 
 describe('regionForZip', () => {
@@ -46,11 +46,11 @@ describe('booking requests', () => {
     expect(bookingSubject({ ...request, date: '2026-11-01' })).toMatch(/^Booking: Sun, Nov 1,/);
   });
 
-  it('builds the Web3Forms payload with readable labels and a reply-to', () => {
-    const body = bookingPayload(request, { web3formsKey: 'k', siteUrl: 'https://x' });
+  it('builds the Formspree payload with readable labels, a subject and a reply-to', () => {
+    const body = bookingPayload(request);
     expect(body).toMatchObject({
-      access_key: 'k',
-      replyto: 'pat@example.com',
+      _subject: 'Booking: Sat, Oct 24, Blue Goose Inn, St. Clair Shores, Bar / club',
+      email: 'pat@example.com',
       Name: 'Pat Booker',
       'Venue and town': 'Blue Goose Inn, St. Clair Shores',
       Act: 'Trio',
@@ -61,16 +61,41 @@ describe('booking requests', () => {
 });
 
 describe('mailing list signups', () => {
-  it('tags the region from the ZIP and keeps the ZIP', () => {
-    const body = signupPayload({ email: 'fan@example.com', zip: '48080' });
-    expect(body.get('email')).toBe('fan@example.com');
-    expect(body.get('tag')).toBe('Metro Detroit');
-    expect(body.get('metadata__zip')).toBe('48080');
+  it('names the region of the ZIP, in the subject too', () => {
+    expect(signupPayload({ email: 'fan@example.com', zip: '48080' })).toEqual({
+      _subject: 'Mailing list signup: Metro Detroit',
+      email: 'fan@example.com',
+      ZIP: '48080',
+      Region: 'Metro Detroit',
+    });
   });
 
-  it('sends no tag without a ZIP', () => {
-    const body = signupPayload({ email: 'fan@example.com' });
-    expect(body.has('tag')).toBe(false);
-    expect(body.has('metadata__zip')).toBe(false);
+  it('still signs up without a ZIP', () => {
+    expect(signupPayload({ email: 'fan@example.com' })).toEqual({ _subject: 'Mailing list signup', email: 'fan@example.com', ZIP: '-', Region: '-' });
+  });
+});
+
+describe('sending', () => {
+  afterEach(() => vi.unstubAllGlobals());
+  const request = { name: 'Pat Booker', email: 'pat@example.com' };
+
+  it('posts JSON to the form’s Formspree endpoint', async () => {
+    const fetch = vi.fn(async () => new Response(JSON.stringify({ ok: true }), { status: 200 }));
+    vi.stubGlobal('fetch', fetch);
+    await sendBooking(request, { bookingForm: 'abc123' });
+    const [url, init] = fetch.mock.calls[0] as unknown as [string, RequestInit];
+    expect(url).toBe('https://formspree.io/f/abc123');
+    expect(init).toMatchObject({ method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' } });
+    expect(JSON.parse(init.body as string)).toMatchObject({ email: 'pat@example.com', Name: 'Pat Booker' });
+  });
+
+  it('turns Formspree’s error into a message', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => new Response(JSON.stringify({ errors: [{ message: 'Form not found' }] }), { status: 404 })));
+    await expect(sendSignup({ email: 'fan@example.com' }, { signupForm: 'nope' })).rejects.toThrow('Form not found');
+  });
+
+  it('says a form isn’t connected when it has no ID', async () => {
+    await expect(sendBooking(request, {})).rejects.toThrow(/not connected/);
+    await expect(sendSignup({ email: 'fan@example.com' }, {})).rejects.toThrow(/not connected/);
   });
 });

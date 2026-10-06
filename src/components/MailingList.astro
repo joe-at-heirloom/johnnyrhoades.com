@@ -1,14 +1,14 @@
 ---
 /*
-  Mailing list signup through Buttondown (PLAN.md section 11). With
-  JavaScript, the ZIP code becomes a region tag (src/lib/regions.ts) so show
-  announcements can go to people nearby.
+  Mailing list signup (PLAN.md section 11), emailed to Johnny through
+  Formspree for now (ADR 0023). With JavaScript, the ZIP code also gets its
+  region (src/lib/regions.ts), so show announcements can go to people nearby.
 */
-import { buttondownEndpoint } from '../lib/forms';
+import { formspreeEndpoint } from '../lib/forms';
 import { PUBLIC_CONFIG } from '../lib/public-config';
 
-const user = PUBLIC_CONFIG.buttondownUser;
-if (!user && process.env.CI) console.warn('PUBLIC_BUTTONDOWN_USER is not set: mailing list signups will not deliver.');
+const form = PUBLIC_CONFIG.formspreeSignup;
+if (!form && process.env.CI) console.warn('No Formspree signup form: mailing list signups will not deliver.');
 ---
 
 <section class="list-band" id="list" aria-labelledby="list-title">
@@ -17,12 +17,13 @@ if (!user && process.env.CI) console.warn('PUBLIC_BUTTONDOWN_USER is not set: ma
       <h2 class="list-title" id="list-title">Mailing list</h2>
       <p class="list-sub">I’ll email you when there are new shows or new music. That’s it.</p>
     </div>
-    <form class="list-form" method="POST" action={user ? buttondownEndpoint(user) : '#list'} data-form="signup" data-buttondown-user={user}>
-      <p class="hp" aria-hidden="true"><label>Leave this unchecked <input type="checkbox" name="botcheck" tabindex="-1" /></label></p>
+    <form class="list-form" method="POST" action={form ? formspreeEndpoint(form) : '#list'} data-form="signup" data-signup-form={form}>
+      <input type="hidden" name="_subject" value="Mailing list signup" />
+      <p class="hp" aria-hidden="true"><label>Leave this empty <input type="text" name="_gotcha" tabindex="-1" autocomplete="off" /></label></p>
       <label class="sr-only" for="l-email">Email address</label>
       <input id="l-email" name="email" type="email" autocomplete="email" placeholder="Email" required />
       <label class="sr-only" for="l-zip">ZIP code (optional, for shows near you)</label>
-      <input id="l-zip" name="metadata__zip" type="text" inputmode="numeric" autocomplete="postal-code" placeholder="ZIP (optional)" maxlength="10" />
+      <input id="l-zip" name="zip" type="text" inputmode="numeric" autocomplete="postal-code" placeholder="ZIP (optional)" maxlength="10" />
       <button class="btn btn-ink" type="submit">Sign up</button>
       <p class="form-status" role="status" aria-live="polite" data-form-status></p>
     </form>

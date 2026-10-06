@@ -25,9 +25,11 @@ export default defineConfig({
     // Fake service IDs: tests intercept the requests (tests/e2e/forms.spec.ts).
     env: {
       SITE_NOW,
-      PUBLIC_WEB3FORMS_KEY: 'test-web3forms-key',
-      PUBLIC_BUTTONDOWN_USER: 'test-johnny',
-      PUBLIC_UMAMI_WEBSITE_ID: 'test-umami-id',
+      // Fakes, so nothing reaches Formspree or Google. GA runs on the test host, against blocked or stubbed Google hosts.
+      PUBLIC_FORMSPREE_BOOKING: 'test-booking',
+      PUBLIC_FORMSPREE_SIGNUP: 'test-signup',
+      PUBLIC_GA_ID: 'G-TEST',
+      PUBLIC_GA_HOSTS: '127.0.0.1', // the test server's host (SITE_URL)
     },
     url: SITE_URL,
     reuseExistingServer: false,

@@ -151,8 +151,11 @@ describe('IndexNow', () => {
 
 describe('security headers', () => {
   it('allow only what the site uses', () => {
-    expect(CSP_DIRECTIVES['script-src']).toEqual(["'self'", 'https://cloud.umami.is']);
-    expect(CSP).not.toMatch(/unsafe-inline|unsafe-eval|\*/);
+    expect(CSP_DIRECTIVES['script-src']).toEqual(["'self'", 'https://www.googletagmanager.com']);
+    expect(CSP).not.toMatch(/unsafe-inline|unsafe-eval/);
+    // No bare *. Subdomain wildcards only for Google Analytics's own hosts, as Google documents for GA4 (ADR 0023).
+    const wildcards = Object.values(CSP_DIRECTIVES).flat().filter((source) => source.includes('*'));
+    for (const source of wildcards) expect(source).toMatch(/^https:\/\/\*\.(google-analytics\.com|analytics\.google\.com|googletagmanager\.com)$/);
     expect(CSP).toContain("frame-src https://www.youtube-nocookie.com");
     expect(CSP).toContain("object-src 'none'");
     expect(CSP).toContain("frame-ancestors 'none'");

@@ -80,11 +80,12 @@ jobs:
 
   build:
     needs: sync
-    # Public service IDs (ADR 0011). Repository variables, not secrets: they end up in the page.
+    # Public service IDs (ADR 0023). The live values are defaults in src/lib/public-config.ts;
+    # a repository variable (not a secret: they end up in the page) overrides one if it's set.
     env:
-      PUBLIC_WEB3FORMS_KEY: ${{ vars.PUBLIC_WEB3FORMS_KEY }}
-      PUBLIC_BUTTONDOWN_USER: ${{ vars.PUBLIC_BUTTONDOWN_USER }}
-      PUBLIC_UMAMI_WEBSITE_ID: ${{ vars.PUBLIC_UMAMI_WEBSITE_ID }}
+      PUBLIC_FORMSPREE_BOOKING: ${{ vars.PUBLIC_FORMSPREE_BOOKING }}
+      PUBLIC_FORMSPREE_SIGNUP: ${{ vars.PUBLIC_FORMSPREE_SIGNUP }}
+      PUBLIC_GA_ID: ${{ vars.PUBLIC_GA_ID }}
       SITE_NOINDEX: ${{ vars.SITE_NOINDEX }}
     outputs:
       indexnow_urls: ${{ steps.indexnow.outputs.urls }}

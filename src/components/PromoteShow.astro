@@ -14,9 +14,9 @@ const file = (kind: string) => `johnny-rhoades-${show.slug}-${kind}.png`;
   <h2 class="show-section-title" id="promote-title">Promote this show</h2>
   <p>Posting about it, or putting it up on the wall? These are ready to go.</p>
   <div class="actions promote-actions">
-    <a class="btn btn-ghost" href={posterPath(show.slug, 'feed')} download={file('instagram-post')} data-umami-event="poster_download" data-umami-event-format="feed">Download Instagram post</a>
-    <a class="btn btn-ghost" href={posterPath(show.slug, 'story')} download={file('instagram-story')} data-umami-event="poster_download" data-umami-event-format="story">Download Instagram story</a>
-    <button class="btn btn-ghost" type="button" data-print-flyer data-umami-event="poster_download" data-umami-event-format="flyer">Print a flyer</button>
+    <a class="btn btn-ghost" href={posterPath(show.slug, 'feed')} download={file('instagram-post')} data-event="poster_download" data-event-format="feed">Download Instagram post</a>
+    <a class="btn btn-ghost" href={posterPath(show.slug, 'story')} download={file('instagram-story')} data-event="poster_download" data-event-format="story">Download Instagram story</a>
+    <button class="btn btn-ghost" type="button" data-print-flyer data-event="poster_download" data-event-format="flyer">Print a flyer</button>
   </div>
 </section>
 

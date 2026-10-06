@@ -13,16 +13,17 @@ import { blockThirdParties, collectConsoleErrors, loadEverything } from './helpe
 
 async function serveWithHeaders(page: Page) {
   await blockThirdParties(page);
-  // A stand-in for Umami that sends one event to the host the real script uses.
-  await page.route('https://cloud.umami.is/script.js', (route) =>
-    route.fulfill({
+  // A stand-in for gtag.js that sends a hit the way the real one can: a fetch to a regional host, and a pixel.
+  let analyticsLoaded = false;
+  await page.route(/googletagmanager\.com\/gtag\/js/, (route) => {
+    analyticsLoaded = true;
+    return route.fulfill({
       contentType: 'text/javascript',
-      body: "window.umami={track(){}};fetch('https://gateway.umami.is/api/send',{method:'POST',body:'{}'}).catch(()=>{});",
-    }),
-  );
-  await page.route('https://gateway.umami.is/**', (route) => route.fulfill({ json: {} }));
-  await page.route('https://api.web3forms.com/submit', (route) => route.fulfill({ json: { success: true } }));
-  await page.route('https://buttondown.com/**', (route) => route.fulfill({ body: '' }));
+      body: "fetch('https://region1.google-analytics.com/g/collect?v=2',{method:'POST',body:''}).catch(()=>{});new Image().src='https://www.google-analytics.com/g/collect?v=2';",
+    });
+  });
+  await page.route(/google-analytics\.com/, (route) => route.fulfill({ status: 204, body: '' }));
+  await page.route(/formspree\.io/, (route) => route.fulfill({ json: { ok: true } }));
   // Song clips: a valid empty WAV, so the request gets as far as the media-src check and past it.
   await page.route(/audio-ssl\.itunes\.apple\.com/, (route) =>
     route.fulfill({ contentType: 'audio/wav', body: Buffer.from('UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAIA+AAACABAAZGF0YQAAAAA=', 'base64') }),
@@ -39,12 +40,13 @@ async function serveWithHeaders(page: Page) {
     w.__violations = [];
     document.addEventListener('securitypolicyviolation', (e) => w.__violations.push(`${e.violatedDirective}: ${e.blockedURI}`));
   });
+  return { analyticsLoaded: () => analyticsLoaded };
 }
 
 const violations = (page: Page) => page.evaluate(() => (window as unknown as { __violations: string[] }).__violations);
 
 test('the home page works under the policy: video, strum, lightbox, forms, analytics', async ({ page }) => {
-  await serveWithHeaders(page);
+  const served = await serveWithHeaders(page);
   const errors = collectConsoleErrors(page);
   await page.goto('/');
   await loadEverything(page);
@@ -69,6 +71,7 @@ test('the home page works under the policy: video, strum, lightbox, forms, analy
   await page.fill('#l-email', 'fan@example.com');
   await page.getByRole('button', { name: 'Sign up' }).click();
   await expect(page.locator('#list [data-form-status]')).toHaveText(/Thanks/);
+  await expect.poll(served.analyticsLoaded).toBe(true); // gtag.js arrives once the page is idle
 
   await page.waitForTimeout(300);
   expect(await violations(page)).toEqual([]);

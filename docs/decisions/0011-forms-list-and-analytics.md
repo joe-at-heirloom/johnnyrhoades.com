@@ -2,6 +2,8 @@
 
 **Status:** Accepted, 2026-09-30 (Phase 5)
 
+*Update, 2026-10-05:* the services changed to Formspree (both forms) and Google Analytics, with no list service yet (ADR 0023). The interfaces and events below stay.
+
 ## Context
 
 The v1 forms used `data-netlify`, which only works on Netlify. On GitHub Pages, booking requests and signups would have gone nowhere without anyone noticing. PLAN.md sections 11 and 13 ask for a hosted form service behind `src/lib/forms.ts`, a mailing list with region tags from the ZIP code, and Umami with eleven custom events.
