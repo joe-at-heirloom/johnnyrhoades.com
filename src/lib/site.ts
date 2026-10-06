@@ -3,6 +3,9 @@ import { DateTime } from 'luxon';
 import { HOME_ZONE } from './time.ts';
 
 export const SITE_URL = 'https://johnnyrhoades.com';
+
+/** The site's source, public: the footer credit links here (PLAN.md section 7.1, with Johnny's OK). */
+export const SITE_SOURCE = 'https://github.com/joe-at-heirloom/johnnyrhoades.com';
 export const SITE_HOST = 'johnnyrhoades.com';
 export const ARTIST = 'Johnny Rhoades';
 export const BANDSINTOWN_PROFILE = 'https://www.bandsintown.com/a/11869348';

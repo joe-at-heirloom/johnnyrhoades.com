@@ -1,5 +1,6 @@
 ---
 import { BUILD_NOW } from '../lib/load-shows';
+import { SITE_SOURCE } from '../lib/site';
 
 import { liveLinks } from '../lib/media';
 import { profiles } from '../lib/load-content';
@@ -14,6 +15,6 @@ const year = BUILD_NOW.year;
     <ul class="socials" aria-label="Johnny Rhoades elsewhere">
       {links.map((p) => <li><a href={p.url} target="_blank" rel="noopener">{p.name}</a></li>)}
     </ul>
-    <p class="fine">© {year} Johnny Rhoades · Detroit, Michigan</p>
+    <p class="fine">© {year} Johnny Rhoades · Detroit, Michigan · <a href={SITE_SOURCE} target="_blank" rel="noopener">Site by Joe</a></p>
   </div>
 </footer>

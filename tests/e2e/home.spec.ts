@@ -139,3 +139,9 @@ test('thanks and 404 pages are noindex', async ({ page }) => {
     await expect(page.getByRole('link', { name: 'Back to the site' })).toBeVisible();
   }
 });
+
+test('the footer credits the site, with Johnny’s OK, and links to its source', async ({ page }) => {
+  await page.goto('/');
+  const credit = page.locator('footer').getByRole('link', { name: 'Site by Joe' });
+  await expect(credit).toHaveAttribute('href', 'https://github.com/joe-at-heirloom/johnnyrhoades.com');
+});

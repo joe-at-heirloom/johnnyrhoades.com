@@ -7,6 +7,8 @@
 .socials a { font-size: .85rem; text-decoration: none; color: var(--bone-2); transition: color .2s; }
 .socials a:hover { color: var(--red-hi); }
 .fine { grid-column: 1 / -1; color: var(--muted); font-size: .9rem; padding-top: 24px; border-top: 1px solid var(--line); }
+.fine a { color: inherit; text-underline-offset: 3px; transition: color .2s; }
+.fine a:hover { color: var(--bone); }
 
 @media (max-width: 700px) {
   .footer-inner { grid-template-columns: 1fr; }
