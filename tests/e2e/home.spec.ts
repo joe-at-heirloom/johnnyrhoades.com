@@ -145,3 +145,16 @@ test('the footer credits the site, with Johnny’s OK, and links to its source',
   const credit = page.locator('footer').getByRole('link', { name: 'Site by Joe' });
   await expect(credit).toHaveAttribute('href', 'https://github.com/joe-at-heirloom/johnnyrhoades.com');
 });
+
+test('no page scrolls sideways, from phone to desktop', async ({ page }) => {
+  const wide: string[] = [];
+  for (const width of [390, 768, 1024, 1280, 1440]) {
+    await page.setViewportSize({ width, height: 900 });
+    for (const path of ['/', '/shows/', '/epk/', '/shows/2026-10-23-blue-goose-inn-st-clair-shores/']) {
+      await page.goto(path);
+      const over = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+      if (over > 0) wide.push(`${path} at ${width}px: ${over}px too wide`);
+    }
+  }
+  expect(wide).toEqual([]);
+});

@@ -13,6 +13,8 @@
 }
 .list-sub { margin-top: 14px; font-weight: 500; font-size: 1.08rem; max-width: 28rem; color: var(--bone); }
 .list-form { display: grid; grid-template-columns: 1.6fr 1fr auto; gap: 10px; position: relative; }
+/* Inputs default to about 20 characters wide; without this they hold the columns open and the page scrolls sideways around 1024 px. */
+.list-form input { min-width: 0; }
 .list-form input {
   min-height: 54px; padding: 0 16px;
   border: 2px solid var(--bone); border-radius: var(--radius);
