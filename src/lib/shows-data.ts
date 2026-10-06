@@ -32,12 +32,20 @@ export const hasPage = (s: Show) => isPublic(s) && localDate(s.start, s.venue.ti
 /** Pages stay indexable until INDEX_DAYS_AFTER days after the show (PLAN.md section 7.2). */
 export const isIndexable = (s: Show, now: DateTime) => hasPage(s) && dt(s.start).plus({ days: INDEX_DAYS_AFTER }) > now;
 
+/**
+ * Which room a show was in, for counting. Johnny has typed the same room many
+ * ways over the years ("Cadieux Cafe", "The Cadiuex Cafe"), so shows with a
+ * street address count by address; the rest fall back to the venue key.
+ */
+export const roomOf = (s: Show) =>
+  s.venue.street ? `${s.venue.street.toLowerCase().replace(/[^a-z0-9]/g, '')}|${s.venue.city.toLowerCase()}` : s.venue.key;
+
 /** The proof sentence (PLAN.md section 4.3), or null when the last year has fewer than ten shows. */
 export function proofLine(shows: Show[], now: DateTime): string | null {
   const yearAgo = now.minus({ years: 1 });
   const lastYear = pastShows(shows, now).filter((s) => dt(s.start) >= yearAgo);
   if (lastYear.length < 10) return null;
-  const rooms = new Set(lastYear.map((s) => s.venue.key)).size;
+  const rooms = new Set(lastYear.map(roomOf)).size;
   const towns = new Set(lastYear.map((s) => `${s.venue.city}|${s.venue.region}`)).size;
   const n = (count: number, one: string, many: string) => `${count} ${count === 1 ? one : many}`;
   return `${n(lastYear.length, 'show', 'shows')} in the last year, in ${n(rooms, 'room', 'rooms')} across ${n(towns, 'town', 'towns')}.`;
@@ -45,7 +53,7 @@ export function proofLine(shows: Show[], now: DateTime): string | null {
 
 /** "Johnny's played here 14 times since 2024." Only once it's more than once. */
 export function venueHistory(shows: Show[], show: Show, now: DateTime): string | null {
-  const here = pastShows(shows, now).filter((s) => s.venue.key === show.venue.key);
+  const here = pastShows(shows, now).filter((s) => roomOf(s) === roomOf(show));
   if (here.length < 2) return null;
   const since = Math.min(...here.map((s) => dt(s.start).year));
   return `Johnny’s played here ${here.length} times since ${since}.`;
@@ -55,9 +63,9 @@ export function venueHistory(shows: Show[], show: Show, now: DateTime): string |
 export function topRooms(shows: Show[], now: DateTime, limit = 10) {
   const counts = new Map<string, { name: string; city: string; count: number }>();
   for (const s of pastShows(shows, now)) {
-    const c = counts.get(s.venue.key) ?? { name: s.venue.name, city: s.venue.city, count: 0 };
+    const c = counts.get(roomOf(s)) ?? { name: s.venue.name, city: s.venue.city, count: 0 };
     c.count++;
-    counts.set(s.venue.key, c);
+    counts.set(roomOf(s), c);
   }
   return [...counts.values()].sort((a, b) => b.count - a.count || a.name.localeCompare(b.name)).slice(0, limit);
 }

@@ -17,7 +17,7 @@
   blurb: TODO
 
 blue-goose-inn:
-  match: ["Blue Goose Inn", "The Blue Goose"]
+  match: ["Blue Goose Inn", "The Blue Goose", "The Blue Goose Inn"]
   name: Blue Goose Inn
   street: 28911 Jefferson Ave
   city: St. Clair Shores
@@ -27,6 +27,7 @@ blue-goose-inn:
   blurb: TODO
 
 cadieux-cafe:
+  match: ["Cadieux Cafe", "The Cadieux Cafe", "Cadiuex Cafe", "The Cadiuex Cafe", "The Cadiex Cafe"] # spellings in Bandsintown, 2022–2026
   name: Cadieux Cafe
   city: Detroit
   region: MI
@@ -53,7 +54,7 @@ the-fed-community:
   blurb: TODO
 
 three-blind-mice-irish-pub:
-  match: ["Three Blind Mice Irish Pub", "Three Blind Mice"]
+  match: ["Three Blind Mice Irish Pub", "Three Blind Mice", "Three Blind Mice Pub"]
   name: Three Blind Mice Irish Pub
   city: Mount Clemens
   region: MI

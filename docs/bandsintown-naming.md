@@ -2,19 +2,16 @@
 
 *For Johnny. Keep this on your phone.*
 
-When you add a show:
+Add shows the way you always have. Within three hours the site picks each one up, builds its page and poster, and adds it to the calendar feed.
 
-1. **Pick the venue from Bandsintown's search list** instead of typing a new one, so the address comes through.
+Three things help:
+
+1. **Pick the venue from Bandsintown's search list** when it's there, so the address comes through.
 2. **Set the start time.**
-3. **In the title, use one of these:**
-   - `Solo acoustic`
-   - `Trio`
-   - `Full band`
-   - `With Motor City Josh & The Big 3`. Use "With …" whenever you're playing in someone else's band.
-   - `Hosting open mic`
-4. **Add a ticket link** if there is one. If the show is free, write `Free` in the description.
-5. **Private gigs: leave them out of Bandsintown.** They never appear on the site.
+3. **Leave private gigs out of Bandsintown.** They never appear on the site.
 
-That's it. Within three hours the site picks up the show, builds its page and poster, and adds it to the calendar feed.
+**Optional: say who's playing.** Type it in the title, or in front of the venue name the way you used to ("Solo Acoustic @ The Whiskey Six"). Either works, in your own words: "Solo Acoustic", "Johnny Rhoades Trio", "Motor City Josh and the Big 3", "w/ Jill Jack", "Hosting open jam". If you skip it, the show is billed as Johnny Rhoades.
+
+If the show is free, mark it free. Add a ticket link if there is one.
 
 If a show gets cancelled, delete it in Bandsintown and tell Joe if you want the page to say "cancelled" instead of just disappearing.

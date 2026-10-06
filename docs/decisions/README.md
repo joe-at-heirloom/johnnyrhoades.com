@@ -22,3 +22,4 @@ Short notes on choices that shape the code, so the reasoning survives. One file 
 | [0016](0016-record-player-and-date-check.md) | Drop the needle, and "am I free that night?" | Accepted |
 | [0017](0017-show-card-poster.md) | The show card, a classic blues poster template | Accepted |
 | [0018](0018-12-bar-strum-and-bend.md) | The 12-bar strum, and the bend | Accepted |
+| [0020](0020-read-the-act-from-what-johnny-types.md) | Read the act from what Johnny already types | Accepted |

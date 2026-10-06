@@ -37,6 +37,7 @@ export const ShowSchema = z.object({
   act: z.enum(ACTS),
   billing: z.string().min(1),
   lineup: z.array(z.string()),
+  /** The act as Johnny typed it: the Bandsintown title, or the label in front of the venue name (ADR 0020). */
   rawTitle: z.string().optional(),
   venue: VenueSchema,
   tickets: z

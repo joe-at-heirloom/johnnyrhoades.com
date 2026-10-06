@@ -81,7 +81,7 @@ Before calling any task done, run `npm run check && npm test && npm run build`. 
 - With Actions-based Pages deploys, the custom domain is set in repo settings and a `CNAME` file is ignored.
 - GitHub Pages can't do redirects or headers. Those are Cloudflare rules documented in `docs/runbook-launch.md`. The only redirects the app generates are alias stubs for changed show slugs.
 - Satori takes TTF, OTF or WOFF (not WOFF2) and doesn't reliably handle variable-font axes. Use the static instances in `src/assets/fonts/poster/`.
-- Bandsintown: model against the captured payloads in `tests/fixtures/`, not assumptions. Confirm the datetime format and the title fields there.
+- Bandsintown: model against the captured payloads in `tests/fixtures/`, not assumptions. Johnny never fills in titles; he labels the act in front of the venue name ("Solo Acoustic @ The Whiskey Six"), so never ask him to change that (ADR 0020).
 
 ## Working style
 

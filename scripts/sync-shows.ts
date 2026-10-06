@@ -20,7 +20,7 @@ import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { parseArgs } from 'node:util';
 import { DateTime } from 'luxon';
-import { ARTIST_NAME, eventsUrl, parseEvents, type BitEvent } from '../src/lib/bandsintown.ts';
+import { ARTIST_NAME, captureText, eventsUrl, parseEvents, type BitEvent } from '../src/lib/bandsintown.ts';
 import { parseOverrides, parseSyncMeta, parseVenueBook, serializeSyncMeta, type SyncMeta } from '../src/lib/data-files.ts';
 import { checkGuard, SyncGuardError } from '../src/lib/guard.ts';
 import { applyOverride, describeSummary, mergeShows } from '../src/lib/merge.ts';
@@ -67,7 +67,7 @@ async function load(kind: 'upcoming' | 'past', now: DateTime): Promise<BitEvent[
   if (args.capture) {
     await mkdir(CAPTURE_DIR, { recursive: true });
     const path = join(CAPTURE_DIR, `captured-${now.toISODate()}-${kind}.json`);
-    await writeFile(path, `${JSON.stringify(json, null, 2)}\n`);
+    await writeFile(path, captureText(json, appId));
     console.log(`Captured ${path}`);
   }
   return parseEvents(json);

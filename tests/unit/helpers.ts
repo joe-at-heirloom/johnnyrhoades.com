@@ -11,6 +11,10 @@ export const FIXTURES = 'tests/fixtures/bandsintown';
 export const fixtureEvents = (kind: 'upcoming' | 'past'): BitEvent[] =>
   parseEvents(JSON.parse(readFileSync(`${FIXTURES}/${kind}.json`, 'utf8')));
 
+/** Real responses from Johnny's Bandsintown, captured 2026-10-05 (app_id redacted). */
+export const captured = (kind: 'upcoming' | 'past'): BitEvent[] =>
+  parseEvents(JSON.parse(readFileSync(`${FIXTURES}/captured-2026-10-05-${kind}.json`, 'utf8')));
+
 export const realVenues = (): VenueBook => parseVenueBook(readFileSync('src/data/venues.yaml', 'utf8'));
 
 export const at = (iso: string) => DateTime.fromISO(iso, { setZone: true });

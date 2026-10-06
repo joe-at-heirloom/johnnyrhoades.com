@@ -1,5 +1,5 @@
 /* Bandsintown event → FreshShow (PLAN.md section 6.1). Pure: no I/O, no clock. */
-import { billingFor, inferAct } from './act.ts';
+import { billingFor, inferAct, splitVenueLabel } from './act.ts';
 import type { BitEvent } from './bandsintown.ts';
 import type { FreshShow } from './shows-schema.ts';
 import { localToIso, venueZone } from './time.ts';
@@ -31,13 +31,16 @@ export const cleanEventUrl = (url: string) => {
 };
 
 export function normalizeEvent(raw: BitEvent, ctx: { venues: VenueBook; artistName: string }): FreshShow {
-  const key = venueKey(raw.venue.name, ctx.venues);
+  // Johnny labels the act in front of the venue name ("Solo Acoustic @ The Whiskey Six"); a title wins if he types one (ADR 0020).
+  const { label: venueLabel, venue: venueName } = splitVenueLabel(raw.venue.name, ctx.artistName);
+  const label = raw.title.trim() || venueLabel || '';
+  const key = venueKey(venueName, ctx.venues);
   const entry = venueEntry(key, ctx.venues);
   const country = countryCode(raw.venue.country);
   const region = known(entry.region) ?? raw.venue.region;
   const timeZone = venueZone(region, country);
 
-  const act = inferAct({ title: raw.title, lineup: raw.lineup, artistName: ctx.artistName });
+  const act = inferAct({ title: label, lineup: raw.lineup, artistName: ctx.artistName });
   const ticketUrl = http(raw.offers.find((o) => /ticket/i.test(o.type) && o.url)?.url);
   const free = raw.free === true || /\bfree\b/i.test(raw.description) || undefined;
 
@@ -45,11 +48,11 @@ export function normalizeEvent(raw: BitEvent, ctx: { venues: VenueBook; artistNa
     id: raw.id,
     start: localToIso(raw.starts_at || raw.datetime, timeZone),
     act,
-    billing: billingFor({ act, title: raw.title, lineup: raw.lineup, artistName: ctx.artistName }),
+    billing: billingFor({ act, title: label, lineup: raw.lineup, artistName: ctx.artistName }),
     lineup: raw.lineup,
     venue: {
       key,
-      name: known(entry.name) ?? raw.venue.name,
+      name: known(entry.name) ?? venueName,
       city: known(entry.city) ?? raw.venue.city,
       region,
       country,
@@ -62,7 +65,7 @@ export function normalizeEvent(raw: BitEvent, ctx: { venues: VenueBook; artistNa
 
   // Optional fields are only set when known, so the JSON stays free of empty values.
   if (raw.ends_at) show.end = localToIso(raw.ends_at, timeZone);
-  if (raw.title) show.rawTitle = raw.title;
+  if (label) show.rawTitle = label;
   const street = known(entry.street) ?? (raw.venue.street_address || undefined);
   const postalCode = known(entry.postalCode) ?? (raw.venue.postal_code || undefined);
   const url = http(known(entry.url));

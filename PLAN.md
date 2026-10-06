@@ -308,14 +308,16 @@ type Show = {
 
 **Act inference.** Overrides always win.
 
-| Signal in the Bandsintown title or lineup | Act |
+The label is the Bandsintown title, or, since Johnny has never used titles, the part of the venue name before "@" ("Solo Acoustic @ The Whiskey Six"). ADR 0020 has the details and his real wordings.
+
+| Signal in the label or lineup | Act |
 |---|---|
-| "solo", "acoustic" | `solo` |
+| "host", "open mic" | `host` |
+| "with …", "w/ …", a name ending in Band, Duo or Trio, another name next to his, Motor City Josh, or a lineup led by another artist | `guest` |
 | "trio" | `trio` |
 | "band", "full band" | `band` |
-| "with …", "w/ …", or a lineup led by another artist | `guest` |
-| "host", "open mic" | `host` |
-| None of the above | `unspecified` (ask Johnny for a default) |
+| "solo", "acoustic" | `solo` |
+| None of the above | `unspecified`, billed as plain "Johnny Rhoades" (no default act; ADR 0020) |
 
 ### 6.3 Hand-kept overrides
 
@@ -696,10 +698,10 @@ Nothing below ships as fact until he answers.
 - [ ] John Németh's Blue Dreamers: which years, and any other records with Németh besides *Feelin' Freaky* (2017).
 - [ ] Brett Lucas's *Soul and Courage* (Detroit Music Award, 2020): is he on it, which volume and which tracks?
 - [ ] The Blue Goose story: did he start there washing dishes?
-- [ ] Lucas Rhoades Band: current or past, and how it should be billed.
+- [ ] Lucas Rhoades Band: current or past, and how it should be billed. Bandsintown has 19 shows billed that way, the latest at The Fed in August 2026; the site says "Lucas Rhoades Band, with Johnny Rhoades" for now.
 - [ ] Years in Motor City Josh's band, and which albums he's on.
 - [ ] Formats: who plays in the trio and the band, typical set lengths, and whether he brings his own PA, and for what size room.
-- [ ] A default act for Bandsintown entries with no label.
+- [x] A default act for Bandsintown entries with no label. Not needed: unlabeled shows are billed as plain "Johnny Rhoades", and the act is read from the label he already types in front of the venue name (ADR 0020).
 - [ ] Which booking email and phone number to publish, and a response time he can keep.
 - [ ] Original high-resolution files and photographer credits for every photo.
 - [ ] A stage plot and input list for each format.
@@ -712,20 +714,9 @@ Nothing below ships as fact until he answers.
 
 ## Appendix A: Bandsintown naming guide for Johnny
 
-Keep this on your phone. When you add a show:
+Keep this on your phone. The current version is `docs/bandsintown-naming.md`; it no longer asks Johnny to type a title (ADR 0020).
 
-1. Pick the venue from Bandsintown's search list instead of typing a new one, so the address comes through.
-2. Set the start time.
-3. In the title, use one of these:
-   - `Solo acoustic`
-   - `Trio`
-   - `Full band`
-   - `With Motor City Josh & The Big 3` (use "With …" whenever you're playing in someone else's band)
-   - `Hosting open mic`
-4. Add a ticket link if there is one. If the show is free, write `Free` in the description.
-5. Private gigs: leave them out of Bandsintown. They never appear on the site.
-
-That's it. The site picks the show up within three hours, builds its page and poster, and adds it to the calendar feed.
+Add shows the way you always have. Three things help: pick the venue from Bandsintown's list when it's there, set the start time, and leave private gigs out. Saying who's playing is optional, in the title or in front of the venue name ("Solo Acoustic @ The Whiskey Six"), in his own words. Unlabeled shows are billed as Johnny Rhoades.
 
 ---
 

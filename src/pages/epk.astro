@@ -18,7 +18,7 @@ import { EPK_FAQ, EPK_FAST_FACTS } from '../lib/copy';
 import { facts, image, media, profiles, videoThumb } from '../lib/load-content';
 import { allShows, BUILD_NOW } from '../lib/load-shows';
 import { liveLinks } from '../lib/media';
-import { pastShows, proofLine, upcomingShows } from '../lib/shows-data';
+import { pastShows, proofLine, roomOf, upcomingShows } from '../lib/shows-data';
 import { PRESS_ZIP, absolute } from '../lib/site';
 
 const video = media.videos.find((v) => v.epk) ?? media.videos[0]!;
@@ -27,7 +27,7 @@ const rooms = [
   ...new Map(
     [...upcomingShows(allShows, BUILD_NOW), ...pastShows(allShows, BUILD_NOW).filter((s) => DateTime.fromISO(s.start, { setZone: true }) >= yearAgo)]
       .filter((s) => s.status !== 'cancelled')
-      .map((s) => [s.venue.key, `${s.venue.name}, ${s.venue.city}`] as const),
+      .map((s) => [roomOf(s), `${s.venue.name}, ${s.venue.city}`] as const),
   ).values(),
 ].sort();
 const highlights = facts.tagged('highlight');

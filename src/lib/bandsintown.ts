@@ -56,6 +56,16 @@ export function parseEvents(json: unknown): BitEvent[] {
   return z.array(BitEventSchema).parse(json);
 }
 
+/**
+ * A raw response, ready to save as a fixture. Bandsintown echoes the app_id
+ * into every event and offer URL, and fixtures are committed to a public
+ * repo, so every occurrence of the key becomes "REDACTED".
+ */
+export function captureText(json: unknown, appId: string): string {
+  const text = `${JSON.stringify(json, null, 2)}\n`;
+  return appId ? text.replaceAll(appId, 'REDACTED') : text;
+}
+
 export function eventsUrl(appId: string, date: 'upcoming' | 'past'): string {
   const url = new URL(`/artists/id_${ARTIST_ID}/events`, API_BASE);
   url.searchParams.set('app_id', appId);

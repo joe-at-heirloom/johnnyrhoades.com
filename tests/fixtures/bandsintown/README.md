@@ -1,6 +1,8 @@
-# Bandsintown fixtures (mock until the API key arrives)
+# Bandsintown fixtures
 
-**These are hand-written mocks, not captured API responses.** PLAN.md section 6.2 says to capture real responses before modeling. That waits on a Bandsintown `app_id` from Johnny's Bandsintown for Artists account. Until then, see ADR 0006.
+**`captured-2026-10-05-*.json` are real responses** (604 past shows back to 2015, 5 upcoming), with the app_id redacted. ADR 0020 records what they showed: Johnny never fills in titles, and labels the act in front of the venue name instead.
+
+**`upcoming.json` and `past.json` are hand-written mocks**, kept until the older tests move to the capture. PLAN.md section 6.2 says to capture real responses before modeling. That waits on a Bandsintown `app_id` from Johnny's Bandsintown for Artists account. Until then, see ADR 0006.
 
 ## What's real and what isn't
 
@@ -11,6 +13,6 @@
 
 ## When the real key arrives
 
-1. `BANDSINTOWN_APP_ID=… npm run sync -- --capture`. This saves the raw responses here as `captured-<date>-upcoming.json` and `captured-<date>-past.json`.
+1. `BANDSINTOWN_APP_ID=… npm run sync -- --capture`. This saves the raw responses here as `captured-<date>-upcoming.json` and `captured-<date>-past.json`. Bandsintown echoes the key into every event URL, so the capture replaces it with `REDACTED` before writing (this repo is public). Still grep the files for the key before committing them.
 2. Compare them with these mocks and fix `src/lib/bandsintown.ts` and `src/lib/normalize.ts` wherever they differ.
 3. Point `npm run sync:fixtures` and the unit tests at the captured files, delete the mocks, and close ADR 0006.

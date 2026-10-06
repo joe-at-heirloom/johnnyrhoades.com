@@ -1,0 +1,200 @@
+[
+  {
+    "id": "108955477",
+    "url": "https://www.bandsintown.com/e/108955477?app_id=REDACTED&came_from=267&utm_medium=api&utm_source=public_api&utm_campaign=event",
+    "datetime": "2026-10-10T14:00:00",
+    "title": "",
+    "description": "",
+    "artist": {
+      "id": "11869348",
+      "name": "Johnny Rhoades",
+      "url": "https://www.bandsintown.com/a/11869348?came_from=267&app_id=REDACTED",
+      "mbid": "",
+      "options": {
+        "display_listen_unit": false
+      },
+      "tracking": [],
+      "image_url": "https://photos.bandsintown.com/artistLarge.jpg",
+      "thumb_url": "https://photos.bandsintown.com/artistThumb.jpg",
+      "facebook_page_url": "",
+      "tracker_count": 102,
+      "upcoming_event_count": 5,
+      "support_url": "",
+      "links": [
+        {
+          "type": "itunes",
+          "url": "https://music.apple.com/artist/942326905?utm_source=bandsintown"
+        },
+        {
+          "type": "shazam",
+          "url": "https://www.shazam.com/artist/-/942326905?utm_source=bandsintown"
+        }
+      ],
+      "artist_optin_show_phone_number": false,
+      "show_multi_ticket": true
+    },
+    "venue": {
+      "location": "Mount Clemens, MI",
+      "name": "Octopus' Beer Garden",
+      "latitude": "42.5977938",
+      "longitude": "-82.8669858",
+      "street_address": "152 N River Rd",
+      "postal_code": "48043",
+      "city": "Mount Clemens",
+      "country": "United States",
+      "region": "MI"
+    },
+    "lineup": [
+      "Johnny Rhoades"
+    ],
+    "offers": [],
+    "free": true,
+    "artist_id": "11869348",
+    "on_sale_datetime": "",
+    "festival_start_date": "",
+    "festival_end_date": "",
+    "festival_datetime_display_rule": "",
+    "starts_at": "2026-10-10T14:00:00",
+    "ends_at": "2026-10-10T15:00:00",
+    "datetime_display_rule": "datetime",
+    "bandsintown_plus": false,
+    "presale": "",
+    "sold_out": false
+  },
+  {
+    "id": "108955484",
+    "url": "https://www.bandsintown.com/e/108955484?app_id=REDACTED&came_from=267&utm_medium=api&utm_source=public_api&utm_campaign=event",
+    "datetime": "2026-10-11T15:00:00",
+    "title": "",
+    "description": "",
+    "venue": {
+      "location": "Detroit, MI",
+      "name": "Cadieux Cafe",
+      "latitude": "42.4015697",
+      "longitude": "-82.9264504",
+      "street_address": "4300 Cadieux Rd",
+      "postal_code": "48224",
+      "city": "Detroit",
+      "country": "United States",
+      "region": "MI"
+    },
+    "lineup": [
+      "Johnny Rhoades"
+    ],
+    "offers": [],
+    "free": true,
+    "artist_id": "11869348",
+    "on_sale_datetime": "",
+    "festival_start_date": "",
+    "festival_end_date": "",
+    "festival_datetime_display_rule": "",
+    "starts_at": "2026-10-11T15:00:00",
+    "ends_at": "2026-10-11T18:00:00",
+    "datetime_display_rule": "datetime",
+    "bandsintown_plus": false,
+    "presale": "",
+    "sold_out": false
+  },
+  {
+    "id": "108955494",
+    "url": "https://www.bandsintown.com/e/108955494?app_id=REDACTED&came_from=267&utm_medium=api&utm_source=public_api&utm_campaign=event",
+    "datetime": "2026-10-17T19:30:00",
+    "title": "",
+    "description": "",
+    "venue": {
+      "location": "Clarkston, MI",
+      "name": "The Fed Community",
+      "latitude": "42.735274",
+      "longitude": "-83.419451",
+      "street_address": "15 S Main St",
+      "postal_code": "48346",
+      "city": "Clarkston",
+      "country": "United States",
+      "region": "MI"
+    },
+    "lineup": [
+      "Johnny Rhoades"
+    ],
+    "offers": [],
+    "free": true,
+    "artist_id": "11869348",
+    "on_sale_datetime": "",
+    "festival_start_date": "",
+    "festival_end_date": "",
+    "festival_datetime_display_rule": "",
+    "starts_at": "2026-10-17T19:30:00",
+    "ends_at": "2026-10-17T22:30:00",
+    "datetime_display_rule": "datetime",
+    "bandsintown_plus": false,
+    "presale": "",
+    "sold_out": false
+  },
+  {
+    "id": "108955500",
+    "url": "https://www.bandsintown.com/e/108955500?app_id=REDACTED&came_from=267&utm_medium=api&utm_source=public_api&utm_campaign=event",
+    "datetime": "2026-10-23T21:00:00",
+    "title": "",
+    "description": "",
+    "venue": {
+      "location": "St. Clair Shores, MI",
+      "name": "Blue Goose Inn",
+      "latitude": "42.5048",
+      "longitude": "-82.8825",
+      "street_address": "28911 Jefferson Ave",
+      "postal_code": "48081",
+      "city": "St. Clair Shores",
+      "country": "United States",
+      "region": "MI"
+    },
+    "lineup": [
+      "Johnny Rhoades"
+    ],
+    "offers": [],
+    "free": false,
+    "artist_id": "11869348",
+    "on_sale_datetime": "",
+    "festival_start_date": "",
+    "festival_end_date": "",
+    "festival_datetime_display_rule": "",
+    "starts_at": "2026-10-23T21:00:00",
+    "ends_at": "2026-10-23T23:59:00",
+    "datetime_display_rule": "datetime",
+    "bandsintown_plus": false,
+    "presale": "",
+    "sold_out": false
+  },
+  {
+    "id": "108955507",
+    "url": "https://www.bandsintown.com/e/108955507?app_id=REDACTED&came_from=267&utm_medium=api&utm_source=public_api&utm_campaign=event",
+    "datetime": "2026-10-24T20:00:00",
+    "title": "",
+    "description": "",
+    "venue": {
+      "location": "Mount Clemens, MI",
+      "name": "Three Blind Mice Irish Pub",
+      "latitude": "42.5997294",
+      "longitude": "-82.8766596",
+      "street_address": "101 N Main St",
+      "postal_code": "48043",
+      "city": "Mount Clemens",
+      "country": "United States",
+      "region": "MI"
+    },
+    "lineup": [
+      "Johnny Rhoades"
+    ],
+    "offers": [],
+    "free": true,
+    "artist_id": "11869348",
+    "on_sale_datetime": "",
+    "festival_start_date": "",
+    "festival_end_date": "",
+    "festival_datetime_display_rule": "",
+    "starts_at": "2026-10-24T20:00:00",
+    "ends_at": "2026-10-24T23:59:00",
+    "datetime_display_rule": "datetime",
+    "bandsintown_plus": false,
+    "presale": "",
+    "sold_out": false
+  }
+]

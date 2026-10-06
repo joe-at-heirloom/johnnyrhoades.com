@@ -7,7 +7,7 @@ import { buildCalendar, escapeText, foldLine } from '../../src/lib/ics.ts';
 import { directionsUrl, googleCalendarUrl, venueAddress } from '../../src/lib/links.ts';
 import { mergeShows } from '../../src/lib/merge.ts';
 import { breadcrumbs, musicEvent, siteGraph } from '../../src/lib/schema.ts';
-import { hasPage, isIndexable, pastShows, proofLine, showEnd, topRooms, upcomingShows, venueHistory } from '../../src/lib/shows-data.ts';
+import { hasPage, isIndexable, pastShows, proofLine, roomOf, showEnd, topRooms, upcomingShows, venueHistory } from '../../src/lib/shows-data.ts';
 import type { Show } from '../../src/lib/shows-schema.ts';
 import { at, fresh } from './helpers.ts';
 
@@ -76,6 +76,20 @@ describe('proof', () => {
     const goosePast = many.filter((s) => s.venue.key === 'blue-goose-inn');
     expect(venueHistory(many, goosePast[0]!, NOW)).toBe(`Johnny’s played here ${goosePast.length} times since 2026.`);
     expect(topRooms(many, NOW)[0]).toMatchObject({ name: 'Blue Goose Inn', count: goosePast.length });
+  });
+
+  it('counts a room once however its name was typed, by street address', () => {
+    const spellings = shows(
+      ['Cadieux Cafe', 'The Cadiuex Cafe', 'Cadiuex Cafe'].map((name, i) => ({
+        id: String(200 + i),
+        datetime: `2026-0${i + 3}-14T20:00:00`,
+        venue: { name, city: 'Detroit', street_address: '4300 Cadieux Rd' },
+      })),
+    );
+    expect(new Set(spellings.map((s) => s.venue.key)).size).toBe(3);
+    expect(new Set(spellings.map(roomOf)).size).toBe(1);
+    expect(venueHistory(spellings, spellings[0]!, NOW)).toBe('Johnny’s played here 3 times since 2026.');
+    expect(topRooms(spellings, NOW)).toHaveLength(1);
   });
 });
 

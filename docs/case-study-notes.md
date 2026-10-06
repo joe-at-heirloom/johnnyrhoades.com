@@ -4,6 +4,24 @@ A running log for the portfolio write-up (PLAN.md section 16): numbers, screensh
 
 ---
 
+## 2026-10-05: The first real Bandsintown data, and not asking Johnny to change
+
+**What changed.** The first live capture had 609 shows going back to 2015. Not one had a title, which the plan had been counting on to say whether a show was solo, trio or a guest spot. Johnny had been labeling every show anyway, in front of the venue name: "Solo Acoustic @ The Whiskey Six". The site now reads that, in his own wording, and the naming guide no longer asks him for anything new (ADR 0020).
+
+**Numbers.**
+
+- 586 of 609 shows now have an act: 239 solo, 309 sitting in with someone else, 21 trio, 15 hosting, 2 full band.
+- Counting rooms by name said 295 rooms. Stripping the labels brought that to 200, and counting by street address to 145, because he's typed some rooms up to eight ways.
+- The proof line from the real history: "106 shows in the last year, in 35 rooms across 26 towns." By name it would have said 47 rooms.
+
+**Worth telling**
+
+- *Capture before you model, again.* The plan's own rule paid off. The mock was faithful to one event's shape and still missed the most important fact about the data: where Johnny writes things down.
+- *The fix for a person is usually in the software.* The plan had a guide asking Johnny to type titles. Reading what he already types was a few hundred lines with tests; changing a working musician's habit wasn't going to happen.
+- *The key was in the data.* Bandsintown echoes the API key into every event URL in its responses. Captures meant for a public repo now redact it before they're written.
+
+---
+
 ## 2026-10-02: A second research pass, and the biggest credit wasn't on the site
 
 **What changed.** Searching outside Johnny's own bio found two things bigger than anything in the press kit: he was John Németh's guitarist in the Blue Dreamers and plays on *Feelin' Freaky* (2017, produced by Luther Dickinson), and the band he still plays in, Motor City Josh & The Big 3, won Detroit Music Awards in 2020 and 2023. Both are `verified` with links and now lead the home page About, the bios, the press kit highlights and /llms.txt.
