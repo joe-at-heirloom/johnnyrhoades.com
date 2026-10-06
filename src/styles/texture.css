@@ -42,11 +42,11 @@ a.show-row-inner:is(:hover, :focus-visible),
 /* The hero logo already is a mask: intersect the two. */
 .hero-title .logo-mark {
   -webkit-mask:
-    url("../assets/brand/logo.png") center / contain no-repeat,
+    url("../assets/brand/logo.webp") center / contain no-repeat,
     url("../assets/textures/letterpress.webp") 0 0 / 384px;
   -webkit-mask-composite: source-in;
           mask:
-    url("../assets/brand/logo.png") center / contain no-repeat,
+    url("../assets/brand/logo.webp") center / contain no-repeat,
     url("../assets/textures/letterpress.webp") 0 0 / 384px;
           mask-composite: intersect;
 }
