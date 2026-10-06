@@ -1,11 +1,11 @@
 {
-  "source": "fixtures",
-  "heartbeatAt": "2026-09-30T21:00:00-04:00",
-  "lastChangeAt": "2026-09-30T21:00:00-04:00",
-  "lastChangeSummary": "+9 new",
+  "source": "api",
+  "heartbeatAt": "2026-10-05T21:30:16-04:00",
+  "lastChangeAt": "2026-10-05T21:30:16-04:00",
+  "lastChangeSummary": "+600 new, 8 updated",
   "counts": {
-    "upcoming": 7,
-    "past": 2,
-    "total": 9
+    "upcoming": 5,
+    "past": 604,
+    "total": 609
   }
 }
