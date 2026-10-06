@@ -27,9 +27,9 @@ The full sequence is `docs/runbook-launch.md`; these are the checks that close i
 
 Set each ID as a GitHub Actions repository **variable** (not a secret; they're public by design) and in `.env` for local testing.
 
-- [ ] **Web3Forms** (`PUBLIC_WEB3FORMS_KEY`). Create an access key at https://web3forms.com with `hello@johnnyrhoades.com`, the inbox Johnny reads for work (ADR 0021). Send a test booking from staging. Expect an email with the subject `Booking: {date}, {venue}, {event type}` and reply-to set to the booker. Then turn JavaScript off and send another; expect `/thanks/`. *Automated now:* `tests/e2e/forms.spec.ts` checks the payload, subject, success and error messages, and the no-JavaScript form attributes against an intercepted endpoint.
-- [ ] **Buttondown** (`PUBLIC_BUTTONDOWN_USER`). Create the account, import the Bandzoogle export (see below), and create the tags Metro Detroit, Ann Arbor, Lansing, West Michigan, Elsewhere in Michigan and Out of state. Sign up from staging with a 48080 ZIP. Expect the subscriber with the Metro Detroit tag and `zip` metadata. *Automated now:* the region mapping and the posted fields.
-- [ ] **Umami** (`PUBLIC_UMAMI_WEBSITE_ID`). Add johnnyrhoades.com in Umami Cloud. After launch, click through a show page and play a video. Expect the pageviews and the events (`directions_click`, `video_play` and so on). Staging won't count, by design (`data-domains`). *Automated now:* every event name, and the script attributes.
+- [ ] **Formspree** (ADR 0023). Both forms are live with their IDs in the code. Check that each Formspree form sends to `hello@johnnyrhoades.com`, the inbox Johnny reads for work (ADR 0021). Send a test booking and a test signup from staging. Expect a booking email with the subject `Booking: {date}, {place}, {event type}` and Reply-To set to the sender, and a signup email with the ZIP and region. Watch the free plan's 50 a month.
+- [ ] **Mailing list service** (later; ADR 0023). Not needed for launch: signups arrive by email. When Joe wants a list, import the Bandzoogle export and the Formspree signups, and create the region tags.
+- [ ] **Google Analytics** (ADR 0023). It only runs on johnnyrhoades.com, so check after cutover: open the site, click through a show page and play a video, and expect the visit in GA's Realtime report with events like `directions_click` and `video_play`. With Global Privacy Control on in the browser, expect nothing.
 - [ ] **Bandzoogle mailing list export.** Export before anything else changes on the old site, and record the count as the baseline (PLAN.md section 13).
 - [ ] **hello@johnnyrhoades.com still gets mail** (Phase 7). After cutover, send it an email from an outside address and check it arrives. The cutover leaves MX and TXT alone, so this should pass; it's the check that matters most if it doesn't. *Automated now:* every email link on the site points to it (`tests/e2e/forms.spec.ts`).
 
@@ -37,7 +37,7 @@ Set each ID as a GitHub Actions repository **variable** (not a secret; they're p
 
 ## Waiting on Johnny's Bandsintown key
 
-- [ ] **Live sync** (Phase 1). Run `BANDSINTOWN_APP_ID=… npm run sync -- --capture`, compare the captured payloads with the mocks (`tests/fixtures/bandsintown/README.md`), fix any differences, and close ADR 0006.
+- [x] **Live sync** (Phase 1). Done 2026-10-05: captured, compared with the mocks (ADR 0020), and the first live sync in the Site workflow committed 609 shows. The capture is now the test fixtures.
 
 ## Waiting on Johnny's answers (PLAN.md section 17)
 

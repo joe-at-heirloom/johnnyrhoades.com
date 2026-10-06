@@ -32,14 +32,14 @@ Available now:
 - `npm run check:redirects`: the live site against `docs/redirect-map.csv` (after cutover; `--base` for another host)
 
 - `npm run sync`: pull Bandsintown into `src/data/shows.json` (needs `BANDSINTOWN_APP_ID`; flags: `--capture`, `--force`, `--dry-run`, `--now`)
-- `npm run sync:fixtures`: the same, offline, from `tests/fixtures/bandsintown/` (mocks until the key arrives; ADR 0006)
+- `npm run sync:fixtures`: the same, offline, from `tests/fixtures/bandsintown/` (the real capture from 2026-10-05; see its README)
 
 - `python3 scripts/make-poster-fonts.py`: regenerate the static poster fonts (needs fonttools; output is committed)
 - `node --experimental-strip-types scripts/make-textures.ts`: regenerate the print textures in `src/assets/textures/` (ADR 0015; output is committed). They're applied in `src/styles/texture.css`
 - `python3 scripts/trim-web-font.py`: regenerate the trimmed web font from `src/assets/fonts/source/` (needs fonttools and brotli)
 - `UPDATE_POSTER_SNAPSHOTS=1 npm test -- posters`: rewrite poster snapshots after an intended design change, then look at them and bump `TEMPLATE_VERSION` (ADR 0009)
 
-Forms and analytics read public IDs from `PUBLIC_*` build variables (copy `.env.example` to `.env`; ADR 0011). Without them the site still builds, and the forms say they aren't connected. The end-to-end build sets fake ones and intercepts the services.
+Forms post to Formspree and analytics is Google Analytics (ADR 0023). Their public IDs are defaults in `src/lib/public-config.ts`; a `PUBLIC_*` build variable overrides one (`.env.example`), which is how the end-to-end build points the forms at fakes and intercepts the services. Analytics only runs on johnnyrhoades.com.
 
 Before calling any task done, run `npm run check && npm test && npm run build`. For UI changes, also run `npm run test:e2e`, `npm run lint:html` and `npm run lhci`, and look at the screenshots. Adding a third-party service means updating `src/lib/security-headers.ts` and `docs/security-headers.md` too; the CSP test fails until you do.
 
@@ -51,7 +51,7 @@ Before calling any task done, run `npm run check && npm test && npm run build`. 
 4. Times are always America/Detroit, handled with luxon. Never pass Bandsintown datetimes to `new Date()`.
 5. Don't break URLs. When a slug changes, the old slug goes into `aliases` so a redirect stub is generated.
 6. Preserve the visual language. Use the tokens in `src/styles/tokens.css`. No new typefaces, colors or motion without a decision record in `docs/decisions/`. The record and the strum are the only playful motion.
-7. Zero client JavaScript by default. Budget: home ≤ 30 KB gzipped before interaction. The strum loads when it scrolls into view, and audio starts only after the visitor switches sound on.
+7. Zero client JavaScript by default. Budget: home ≤ 30 KB gzipped before interaction (the site's own script; Google Analytics loads after the page is idle and sits outside it, ADR 0023). The strum loads when it scrolls into view, and audio starts only after the visitor switches sound on.
 8. Accessibility is a gate, not a polish step: WCAG 2.2 AA, keyboard access, visible focus, reduced motion, real alt text.
 9. Secrets live only in GitHub Actions secrets. Nothing secret in client code or committed files.
 10. Stay within the page list in PLAN.md section 3. Proposing a new page needs a decision record explaining how it passes the "worth it" test.

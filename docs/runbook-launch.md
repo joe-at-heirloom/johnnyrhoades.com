@@ -20,9 +20,9 @@ A public lookup can't see every record. The zone export in step 2 is the real li
 
 ## Before launch
 
-1. [ ] **Johnny:** access to Squarespace Domains, Bandzoogle, Bandsintown for Artists, Zoho Mail admin, and the Cloudflare account that holds the zone. If nobody knows which Cloudflare account it is, Squarespace or Bandzoogle support can say who set the nameservers. If it's Bandzoogle's, the zone moves to a free Cloudflare account Johnny owns in step 5.
+1. [ ] **Johnny:** access to Bandzoogle (for the exports) and Zoho Mail admin. *Joe owns the domain (2026-10-05); its DNS is on Cloudflare. The zone shows Zoho's verification TXT record, but no Search Console or GitHub Pages one yet: see steps 4 and 6.* Earlier note: access to Squarespace Domains, Bandzoogle, Bandsintown for Artists, Zoho Mail admin, and the Cloudflare account that holds the zone. If nobody knows which Cloudflare account it is, Squarespace or Bandzoogle support can say who set the nameservers. If it's Bandzoogle's, the zone moves to a free Cloudflare account Johnny owns in step 5.
 2. [ ] **Exports.**
-   - Bandzoogle mailing list (CSV). Record the count in `docs/case-study-notes.md` as the baseline (PLAN.md section 13), then import it into Buttondown.
+   - Bandzoogle mailing list (CSV). Record the count in `docs/case-study-notes.md` as the baseline (PLAN.md section 13), and keep the file for whenever there's a list service (ADR 0023).
    - Audio, and the original photo files with photographer names (they unlock the press photo zip; `docs/manual-checks.md`).
    - The full DNS zone from Cloudflare (DNS → Records → Export), saved outside the repo.
 3. [x] **Redirect map.** The old site was crawled on 2026-09-30: `docs/redirect-map.csv`. Re-crawl the week of launch in case Johnny added pages.
@@ -32,8 +32,8 @@ A public lookup can't see every record. The zone export in step 2 is the real li
 7. [x] Public repository: https://github.com/joe-at-heirloom/johnnyrhoades.com (2026-10-02). In the repo:
    - [x] Settings → Pages → Source: GitHub Actions.
    - [x] Variable `SITE_NOINDEX` = `true`.
-   - [ ] Secret `BANDSINTOWN_APP_ID` (from Bandsintown for Artists → Settings). Run `BANDSINTOWN_APP_ID=… npm run sync -- --capture` locally first and compare with the mocks (ADR 0006).
-   - [ ] Variables `PUBLIC_WEB3FORMS_KEY` (create the key with `hello@johnnyrhoades.com`), `PUBLIC_BUTTONDOWN_USER`, `PUBLIC_UMAMI_WEBSITE_ID` (ADR 0011).
+   - [x] Secret `BANDSINTOWN_APP_ID` (from Bandsintown for Artists → Settings), added 2026-10-05. The first live sync ran on the next push.
+   - [x] Form and analytics IDs: none to set. The Formspree forms and the GA4 ID are defaults in `src/lib/public-config.ts`; a `PUBLIC_*` variable only overrides one (ADR 0023).
 
 ## Staging
 

@@ -191,9 +191,9 @@ flowchart LR
 | Show data | Bandsintown API at build time, snapshot committed to the repo | Johnny already keeps it current. Committed history survives API changes, and the commits keep scheduled workflows alive. |
 | Dates and times | luxon, zone `America/Detroit` | DST-safe conversion of venue-local times. |
 | Posters | satori + @resvg/resvg-js | Templates in JSX, PNGs at build time, no headless browser. |
-| Forms | Web3Forms or Formspree at launch, behind a small interface a Cloudflare Worker can replace later | GitHub Pages has no server. |
-| Mailing list | Kit or Buttondown | Real list management, a ZIP custom field, RSS-to-email. |
-| Analytics | Umami Cloud (cookieless, custom events), Google Search Console, Bing Webmaster Tools | No cookie banner, plus the conversion events the case study needs. |
+| Forms | Formspree (ADR 0023), behind a small interface a Cloudflare Worker can replace later | GitHub Pages has no server. |
+| Mailing list | For now, signups are emailed through Formspree with their ZIP and region (ADR 0023). Kit or Buttondown later | Real list management, a ZIP custom field, RSS-to-email, when Joe wants a list. |
+| Analytics | Google Analytics 4 (ADR 0023: real domain only, after the page is idle, GPC and DNT honored), Google Search Console, Bing Webmaster Tools | The conversion events the case study needs. |
 | Testing | Vitest, Playwright with axe-core, Lighthouse CI, lychee, html-validate | Quality gates that double as portfolio evidence. |
 | Editing (optional) | Pages CMS | A friendly editor for bios, facts and quotes on a static GitHub site, with no server to run. |
 
@@ -533,7 +533,7 @@ Answer engines describe the artists they can identify with confidence and verify
 **Booking form**
 
 - Fields: name, email, phone (optional), date, venue and town, event type, act (solo acoustic, trio, full band, not sure), budget range (optional), details.
-- Delivery: Web3Forms or Formspree at launch, called from `src/lib/forms.ts` so a Cloudflare Worker with Turnstile can replace it later without touching the markup. Keep the honeypot.
+- Delivery: Formspree (ADR 0023), called from `src/lib/forms.ts` so a Cloudflare Worker with Turnstile can replace it later without touching the markup. Keep the honeypot.
 - Email subject: `Booking: {date}, {venue/town}, {event type}`, so Johnny can triage from his phone.
 - States: an inline success message with JavaScript, `/thanks/` without. Errors say what went wrong and offer the booking email as a fallback.
 
@@ -544,7 +544,7 @@ Answer engines describe the artists they can identify with confidence and verify
 **Mailing list**
 
 - Export the list from Bandzoogle before anything else changes.
-- Move to Kit or Buttondown. Keep the ZIP field and map it to a region tag (Metro Detroit, Ann Arbor, Lansing, West Michigan, out of state) so announcements can target people nearby.
+- For now, signups are emailed to Johnny through Formspree, with the ZIP and its region (ADR 0023). Later, move to Kit or Buttondown and map the ZIP to a region tag (Metro Detroit, Ann Arbor, Lansing, West Michigan, out of state) so announcements can target people nearby.
 - Optional: RSS-to-email from `/shows/feed.xml` for an automatic weekly "where I'm playing" email.
 
 ---
@@ -584,10 +584,10 @@ Capture the baseline before launch. The portfolio case study depends on it.
 
 | Metric | Baseline (capture now) | Target | Source |
 |---|---|---|---|
-| Booking inquiries per month | Ask Johnny for the last three months | A meaningful rise within six months; set the number once the baseline is known | Form delivery, Umami event |
+| Booking inquiries per month | Ask Johnny for the last three months | A meaningful rise within six months; set the number once the baseline is known | Form delivery, GA event |
 | Public shows with valid event markup | 0% | 100% | CI and the Search Console enhancement report |
 | Non-branded search impressions ("detroit blues", town plus "live blues") | Search Console | Growing month over month | Search Console |
-| Show page shares and poster downloads | None | Tracked from launch | Umami events |
+| Show page shares and poster downloads | None | Tracked from launch | GA events |
 | AI answer accuracy (five questions, four engines) | Audit before launch | 16 of 20 accurate within six months | `geo-audit-log.md` |
 | Core Web Vitals | Lighthouse on the current Bandzoogle site | All green | Search Console, Lighthouse CI |
 | Mailing list size | Bandzoogle export count | Growing | Email service |
@@ -658,8 +658,8 @@ Each phase is sized for one or two Claude Code sessions and ends with acceptance
 
 **Phase 5: Forms, email, list and analytics**
 
-- Move both forms off Netlify, deliver bookings to Johnny's work email, connect the email service with ZIP tags, and add Umami with the custom events.
-- Acceptance: a test booking reaches Johnny's inbox with the right subject line. A signup lands in the email service with its region tag. Events show up in Umami.
+- Move both forms off Netlify, deliver bookings to Johnny's work email, and add analytics with the custom events. (Done with Formspree and Google Analytics; ADR 0023.)
+- Acceptance: a test booking reaches Johnny's inbox with the right subject line. A signup reaches it too, with its region. Events show up in Google Analytics.
 
 **Phase 6: Hardening**
 
@@ -709,9 +709,9 @@ Nothing below ships as fact until he answers.
 - [ ] Original high-resolution files and photographer credits for every photo. Answered 2026-10-05: Kyla Pedraz took the posed portraits (credited in `media.yaml`). Still need her OK for press use and the original files.
 - [ ] A stage plot and input list for each format. Answered 2026-10-05: he'll make a stage plot and send it.
 - [ ] Access to Spotify for Artists and Apple Music for Artists, and who distributed *Waiting on the Sun*. Answered 2026-10-05: he doesn't use Spotify; CD Baby distributed the album. Still open: Apple Music for Artists, and claiming both profiles through CD Baby.
-- [ ] Registrar, Bandzoogle and Bandsintown logins, and any email currently running on the domain.
+- [x] Registrar, Bandzoogle and Bandsintown logins, and any email currently running on the domain. Answered 2026-10-05: Joe owns the domain (DNS on Cloudflare); Bandsintown is connected; email is Johnny's Zoho (ADR 0013). Bandzoogle still matters for the exports before cutover.
 - [ ] Two or three venue owners or bookers who'd give a one-line quote. Answered 2026-10-05: Cal Stone and Lisa Boitel. Joe asks them for a line; quotes go on the press kit only once they've sent one.
-- [ ] OK to make the repo public and to add a "Site by Joe" credit.
+- [x] OK to make the repo public and to add a "Site by Joe" credit. Answered 2026-10-05: yes. The footer credit links to the repo.
 
 ---
 

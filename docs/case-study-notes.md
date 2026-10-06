@@ -15,6 +15,23 @@ A running log for the portfolio write-up (PLAN.md section 16): numbers, screensh
 
 ---
 
+## 2026-10-05: Real data in the tests, Formspree and Google Analytics
+
+**What changed.** Every test now runs on the real Bandsintown capture (609 shows) instead of the nine hand-written mocks, and the mocks are gone (ADR 0006 closed). Both forms post to Formspree and analytics is Google Analytics, loaded only on the real domain, after the page is idle, and never for a browser that sends Global Privacy Control (ADR 0023). The footer credits the site, with Johnny's OK.
+
+**Numbers.**
+
+- Lighthouse LCP on the home page, simulated slow 4G: 2.88 s → 2.64 s, from re-encoding the logo mask as lossless WebP (59 KB → 27 KB, the same alpha bit for bit). Measured directly with a 4× slower CPU, the page paints in about 0.35 s; the simulation charges every early byte against the hero.
+
+**Worth telling**
+
+- *Real data found a false alarm and a real gap.* Five poster tests failed on the history. Every failure was a long date measured 0.0000000000001 px over a box it was sized to fill exactly: floating point, not overflow. The name check already had half a pixel of slack; the venue and date checks now do too.
+- *Tests that count things go stale.* "9 calendar events" was true of the mocks. Against data that syncs every three hours, the end-to-end tests now work out their expected counts from `shows.json` with the site's own functions.
+- *A new test found two old layout bugs.* Checking that no page scrolls sideways at five widths caught the mailing list form at about 1024 px (inputs refusing to shrink below 20 characters) and the press kit's logo buttons on phones. Both were already on staging.
+- *Analytics without the bloat, mostly.* GA's script is much bigger than the site's whole JavaScript budget. Loading it after the page is idle keeps it out of the first paint and out of Lighthouse; the trade-off is written down rather than hidden.
+
+---
+
 ## 2026-10-05: The first real Bandsintown data, and not asking Johnny to change
 
 **What changed.** The first live capture had 609 shows going back to 2015. Not one had a title, which the plan had been counting on to say whether a show was solo, trio or a guest spot. Johnny had been labeling every show anyway, in front of the venue name: "Solo Acoustic @ The Whiskey Six". The site now reads that, in his own wording, and the naming guide no longer asks him for anything new (ADR 0020).
