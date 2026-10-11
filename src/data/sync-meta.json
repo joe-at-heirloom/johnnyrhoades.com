@@ -1,11 +1,11 @@
 {
   "source": "api",
-  "heartbeatAt": "2026-10-05T21:30:16-04:00",
-  "lastChangeAt": "2026-10-05T21:30:16-04:00",
-  "lastChangeSummary": "+600 new, 8 updated",
+  "heartbeatAt": "2026-10-11T01:41:26-04:00",
+  "lastChangeAt": "2026-10-11T01:41:26-04:00",
+  "lastChangeSummary": "1 updated",
   "counts": {
-    "upcoming": 5,
-    "past": 604,
+    "upcoming": 4,
+    "past": 605,
     "total": 609
   }
 }

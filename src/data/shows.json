@@ -18070,7 +18070,6 @@
     "slug": "2026-10-10-octopus-beer-garden-mount-clemens",
     "aliases": [],
     "start": "2026-10-10T14:00:00-04:00",
-    "end": "2026-10-10T15:00:00-04:00",
     "act": "unspecified",
     "billing": "Johnny Rhoades",
     "lineup": [
@@ -18087,9 +18086,6 @@
       "lat": 42.5977938,
       "lng": -82.8669858,
       "timeZone": "America/Detroit"
-    },
-    "tickets": {
-      "free": true
     },
     "bandsintownUrl": "https://www.bandsintown.com/e/108955477",
     "status": "scheduled",
