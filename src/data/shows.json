@@ -18099,7 +18099,6 @@
     "slug": "2026-10-11-cadieux-cafe-detroit",
     "aliases": [],
     "start": "2026-10-11T15:00:00-04:00",
-    "end": "2026-10-11T18:00:00-04:00",
     "act": "unspecified",
     "billing": "Johnny Rhoades",
     "lineup": [
@@ -18116,9 +18115,6 @@
       "lat": 42.4015697,
       "lng": -82.9264504,
       "timeZone": "America/Detroit"
-    },
-    "tickets": {
-      "free": true
     },
     "bandsintownUrl": "https://www.bandsintown.com/e/108955484",
     "status": "scheduled",
