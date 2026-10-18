@@ -18128,7 +18128,6 @@
     "slug": "2026-10-17-the-fed-community-clarkston",
     "aliases": [],
     "start": "2026-10-17T19:30:00-04:00",
-    "end": "2026-10-17T22:30:00-04:00",
     "act": "unspecified",
     "billing": "Johnny Rhoades",
     "lineup": [
@@ -18145,9 +18144,6 @@
       "lat": 42.735274,
       "lng": -83.419451,
       "timeZone": "America/Detroit"
-    },
-    "tickets": {
-      "free": true
     },
     "bandsintownUrl": "https://www.bandsintown.com/e/108955494",
     "status": "scheduled",
