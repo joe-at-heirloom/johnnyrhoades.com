@@ -1,6 +1,6 @@
 # 0018: The 12-bar strum, and the bend
 
-**Status:** Accepted, 2026-10-02
+**Status:** Accepted, 2026-10-02. The sound rule ("Sound stays off until the switch is on") is superseded by ADR 0024: sound is on by default.
 
 ## Context
 

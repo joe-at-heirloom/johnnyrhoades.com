@@ -106,15 +106,20 @@ test.describe('forms', () => {
     expect((await analyticsEvents(page)).map(([e]) => e)).toContain('list_signup');
   });
 
-  test('playing a video and turning the strum sound on are tracked', async ({ page }) => {
+  test('playing a video, the first note from the guitar, and muting it are tracked', async ({ page }) => {
     await page.goto('/');
     await page.locator('[data-video="Xvm2uMDesXU"]').click();
-    await page.locator('[data-neck]').scrollIntoViewIfNeeded();
-    await expect(page.locator('[data-neck] path.neck-string')).toHaveCount(6);
+    const neck = page.locator('[data-neck]');
+    await neck.scrollIntoViewIfNeeded();
+    await expect(neck.locator('path.neck-string')).toHaveCount(6);
+    // a tap on the top string: sound is on by default, so it plays
+    const box = (await neck.boundingBox())!;
+    await page.mouse.click(box.x + box.width / 2, box.y + box.height * 0.17);
     await page.getByRole('switch', { name: 'Sound' }).click();
     const names = (await analyticsEvents(page)).map(([e]) => e);
     expect(names).toContain('video_play');
-    expect(names).toContain('strum_sound_on');
+    expect(names).toContain('strum_play');
+    expect(names).toContain('strum_sound_off');
   });
 
   test('links and buttons carry their events, and a click sends one', async ({ page }) => {

@@ -77,12 +77,17 @@ test('strum code is not in the initial page; it loads and draws six strings near
   const neck = page.locator('[data-neck]');
   await neck.scrollIntoViewIfNeeded();
   await expect(neck.locator('path.neck-string')).toHaveCount(6);
+  // Sound is on by default (ADR 0024); the switch mutes it, and a mute is remembered.
   const speaker = page.getByRole('switch', { name: 'Sound' });
-  await expect(speaker).toHaveAttribute('aria-checked', 'false');
-  await speaker.click();
   await expect(speaker).toHaveAttribute('aria-checked', 'true');
   await speaker.click();
   await expect(speaker).toHaveAttribute('aria-checked', 'false');
+  await page.reload();
+  await page.locator('[data-neck]').scrollIntoViewIfNeeded();
+  await expect(page.locator('[data-neck] path.neck-string')).toHaveCount(6);
+  await expect(speaker).toHaveAttribute('aria-checked', 'false');
+  await speaker.click();
+  await expect(speaker).toHaveAttribute('aria-checked', 'true');
 });
 
 test('each strum plays the next bar of a 12-bar blues in E, and a held string bends', async ({ page }) => {

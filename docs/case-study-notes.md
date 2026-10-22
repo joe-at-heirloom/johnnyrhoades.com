@@ -15,6 +15,19 @@ A running log for the portfolio write-up (PLAN.md section 16): numbers, screensh
 
 ---
 
+## 2026-10-21: The guitar plays by default, and it was out of tune
+
+**What changed.** The strummable neck now has sound on by default, unlocked by the visitor's first click or tap, with the switch as a mute (ADR 0024). Measuring the synthesized notes on the way found every one of them sharp, and the fix tunes them exactly.
+
+**Numbers.** As shipped, the high E string was 13 to 17 cents sharp and the low E 2 to 3, so strings within one chord disagreed by up to 14.6 cents: a sour chord. Now every note of every chord is within 0.03 cents, at 44.1 and 48 kHz.
+
+**Worth telling**
+
+- *A comment was wrong and nobody could hear it.* The code said the averaging filter adds half a sample of delay; in this loop it takes half a sample away. With sound off by default almost nobody heard the guitar, so the error lived for weeks. Turning the sound on is what made it matter.
+- *Test what you hear, not the arithmetic.* The old test checked the waveform repeated at the computed period, so it agreed with the bug. The new one measures the pitch by autocorrelation against a pure sine, and holds every chord tone to a cent.
+
+---
+
 ## 2026-10-05: Real data in the tests, Formspree and Google Analytics
 
 **What changed.** Every test now runs on the real Bandsintown capture (609 shows) instead of the nine hand-written mocks, and the mocks are gone (ADR 0006 closed). Both forms post to Formspree and analytics is Google Analytics, loaded only on the real domain, after the page is idle, and never for a browser that sends Global Privacy Control (ADR 0023). The footer credits the site, with Johnny's OK.

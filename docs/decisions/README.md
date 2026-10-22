@@ -21,8 +21,9 @@ Short notes on choices that shape the code, so the reasoning survives. One file 
 | [0015](0015-print-texture.md) | Print texture | Accepted |
 | [0016](0016-record-player-and-date-check.md) | Drop the needle, and "am I free that night?" | Accepted |
 | [0017](0017-show-card-poster.md) | The show card, a classic blues poster template | Accepted |
-| [0018](0018-12-bar-strum-and-bend.md) | The 12-bar strum, and the bend | Accepted |
+| [0018](0018-12-bar-strum-and-bend.md) | The 12-bar strum, and the bend | Accepted (sound default superseded by 0024) |
 | [0020](0020-read-the-act-from-what-johnny-types.md) | Read the act from what Johnny already types | Accepted |
 | [0021](0021-hello-is-the-booking-email.md) | hello@ is the booking email | Accepted |
 | [0022](0022-the-bio-is-in-the-third-person.md) | The bio is in the third person, and reads as one text | Accepted |
 | [0023](0023-formspree-and-google-analytics.md) | Formspree for both forms, and Google Analytics | Accepted |
+| [0024](0024-the-guitar-plays-by-default-and-in-tune.md) | The guitar plays by default, and in tune | Accepted |

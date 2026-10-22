@@ -158,7 +158,7 @@ It appears on the home page, `/shows/` and `/epk/`, and hides itself when the la
 
 ### 4.4 The 12-bar strum (built, with the bend: ADR 0018)
 
-The strummable neck already plays E7. Let each strum advance through a 12-bar blues in E (E7 for four bars, A7 for two, E7 for two, then B7, A7, E7, B7), with the chord name shown quietly beside the neck. The progression resets after eight seconds without a strum. Sound stays off until the visitor turns it on, and the string vibration respects reduced motion. It's small and on-subject, and it's the kind of detail people send to friends.
+The strummable neck already plays E7. Let each strum advance through a 12-bar blues in E (E7 for four bars, A7 for two, E7 for two, then B7, A7, E7, B7), with the chord name shown quietly beside the neck. The progression resets after eight seconds without a strum. Sound is on by default once the visitor has clicked or tapped anything, the switch mutes it (ADR 0024), and the string vibration respects reduced motion. It's small and on-subject, and it's the kind of detail people send to friends.
 
 The bend: press a string, hold it a moment and push, and it bends up to a whole step, B.B. King's move; wiggle it for vibrato. Holding the up arrow does the same on the B string.
 
@@ -555,7 +555,7 @@ Answer engines describe the artists they can identify with confidence and verify
 |---|---|
 | Core Web Vitals (mobile) | LCP ≤ 2.0 s, CLS ≤ 0.05, INP ≤ 150 ms |
 | Lighthouse (mobile) on `/`, a show page and `/epk/` | Performance ≥ 95; Accessibility, Best Practices and SEO at 100 |
-| JavaScript | Home ≤ 30 KB gzipped before interaction. The strum loads when it scrolls into view, and audio starts only after the visitor turns sound on. |
+| JavaScript | Home ≤ 30 KB gzipped before interaction. The strum loads when it scrolls into view; its sound is on by default but only ever answers the visitor's own strums (ADR 0024). |
 | Page weight | Home first view ≤ 600 KB, excluding video |
 | Accessibility | WCAG 2.2 AA. Keyboard access for the strum, lightbox, video stage and forms. Visible focus. Reduced motion respected. |
 | Security headers (via Cloudflare) | HSTS; a Content-Security-Policy that allows only YouTube (nocookie) frames, the form endpoint and analytics; `Referrer-Policy: strict-origin-when-cross-origin`; `X-Content-Type-Options: nosniff`; a tight `Permissions-Policy` |
@@ -592,7 +592,7 @@ Capture the baseline before launch. The portfolio case study depends on it.
 | Core Web Vitals | Lighthouse on the current Bandzoogle site | All green | Search Console, Lighthouse CI |
 | Mailing list size | Bandzoogle export count | Growing | Email service |
 
-Custom events: `booking_submit`, `booking_error`, `list_signup`, `poster_download` (with format), `calendar_add`, `calendar_subscribe`, `directions_click`, `rsvp_click`, `ticket_click`, `video_play`, `strum_sound_on`, `email_click` (with where; ADR 0021).
+Custom events: `booking_submit`, `booking_error`, `list_signup`, `poster_download` (with format), `calendar_add`, `calendar_subscribe`, `directions_click`, `rsvp_click`, `ticket_click`, `video_play`, `strum_play`, `strum_sound_off`, `strum_sound_on`, `email_click` (with where; ADR 0021).
 
 ---
 

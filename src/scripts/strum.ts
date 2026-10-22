@@ -11,7 +11,11 @@
   it bends up to a whole step, and wiggling it is vibrato. Holding the up
   arrow does the same on the B string.
 
-  It's silent until the visitor flips the little speaker switch under it.
+  Sound is on by default (ADR 0024), but a browser lets a page make no sound
+  until the visitor has clicked, tapped or pressed a key on it. So the first
+  such gesture anywhere on the page unlocks it, and a tap or click on the
+  strings plays at once. Until then a hover strum moves the strings silently.
+  The little speaker switch under the neck mutes it, and a mute is remembered.
   Loaded on demand by the StrumNeck component when the neck nears the viewport.
 */
 import {
@@ -37,6 +41,7 @@ const STRUM_GAP_MS = 220; // a pause this long ends one strum
 const RESET_MS = 8000; // the 12-bar starts over after this long without a strum
 const BEND_HOLD_MS = 110; // hold a pressed string this long and it bends instead of strumming
 const KEY_BEND_STRING = 4; // the B string, where B.B. King did his bending
+const MUTE_KEY = 'strum-sound'; // localStorage: "off" once the visitor mutes it
 
 type GuitarString = {
   i: number;
@@ -159,7 +164,26 @@ export function initStrum(root: HTMLElement): void {
   let input: GainNode | null = null;
   const buffers = new Map<string, AudioBuffer>();
   const voices: (Voice | null)[] = [];
-  let soundOn = false;
+  let soundOn = true;
+  let played = false; // counted once, the first time a note actually sounds
+
+  const mutedBefore = () => {
+    try {
+      return localStorage.getItem(MUTE_KEY) === 'off';
+    } catch {
+      return false; // storage blocked: just use the default
+    }
+  };
+  const rememberMute = (muted: boolean) => {
+    try {
+      if (muted) localStorage.setItem(MUTE_KEY, 'off');
+      else localStorage.removeItem(MUTE_KEY);
+    } catch {
+      // storage blocked: the switch still works for this visit
+    }
+  };
+  type UserActivation = { isActive: boolean; hasBeenActive: boolean };
+  const activation = () => (navigator as Navigator & { userActivation?: UserActivation }).userActivation;
 
   function roomImpulse(audio: AudioContext, seconds: number) {
     const len = Math.floor(audio.sampleRate * seconds);
@@ -235,21 +259,33 @@ export function initStrum(root: HTMLElement): void {
   /** Synthesize a chord's strings ahead of its bar, so the strum doesn't wait on them. */
   const warm = (name: keyof typeof CHORDS) => CHORDS[name].forEach((midi, i) => bufferFor(i, midi));
 
+  /** Start the audio, if sound is on. Only takes effect inside a click, tap or key press, or after one (Chrome). */
+  function unlock() {
+    if (!soundOn || !initAudio() || !ctx) return;
+    if (ctx.state !== 'running') void ctx.resume();
+  }
+
   function setSound(on: boolean) {
-    if (on && !initAudio()) return;
     soundOn = on;
     speaker!.setAttribute('aria-checked', String(on));
-    if (!ctx) return;
-    if (on) {
-      track('strum_sound_on');
-      if (ctx.state !== 'running') void ctx.resume();
-    } else {
-      for (const v of voices) v?.gain.gain.setTargetAtTime(0, ctx.currentTime, 0.03);
-    }
+    rememberMute(!on);
+    track(on ? 'strum_sound_on' : 'strum_sound_off');
+    if (on) unlock(); // the switch's own click is the gesture that lets it start
+    else if (ctx) for (const v of voices) v?.gain.gain.setTargetAtTime(0, ctx.currentTime, 0.03);
   }
 
   function play(i: number, velocity: number) {
-    if (!soundOn || !ctx || !input || ctx.state !== 'running') return;
+    if (!soundOn || !ctx || !input) return;
+    if (ctx.state !== 'running') {
+      // Not started yet. Inside a tap or click it can start now, and this note plays as it does;
+      // outside one (a hover strum before any click), stay silent rather than queue notes for later.
+      if (!activation()?.isActive) return;
+      void ctx.resume();
+    }
+    if (!played) {
+      played = true;
+      track('strum_play');
+    }
     const midi = CHORDS[chord()][i] ?? null;
     const buffer = bufferFor(i, midi);
     if (!buffer) return;
@@ -453,6 +489,21 @@ export function initStrum(root: HTMLElement): void {
   });
 
   speaker.addEventListener('click', () => setSound(speaker.getAttribute('aria-checked') !== 'true'));
+
+  // Sound on by default, unless this visitor muted it before.
+  if (mutedBefore()) {
+    soundOn = false;
+    speaker.setAttribute('aria-checked', 'false');
+  }
+  // The first click, tap or key press anywhere on the page unlocks the audio, so hover strums sound after it.
+  const gestures = ['pointerdown', 'touchend', 'keydown'] as const;
+  const onGesture = () => {
+    unlock();
+    if (ctx?.state === 'running') for (const g of gestures) document.removeEventListener(g, onGesture, true);
+  };
+  for (const g of gestures) document.addEventListener(g, onGesture, { capture: true, passive: true });
+  // Chrome lets audio start any time after the visitor's first gesture, even one made before this loaded.
+  if (activation()?.hasBeenActive) unlock();
 
   /* ---------- Setup ---------- */
 

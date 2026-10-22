@@ -51,7 +51,7 @@ Before calling any task done, run `npm run check && npm test && npm run build`. 
 4. Times are always America/Detroit, handled with luxon. Never pass Bandsintown datetimes to `new Date()`.
 5. Don't break URLs. When a slug changes, the old slug goes into `aliases` so a redirect stub is generated.
 6. Preserve the visual language. Use the tokens in `src/styles/tokens.css`. No new typefaces, colors or motion without a decision record in `docs/decisions/`. The record and the strum are the only playful motion.
-7. Zero client JavaScript by default. Budget: home ≤ 30 KB gzipped before interaction (the site's own script; Google Analytics loads after the page is idle and sits outside it, ADR 0023). The strum loads when it scrolls into view, and audio starts only after the visitor switches sound on.
+7. Zero client JavaScript by default. Budget: home ≤ 30 KB gzipped before interaction (the site's own script; Google Analytics loads after the page is idle and sits outside it, ADR 0023). The strum loads when it scrolls into view. Its sound is on by default, but only the visitor's own strums ever make a sound, and the switch mutes it (ADR 0024).
 8. Accessibility is a gate, not a polish step: WCAG 2.2 AA, keyboard access, visible focus, reduced motion, real alt text.
 9. Secrets live only in GitHub Actions secrets. Nothing secret in client code or committed files.
 10. Stay within the page list in PLAN.md section 3. Proposing a new page needs a decision record explaining how it passes the "worth it" test.

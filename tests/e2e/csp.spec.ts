@@ -56,7 +56,8 @@ test('the home page works under the policy: video, strum, lightbox, forms, analy
 
   await page.locator('[data-neck]').scrollIntoViewIfNeeded();
   await expect(page.locator('[data-neck] path.neck-string')).toHaveCount(6);
-  await page.getByRole('switch', { name: 'Sound' }).click();
+  const neck = (await page.locator('[data-neck]').boundingBox())!;
+  await page.mouse.click(neck.x + neck.width / 2, neck.y + neck.height * 0.17); // pluck the top string, with sound (on by default)
 
   await page.getByRole('button', { name: 'Play a clip of Two Way Street' }).click();
 
