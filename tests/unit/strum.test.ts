@@ -78,7 +78,7 @@ describe('karplusStrong', () => {
 
   it('starts with no DC offset', () => {
     const freq = 110;
-    const period = Math.round(sampleRate / freq - 0.5);
+    const period = Math.floor(sampleRate / freq + 0.4); // the delay line's length
     const out = karplusStrong({ sampleRate, freq, sustain: 2, random: seeded(7) });
     let mean = 0;
     for (let i = 0; i < period; i++) mean += out[i] ?? 0;
@@ -97,7 +97,7 @@ describe('karplusStrong', () => {
   it('repeats at the requested pitch', () => {
     const freq = 196;
     const out = karplusStrong({ sampleRate, freq, sustain: 2, random: seeded(11) });
-    const period = Math.round(sampleRate / freq - 0.5);
+    const period = Math.round(sampleRate / freq); // the true period, to the nearest sample
     // A plucked string is nearly periodic: one period apart, the waveform correlates strongly.
     let dot = 0;
     let norm = 0;
@@ -106,6 +106,62 @@ describe('karplusStrong', () => {
       norm += (out[i] ?? 0) ** 2;
     }
     expect(dot / norm).toBeGreaterThan(0.95);
+  });
+
+  // The pitch, from the autocorrelation peak near the expected period, refined between samples.
+  function measuredHz(out: Float32Array, rate: number, expected: number) {
+    const from = Math.floor(rate * 0.2);
+    const to = Math.floor(rate * 0.7);
+    const corr = (lag: number) => {
+      let dot = 0;
+      let a = 0;
+      let b = 0;
+      for (let i = from; i < to; i++) {
+        const x = out[i] ?? 0;
+        const y = out[i + lag] ?? 0;
+        dot += x * y;
+        a += x * x;
+        b += y * y;
+      }
+      return dot / Math.sqrt(a * b);
+    };
+    const guess = rate / expected;
+    let best = Math.round(guess);
+    for (let lag = Math.floor(guess * 0.97); lag <= Math.ceil(guess * 1.03); lag++) if (corr(lag) > corr(best)) best = lag;
+    const [l, m, r] = [corr(best - 1), corr(best), corr(best + 1)];
+    return rate / (best + (0.5 * (l - r)) / (l - 2 * m + r));
+  }
+
+  it.each([44100, 48000])('tunes every note of every chord to within a cent, at %i Hz', (rate) => {
+    // As first shipped, every note was sharp: 2 cents on the low E, up to 17 on the high E (ADR 0024).
+    for (const [name, notes] of Object.entries(CHORDS)) {
+      for (const midi of notes) {
+        if (midi === null) continue;
+        const freq = midiToHz(midi);
+        const out = karplusStrong({ sampleRate: rate, freq, sustain: 3, random: seeded(midi) });
+        const cents = 1200 * Math.log2(measuredHz(out, rate, freq) / freq);
+        expect(Math.abs(cents), `${name} note ${midi}: ${cents.toFixed(2)} cents`).toBeLessThan(1);
+      }
+    }
+  });
+
+  it('shapes the pluck by where it is picked', () => {
+    // Picked a fifth of the way along, the 5th harmonic nearly vanishes from the pluck; picked unshaped, it doesn't.
+    const freq = 110;
+    const harmonic = (out: Float32Array, h: number) => {
+      const period = sampleRate / freq;
+      let re = 0;
+      let im = 0;
+      const n = Math.floor(period * 4);
+      for (let i = 0; i < n; i++) {
+        re += (out[i] ?? 0) * Math.cos((2 * Math.PI * h * i) / period);
+        im += (out[i] ?? 0) * Math.sin((2 * Math.PI * h * i) / period);
+      }
+      return Math.hypot(re, im);
+    };
+    const picked = karplusStrong({ sampleRate, freq, sustain: 2, pick: 0.2, random: seeded(5) });
+    const flat = karplusStrong({ sampleRate, freq, sustain: 2, pick: 0, random: seeded(5) });
+    expect(harmonic(picked, 5) / harmonic(picked, 2)).toBeLessThan((harmonic(flat, 5) / harmonic(flat, 2)) * 0.5);
   });
 });
 
