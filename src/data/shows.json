@@ -18186,7 +18186,6 @@
     "slug": "2026-10-24-three-blind-mice-irish-pub-mount-clemens",
     "aliases": [],
     "start": "2026-10-24T20:00:00-04:00",
-    "end": "2026-10-24T23:59:00-04:00",
     "act": "unspecified",
     "billing": "Johnny Rhoades",
     "lineup": [
@@ -18203,9 +18202,6 @@
       "lat": 42.5997294,
       "lng": -82.8766596,
       "timeZone": "America/Detroit"
-    },
-    "tickets": {
-      "free": true
     },
     "bandsintownUrl": "https://www.bandsintown.com/e/108955507",
     "status": "scheduled",
