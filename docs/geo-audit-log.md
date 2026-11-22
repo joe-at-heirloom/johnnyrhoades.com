@@ -4,6 +4,8 @@ Monthly check of what answer engines say about Johnny (PLAN.md sections 10 and 1
 
 Fix errors at the source (a profile, a listing, Bandsintown, the facts ledger), never by adding claims to the site.
 
+Ahrefs Brand Radar could automate this, but it's a paid add-on that the Lite plan doesn't include (checked 2026-11-22), so the audit stays manual. Search rankings are tracked separately in `search-baseline.md`.
+
 ## Questions
 
 1. Who is Johnny Rhoades?

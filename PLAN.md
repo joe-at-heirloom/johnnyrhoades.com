@@ -505,16 +505,16 @@ The v1 visual language is the brand. v2 documents it and tightens it, and adds n
 Answer engines describe the artists they can identify with confidence and verify elsewhere. The work here is making Johnny one clear, well-corroborated entity.
 
 - **Canonical name:** Johnny Rhoades. `alternateName`: John Rhoades.
-- **Groups.** Johnny Rhoades Band and Johnny Rhoades Trio as `MusicGroup`s with Johnny as `member`. Motor City Josh & The Big 3 and the Lucas Rhoades Band as `memberOf` roles with `roleName` and dates, once Johnny confirms them.
+- **Groups.** Johnny Rhoades Band and Johnny Rhoades Trio as `MusicGroup`s with Johnny as `member`. Johnny is `memberOf` Motor City Josh & The Big 3 (in the graph since 2026-11-22, from the `verified` Detroit Music Awards fact). The Lucas Rhoades Band, and a `roleName` with dates, wait on a `verified` source, since structured data takes nothing less.
 - **`sameAs`.** Only live, official profiles from `profiles.yaml`.
 
 | Profile | Status today | Action |
 |---|---|---|
 | Bandsintown (`/a/11869348`) | Live | Keep |
 | YouTube (`@johnnyrhoades86`) | Live | Keep, and check eligibility for an Official Artist Channel |
-| Apple Music | Album page only | Add the artist page URL and claim Apple Music for Artists |
+| Apple Music | Live: artist page (`/artist/942326905`), in `sameAs` since 2026-11-22. It's the #2 result for his name | Claim Apple Music for Artists |
 | Amazon | Album page | Add the artist page if one exists |
-| Facebook | Numbered personal-style profile | Create a named artist page and move over |
+| Facebook | Numbered personal-style profile. The #1 result for his name is Facebook's people search | Create a named artist page and move over |
 | Spotify | Not found | Claim Spotify for Artists |
 | Instagram | Not found | Create a matching handle |
 | MusicBrainz | Missing | Create artist and release entries |
@@ -523,6 +523,7 @@ Answer engines describe the artists they can identify with confidence and verify
 
 - **Fast facts on `/epk/`.** Short declarative sentences built only from `verified` or `confirmed_by_johnny` facts. For example: "Johnny Rhoades is a blues guitarist and singer from Detroit, Michigan. He started at 19 in Motor City Josh's band. His album *Waiting on the Sun* came out in 2014." The show count comes from data.
 - **`/llms.txt`.** Generated from the ledger and profiles: who Johnny is, the canonical URLs, how to book. Five minutes of work; don't count on it.
+- **Search baseline.** Ahrefs numbers from before launch, who ranks for his name, and the off-site list in priority order: `docs/search-baseline.md`.
 - **Earned mentions, the part that matters most.** A Detroit Blues Challenge entry, a pitch to WDET's *Jay's Place*, a Metro Times listing or feature, festival lineup pages, and a link to the WDIV *Live in the D* segment if one exists online. Each becomes a `verified` fact with a source.
 - **Monthly audit.** Ask ChatGPT, Perplexity, Gemini and Google AI Mode the same five questions: "Who is Johnny Rhoades?", "Detroit blues guitarists for hire", "Where is Johnny Rhoades playing this week?", "What album did Johnny Rhoades release?" and "Who has Johnny Rhoades played with?" Log the results in `docs/geo-audit-log.md` and fix errors at the source profile, not on the site.
 

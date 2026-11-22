@@ -71,7 +71,7 @@ Before calling any task done, run `npm run check && npm test && npm run build`. 
 - `src/data/profiles.yaml`: official profiles. Only `live` ones render as links or go into `sameAs`.
 - `src/lib/`: pure functions (normalize, slug, time, schema, ics, stats, posters). Keep them pure and tested.
 - `reference/v1/`: the original prototype and the visual parity baseline.
-- `docs/`: decision records, the launch runbook, the redirect map, the GEO audit log and the case study notes.
+- `docs/`: decision records, the launch runbook, the redirect map, the GEO audit log, the search baseline and the case study notes.
 
 ## Gotchas
 

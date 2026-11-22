@@ -4,6 +4,20 @@ A running log for the portfolio write-up (PLAN.md section 16): numbers, screensh
 
 ---
 
+## 2026-11-22: The search baseline, from Ahrefs
+
+**What changed.** A search "before", measured with Ahrefs while the domain still serves Bandzoogle (`docs/search-baseline.md`). It found the gaps, and the fixes all use facts the ledger already had. His Apple Music artist page goes into `sameAs`. The structured data now ties him to Motor City Josh & The Big 3 and to John Németh's *Feelin' Freaky*, and names the band's older billing. `llms.txt` says which Johnny Rhodes he isn't.
+
+**Numbers.** Domain Rating 0.1, no organic keywords, no traffic. johnnyrhoades.com isn't in the top 10 for his own name. The top result is Facebook's people search and the second is his Apple Music page. Of 25 referring domains, one was a real link (Pure Michigan, DR 78, an event listing that expired in July), and the rest are link spam. "johnny rhoades" gets about 10 searches a month. "johnny rhodes" gets 150, all about other people.
+
+**Worth telling**
+
+- *The biggest search problem wasn't on the site.* Bandsintown has had nothing upcoming for him since Oct 24, so Detroit's Bandsintown blues page, which is the kind of page that ranks for "blues bands near me", listed six shows by other players and none by him. The sync was fine; its log said `0 upcoming, 609 past` every three hours.
+- *A test that only failed in winter.* The rule for 1:30 am on the night clocks fall back is to take the first one, in daylight time. Luxon picks between the two by the offset in effect when the code runs, so all summer the test passed, and in November it failed. Shows aren't booked at 1:30 am, but the fix is now explicit, and the test runs as if built in July and in December.
+- *Two tests expired on Oct 25.* The booking tests typed Oct 24 into a date field whose minimum is the browser's today, so once that date passed, the browser refused to submit. They now pin the browser's clock to the build date, as the show tests already did.
+
+---
+
 ## 2026-10-05: Johnny reads his bio
 
 **What changed.** Johnny's first notes on his own About section: don't say "I", say "he"; and it sounds repetitive. Both came from the ledger. Every sentence was one fact, written to stand on its own, so every sentence started the same way. Facts now carry a second wording for their place in the running bio, which can lean on the sentence before ("Since then…", "Years later…"). The home page About and the press kit's medium bio became one text (ADR 0022). He also asked for his current work with Jill Jack and Julianne Ankley, which went in as a `verified` fact from a Local Spins profile and a venue listing.

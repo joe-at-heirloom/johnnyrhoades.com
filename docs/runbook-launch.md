@@ -65,9 +65,9 @@ Pick a quiet weekday morning, not the day before a gig.
 
 18. [ ] `npm run check:redirects`: every row of the redirect map answers 301 to its target, and the target loads.
 19. [ ] `curl -sI https://johnnyrhoades.com/ | grep -iE "content-security|strict-transport|permissions"`: headers present. After a clean week in report-only, enforce the CSP, then raise HSTS from 300 to a year.
-20. [ ] The rest of `docs/manual-checks.md`: Rich Results Test on two show pages, calendar subscriptions, a test booking (should arrive at `hello@`), an email to `hello@` from an outside address (mail still flows), a test signup with its region tag, Umami events.
+20. [ ] The rest of `docs/manual-checks.md`: Rich Results Test on two show pages, calendar subscriptions, a test booking (should arrive at `hello@`), an email to `hello@` from an outside address (mail still flows), a test signup with its region tag, Google Analytics events.
 21. [ ] **Johnny:** keep Bandzoogle paid for 30 days as the rollback. Cancel it only after the exports are safe and email has worked for a month. Make sure cancelling Bandzoogle doesn't touch the domain registration (it's at Squarespace).
-22. [ ] Day 28: Core Web Vitals in Search Console; first AI answer audit after launch (`docs/geo-audit-log.md`).
+22. [ ] Day 28: Core Web Vitals in Search Console; first AI answer audit after launch (`docs/geo-audit-log.md`); verify the site in Ahrefs Webmaster Tools and rerun the Ahrefs baseline (`docs/search-baseline.md`). Rerun the baseline again on day 90.
 
 ## Rollback
 
