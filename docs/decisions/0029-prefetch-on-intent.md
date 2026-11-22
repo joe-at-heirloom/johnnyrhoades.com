@@ -30,4 +30,9 @@ Inline, there's no extra request. A/B with and without the inline block, three r
 ## Consequences
 
 - **Tested:** an end-to-end test hovers the press kit link on the home page, under the served headers, then clicks. It checks that the browser reports `deliveryType: "navigational-prefetch"` for the page it lands on. Another test fails if any page carries an inline script other than JSON-LD, the Tonight data island and these rules, or a rules block whose hash isn't in the CSP.
+- **Checked live on staging, 2026-11-22,** in a clean Chromium:
+  - hover, then click: the press kit arrives as `navigational-prefetch`, its first byte at 12 ms;
+  - a straight click: also prefetched, at 42 ms, because Chrome starts on the press.
+
+  In Chrome driven by the Claude extension it didn't prefetch. Chrome turns preloading off while a debugger is attached, and the user can turn it off too (Settings → Performance → Preload pages). To see it by hand: DevTools → Application → Speculative loads.
 - **The cost:** about 400 bytes per page. A hover that doesn't end in a click also spends one page's HTML, about 10–25 KB compressed. Data Saver and battery saver modes turn prefetching off in the browser.
