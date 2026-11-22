@@ -8,8 +8,9 @@
   The policy allows only what the site uses: its own files, YouTube's
   privacy-enhanced player once someone presses play, Apple's song clips once
   someone presses play on a track, Formspree, and Google Analytics (ADR 0023). No inline scripts (astro.config.mjs keeps every script
-  external), so no hashes that change every build. JSON-LD and the Tonight
-  data island are data blocks, which CSP doesn't apply to.
+  external). The stylesheet is inline (ADR 0028), so the build adds its
+  sha256 to style-src (cspWithStyleHashes, used by src/lib/edge.ts). JSON-LD
+  and the Tonight data island are data blocks, which CSP doesn't apply to.
 */
 
 const YOUTUBE = 'https://www.youtube-nocookie.com';
@@ -35,9 +36,19 @@ export const CSP_DIRECTIVES: Record<string, string[]> = {
   'frame-ancestors': ["'none'"],
 };
 
-export const CSP = Object.entries(CSP_DIRECTIVES)
-  .map(([name, values]) => [name, ...values].join(' '))
-  .join('; ');
+const serialize = (directives: Record<string, string[]>) =>
+  Object.entries(directives)
+    .map(([name, values]) => [name, ...values].join(' '))
+    .join('; ');
+
+/** The policy as written above, before the build adds the inline stylesheet's hash. */
+export const CSP = serialize(CSP_DIRECTIVES);
+
+/** The policy the site is served with: style-src also allows each inline <style> by its sha256 (base64). */
+export function cspWithStyleHashes(hashes: readonly string[]): string {
+  const styleSrc = [...CSP_DIRECTIVES['style-src']!, ...[...new Set(hashes)].sort().map((h) => `'sha256-${h}'`)];
+  return serialize({ ...CSP_DIRECTIVES, 'style-src': styleSrc });
+}
 
 const off = ['accelerometer', 'camera', 'geolocation', 'gyroscope', 'magnetometer', 'microphone', 'payment', 'usb', 'browsing-topics'];
 // The player needs these; the iframe's `allow` attribute (src/scripts/video-stage.ts) asks for the same list.

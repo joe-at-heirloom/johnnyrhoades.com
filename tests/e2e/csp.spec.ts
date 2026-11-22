@@ -7,7 +7,7 @@
 import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { expect, test, type Page } from '@playwright/test';
-import { headersFor, parseHeadersFile } from '../../src/lib/edge';
+import { headersFor, parseHeadersFile, styleHashes } from '../../src/lib/edge';
 import { CSP, PERMISSIONS_POLICY } from '../../src/lib/security-headers';
 import { SITE_URL } from '../../playwright.config';
 import { blockThirdParties, collectConsoleErrors, loadEverything } from './helpers';
@@ -35,8 +35,10 @@ async function serveWithHeaders(page: Page) {
     if (request.resourceType() !== 'document' || !request.url().startsWith(SITE_URL)) return route.fallback();
     const response = await route.fetch();
     const fromFile = headersFor(new URL(request.url()).pathname, parseHeadersFile(readFileSync('dist/_headers', 'utf8')));
-    // The file must carry the policy this module defines; then serve exactly what it says.
-    expect(fromFile['Content-Security-Policy']).toBe(CSP);
+    // The file must carry the policy this module defines, plus the inline stylesheet's hash (ADR 0028);
+    // then serve exactly what it says. A wrong hash would leave the page unstyled and fail the checks below.
+    expect(fromFile['Content-Security-Policy']).toMatch(/style-src 'self' 'sha256-[A-Za-z0-9+/]+=*'/);
+    expect(fromFile['Content-Security-Policy']!.replace(/ 'sha256-[^']+'/g, '')).toBe(CSP);
     expect(fromFile['Permissions-Policy']).toBe(PERMISSIONS_POLICY);
     await route.fulfill({ response, headers: { ...response.headers(), ...Object.fromEntries(Object.entries(fromFile).map(([k, v]) => [k.toLowerCase(), v])) } });
   });
@@ -96,6 +98,8 @@ for (const path of ['/shows/', '/shows/2026-10-23-blue-goose-inn-st-clair-shores
 }
 
 test('no built page has an inline script or style the policy would block', () => {
+  // The served policy, with the inline stylesheet's hash in it (ADR 0028).
+  const csp = headersFor('/', parseHeadersFile(readFileSync('dist/_headers', 'utf8')))['Content-Security-Policy']!;
   const pages: string[] = [];
   const walk = (dir: string) => {
     for (const entry of readdirSync(dir, { withFileTypes: true })) {
@@ -113,7 +117,7 @@ test('no built page has an inline script or style the policy would block', () =>
       const dataBlock = /type="application\/(ld\+)?json"/.test(attrs);
       if (!dataBlock && body.trim()) problems.push(`${file}: inline script`);
     }
-    if (/<style[\s>]/.test(html)) problems.push(`${file}: <style> element`);
+    for (const hash of styleHashes([html])) if (!csp.includes(`'sha256-${hash}'`)) problems.push(`${file}: a <style> the CSP doesn't allow`);
     if (/\sstyle="/.test(html)) problems.push(`${file}: style attribute`);
     if (/\son[a-z]+="/.test(html)) problems.push(`${file}: inline event handler`);
   }

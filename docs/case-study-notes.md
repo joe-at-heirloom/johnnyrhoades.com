@@ -4,6 +4,23 @@ A running log for the portfolio write-up (PLAN.md section 16): numbers, screensh
 
 ---
 
+## 2026-11-22: The stylesheet goes inline
+
+**What changed.** The stylesheet is inline in every page, and the CSP allows it by a sha256 the build computes (ADR 0028). That was possible only once the headers became a file the build writes.
+
+**Numbers** (Lighthouse CI, mobile, median of 3, over HTTP/2):
+- Press kit LCP 1905 → 1605 ms.
+- Home LCP 1800 → 1726 ms.
+- Show page unchanged at 1455 ms.
+- 100 everywhere.
+
+**Worth telling**
+
+- *Estimates are made over your test server.* Lighthouse had promised 455 ms for this. That figure came from the old HTTP/1.1 test server. Over HTTP/2 the request it removes was cheap, so the real gain was 74 to 300 ms.
+- *Security didn't loosen.* No `'unsafe-inline'`: one exact hash, recomputed every build, and a test that fails if a page carries a `<style>` the policy doesn't allow.
+
+---
+
 ## 2026-11-22: From GitHub Pages to Cloudflare Workers
 
 **What changed.** Joe suggested Cloudflare Workers, and the site moved its hosting there (ADR 0027): static assets only, no Worker script. The build now writes `dist/_headers` and `dist/_redirects`. Staging moved the same day: the first deploy took about a minute, and new.johnnyrhoades.com served over HTTP/2 with every header and redirect in place.

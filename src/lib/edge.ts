@@ -12,7 +12,8 @@
   Pure, so the limits Cloudflare enforces (and would otherwise only report at
   deploy time) are checked by the unit tests.
 */
-import { SECURITY_HEADERS } from './security-headers.ts';
+import { createHash } from 'node:crypto';
+import { cspWithStyleHashes, SECURITY_HEADERS } from './security-headers.ts';
 
 // docs/redirect-map.csv is read by src/lib/redirects.ts (parseRedirectMap), which also checks the live site after launch.
 
@@ -27,12 +28,27 @@ export const HASHED_CACHE = 'public, max-age=31536000, immutable';
 type HeaderRule = { path: string; headers: Record<string, string> };
 
 /**
+ * The sha256 (base64) of every inline <style> in the given pages, for the CSP
+ * (ADR 0028). A browser hashes the element's text exactly as written, so this
+ * does too: no trimming.
+ */
+export function styleHashes(htmls: readonly string[]): string[] {
+  const hashes = new Set<string>();
+  for (const html of htmls) {
+    for (const [, css] of html.matchAll(/<style(?:\s[^>]*)?>([\s\S]*?)<\/style>/g)) {
+      hashes.add(createHash('sha256').update(css!, 'utf8').digest('base64'));
+    }
+  }
+  return [...hashes].sort();
+}
+
+/**
  * The header rules, in file order. Staging adds X-Robots-Tag on top of the
  * page-level noindex. `hstsMaxAge` overrides the one-year HSTS for the first
  * day after launch (docs/security-headers.md, "Rolling it out").
  */
-export function headerRules({ noindex, hstsMaxAge }: { noindex: boolean; hstsMaxAge?: number }): HeaderRule[] {
-  const security = { ...SECURITY_HEADERS };
+export function headerRules({ noindex, hstsMaxAge, styleHashes = [] }: { noindex: boolean; hstsMaxAge?: number; styleHashes?: readonly string[] }): HeaderRule[] {
+  const security: Record<string, string> = { ...SECURITY_HEADERS, 'Content-Security-Policy': cspWithStyleHashes(styleHashes) };
   if (hstsMaxAge !== undefined) {
     if (!Number.isInteger(hstsMaxAge) || hstsMaxAge < 0) throw new Error(`HSTS max-age must be a whole number of seconds, not ${hstsMaxAge}`);
     security['Strict-Transport-Security'] = security['Strict-Transport-Security']!.replace(/max-age=\d+/, `max-age=${hstsMaxAge}`);

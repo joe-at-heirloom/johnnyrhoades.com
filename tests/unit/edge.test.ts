@@ -12,14 +12,31 @@ import {
   redirectsFile,
   SLASH_REDIRECTS,
   stubRedirects,
+  styleHashes,
   type Redirect,
 } from '../../src/lib/edge.ts';
 import { parseRedirectMap } from '../../src/lib/redirects.ts';
-import { SECURITY_HEADERS } from '../../src/lib/security-headers.ts';
+import { CSP, cspWithStyleHashes, SECURITY_HEADERS } from '../../src/lib/security-headers.ts';
 
 describe('_headers', () => {
   const file = headersFile(headerRules({ noindex: false }));
   const rules = parseHeadersFile(file);
+
+  it('hashes each inline stylesheet exactly as written, once', () => {
+    // echo -n 'a{color:red}' | openssl dgst -sha256 -binary | base64
+    const red = '6hWWMOcF+mJesSJGYhmK2lkIIEw9Xc5XKGLPVzh8yxs=';
+    expect(styleHashes(['<style>a{color:red}</style>', '<html><style data-x="1">a{color:red}</style></html>'])).toEqual([red]);
+    expect(styleHashes(['<style> a{color:red}</style>'])).not.toEqual([red]); // whitespace counts
+    expect(styleHashes(['<p>no styles</p>'])).toEqual([]);
+  });
+
+  it('allows the inline stylesheet by hash, and only that', () => {
+    const csp = headersFor('/', parseHeadersFile(headersFile(headerRules({ noindex: false, styleHashes: ['abc=', 'abc='] }))))['Content-Security-Policy']!;
+    expect(csp).toContain("style-src 'self' 'sha256-abc='; ");
+    expect(csp).not.toContain('unsafe-inline');
+    expect(csp.replace(" 'sha256-abc='", '')).toBe(CSP);
+    expect(cspWithStyleHashes([])).toBe(CSP);
+  });
 
   it('puts every security header on every response', () => {
     for (const path of ['/', '/shows/some-show/', '/posters/x/og.png', '/_astro/app.js']) {

@@ -9,6 +9,9 @@ export default defineConfig({
   integrations: [edgeFiles()],
   build: {
     format: 'directory',
+    // The stylesheet goes inline, so the first paint doesn't wait on a second request (ADR 0028).
+    // Its sha256 goes into the CSP in dist/_headers (src/lib/edge.ts).
+    inlineStylesheets: 'always',
   },
   vite: {
     build: {
