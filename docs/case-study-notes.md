@@ -6,7 +6,7 @@ A running log for the portfolio write-up (PLAN.md section 16): numbers, screensh
 
 ## 2026-11-22: From GitHub Pages to Cloudflare Workers
 
-**What changed.** Joe suggested Cloudflare Workers, and the site moved its hosting there (ADR 0027): static assets only, no Worker script. The build now writes `dist/_headers` and `dist/_redirects`. Ready in the repo; it goes live when the deploy secrets are in.
+**What changed.** Joe suggested Cloudflare Workers, and the site moved its hosting there (ADR 0027): static assets only, no Worker script. The build now writes `dist/_headers` and `dist/_redirects`. Staging moved the same day: the first deploy took about a minute, and new.johnnyrhoades.com served over HTTP/2 with every header and redirect in place.
 
 **Numbers.**
 - The launch runbook's cutover went from five dashboard redirect rules, a header Transform Rule, two cache rules, a GitHub verified domain and a certificate wait to one redirect rule, for `www`.

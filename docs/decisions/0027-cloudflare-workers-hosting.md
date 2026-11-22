@@ -1,6 +1,6 @@
 # 0027: Host on Cloudflare Workers, not GitHub Pages
 
-**Status:** Accepted, 2026-11-22. Replaces the hosting rows of PLAN.md section 5 and the cutover in section 14. Refines ADR 0012 (headers and redirects) and ADR 0026 (the Lighthouse server).
+**Status:** Accepted, 2026-11-22; staging has served from Workers since that day. Replaces the hosting rows of PLAN.md section 5 and the cutover in section 14. Refines ADR 0012 (headers and redirects) and ADR 0026 (the Lighthouse server).
 
 ## Context
 
