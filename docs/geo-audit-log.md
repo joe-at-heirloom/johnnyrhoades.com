@@ -18,22 +18,23 @@ Ahrefs Brand Radar could automate this, but it's a paid add-on that the Lite pla
 
 ### Baseline, before launch: 2026-11-22
 
-Run signed out in Claude's built-in browser, a fresh chat per question. Three engines didn't finish:
-- **ChatGPT** sent every request to its login page.
-- **Perplexity** answered two questions, then asked for a sign-in ("Sign up and repeat your request").
-- **Gemini** accepted the question but sat on "Searching the web" with the browser pane hidden.
+Google AI Mode and Perplexity were run signed out, in Claude's built-in browser, with a fresh chat per question. ChatGPT was run in Joe's Chrome, signed in but in a temporary chat; ChatGPT notes that a temporary chat can still use the account's memory. Its answers cite johnnyrhoades.com and Bandsintown, not anything private.
 
-Joe can fill those cells in by hand.
+Two engines didn't finish:
+- **Perplexity** answered two questions, then asked for a sign-in, in both browsers.
+- **Gemini** stalled signed out, and is switched off for Joe's Workspace account ("Service Not Allowed").
+
+Joe can fill those cells in by hand, from a personal account or a private window.
 
 | Question | ChatGPT | Perplexity | Gemini | Google AI Mode |
 |---|---|---|---|---|
-| 1. Who is he | not run | W | not run | P |
-| 2. Guitarists for hire | not run | N | not run | N |
-| 3. Playing this week | not run | not run | not run | A |
-| 4. Album | not run | not run | not run | A |
-| 5. Played with | not run | not run | not run | A |
+| 1. Who is he | P | W | not run | P |
+| 2. Guitarists for hire | N | N | not run | N |
+| 3. Playing this week | A | not run | not run | A |
+| 4. Album | A | not run | not run | A |
+| 5. Played with | A | not run | not run | A |
 
-Accurate: 3 of the 7 answered (target: 16 of 20). Notes on what each got wrong, and where the wrong answer came from:
+Accurate: 6 of the 12 answered (target: 16 of 20). Notes on what each got wrong, and where the wrong answer came from:
 
 - **Google AI Mode, 1 (P).** Right on the basics: Detroit blues guitarist and singer, the influences, the 2014 album, the B.B. King memorial and the Fed.
   - It calls him a "Detroit Music Award nominee", quoting the Bandzoogle bio and Cliff Bell's 2017 page. He won twice with Motor City Josh & The Big 3; the new site says so, and launch replaces the Bandzoogle text.
@@ -43,5 +44,9 @@ Accurate: 3 of the 7 answered (target: 16 of 20). Notes on what each got wrong, 
 - **Google AI Mode, 3 (A).** "No upcoming shows… his Bandsintown page has no dates posted after late October 2026." True, and the reason is that nothing is in Bandsintown (`search-baseline.md`, item 1).
 - **Google AI Mode, 4 (A).** *Waiting on the Sun*, November 2, 2014, ten tracks. It also names Motor City Josh as producer, "recorded at The Sound Shop", citing Amazon. Amazon blocks AI agents, so that's unconfirmed here, and the fact stays `unverified` in the ledger. Joe can check the album page's credits by hand.
 - **Google AI Mode, 5 (A).** Thornetta Davis, Motor City Josh, Németh, RJ Spangler, Brett Lucas and Paul Carey, plus trio players from his Facebook posts.
+- **ChatGPT, 1 (P).** The same "Detroit Music Award nominee" line from the old bio. Everything else is right: Motor City Josh at 19, the influences, the road, the B.B. King memorial, the album.
+- **ChatGPT, 2 (N).** Names Chris Brantley, Todd Albright, Howard Glazer, the Chris Canas Band and Ben Shotts, with Glazer's phone and email "published by the Detroit Blues Society". The Society's listings are a source. They list member bands only, and take gigs by email (`search-baseline.md`, item 6).
+- **ChatGPT, 3 (A).** No shows this week, with the last three right: Three Blind Mice on Oct 24, the Blue Goose on Oct 23, the Fed on Oct 17. "It's possible he has local bar gigs that haven't been posted."
+- **ChatGPT, 4 and 5 (A).** *Waiting on the Sun* (2014). Németh, Thornetta Davis, Motor City Josh, RJ Spangler, Brett Lucas and Paul Carey, and the Blue Dreamers.
 - **Perplexity, 1 (W).** "I can't identify a notable person named 'Johnny Rhoades'", then it suggests Johnny Rhodes, a musician in North Wales. This is the entity problem the structured data, `sameAs` and `llms.txt` name variants are for; it needs the new site live and indexed.
 - **Perplexity, 2 (N).** Points to The Bash and Gig Heaven. Same lesson as Google's answer: it's built from marketplaces.
