@@ -52,6 +52,7 @@ describe('normalizeEvent against the fixtures', () => {
       lat: 42.7867362,
       lng: -83.4217305,
       timeZone: 'America/Detroit',
+      url: 'https://www.15thstreettavern.com/', // from venues.yaml; Bandsintown has none
     });
   });
 
@@ -59,7 +60,7 @@ describe('normalizeEvent against the fixtures', () => {
     expect(goose.venue.key).toBe('blue-goose-inn');
     expect(goose.venue.street).toBe('28911 Jefferson Ave');
     expect(goose.venue.postalCode).toBe('48081'); // "TODO" in venues.yaml, so Bandsintown's value
-    expect(goose.venue.url).toBeUndefined(); // "TODO", and Bandsintown has none
+    expect(goose.venue.url).toBe('https://www.facebook.com/TheBlueGooseInn/'); // hand-kept: its old domains are spam or for sale
   });
 
   it('strips tracking parameters from the event link', () => {

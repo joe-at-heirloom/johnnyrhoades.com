@@ -13,7 +13,7 @@
   city: Clarkston
   region: MI
   postalCode: "48348"
-  url: TODO
+  url: https://www.15thstreettavern.com/ # its own site, checked 2026-11-22
   blurb: TODO
 
 blue-goose-inn:
@@ -23,7 +23,7 @@ blue-goose-inn:
   city: St. Clair Shores
   region: MI
   postalCode: TODO
-  url: TODO
+  url: https://www.facebook.com/TheBlueGooseInn/ # its Facebook page: bluegooseinn.com serves gambling spam, bluegoose.info is parked, and bluegooseinn.net (the site its page lists) is for sale (2026-11-22)
   blurb: TODO
 
 cadieux-cafe:
@@ -32,7 +32,7 @@ cadieux-cafe:
   city: Detroit
   region: MI
   street: TODO
-  url: TODO
+  url: https://cadieuxcafe.com/ # its own site, checked 2026-11-22
   blurb: TODO
 
 octopus-beer-garden:
@@ -41,7 +41,7 @@ octopus-beer-garden:
   city: Mount Clemens
   region: MI
   street: TODO
-  url: TODO
+  url: https://octopusbeergarden.com/ # its own site, checked 2026-11-22
   blurb: TODO
 
 the-fed-community:
@@ -50,7 +50,7 @@ the-fed-community:
   city: Clarkston
   region: MI
   street: TODO
-  url: TODO
+  url: https://www.thefedcommunity.com/ # its own site, checked 2026-11-22
   blurb: TODO
 
 three-blind-mice-irish-pub:
@@ -59,7 +59,7 @@ three-blind-mice-irish-pub:
   city: Mount Clemens
   region: MI
   street: TODO
-  url: TODO
+  url: https://threeblindmiceirishpub.com/ # its own site, checked 2026-11-22
   blurb: TODO
 
 token-lounge:
@@ -68,5 +68,5 @@ token-lounge:
   city: Westland
   region: MI
   street: TODO
-  url: TODO
+  url: https://www.tokenlounge.com/ # not thetokenlounge.com, whose certificate expired in 2022
   blurb: TODO
