@@ -5,6 +5,11 @@
 
   The show page is the first one in the built sitemap, so this measures what
   would ship today. Results stay local (.lighthouseci/), never uploaded.
+
+  The build is served over HTTP/2 with gzip (scripts/serve-dist.ts), as GitHub
+  Pages and Cloudflare serve it. lhci's own static server is HTTP/1.1, and
+  Lighthouse's simulation then queues requests six at a time, which read
+  about 0.9 s slower on the home page's LCP than staging does (ADR 0026).
 */
 const { readFileSync } = require('node:fs');
 
@@ -13,15 +18,18 @@ const show = sitemap.match(/<loc>https:\/\/johnnyrhoades\.com(\/shows\/[^<]+)<\/
 if (!show) console.warn('No show page in the sitemap; measuring / and /epk/ only.');
 
 const chromePath = process.env.CHROME_PATH || require('@playwright/test').chromium.executablePath();
+const PORT = 4510;
 
 module.exports = {
   ci: {
     collect: {
-      staticDistDir: './dist',
-      url: ['/', show, '/epk/'].filter(Boolean).map((path) => `http://localhost${path}`),
+      startServerCommand: `node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/serve-dist.ts ${PORT}`,
+      startServerReadyPattern: 'Serving dist',
+      url: ['/', show, '/epk/'].filter(Boolean).map((path) => `https://localhost:${PORT}${path}`),
       numberOfRuns: 3,
       chromePath,
-      settings: { chromeFlags: '--headless=new' },
+      // The certificate is a throwaway self-signed one, made by serve-dist.ts for each run.
+      settings: { chromeFlags: '--headless=new --ignore-certificate-errors' },
     },
     assert: {
       assertMatrix: [
@@ -34,14 +42,14 @@ module.exports = {
             'categories:seo': ['error', { minScore: 1 }],
             // A shift in any run fails: they tend to be intermittent.
             'cumulative-layout-shift': ['error', { maxNumericValue: 0.05, aggregationMethod: 'pessimistic' }],
-            // The 2.0 s bar in PLAN.md is a field metric (Search Console, real phones). Lighthouse's
-            // simulated slow 4G reads higher, so in the lab it's a warning to watch, not a gate (ADR 0012).
+            // The 2.0 s bar in PLAN.md is a field metric (Search Console, real phones). In the lab it's a
+            // warning to watch, not a gate (ADR 0012): over HTTP/2 the home page reads about 1.8 s (ADR 0026).
             'largest-contentful-paint': ['warn', { maxNumericValue: 2000, aggregationMethod: 'median' }],
           },
         },
         {
           // Home: at most 30 KB of JavaScript before interaction, 600 KB first view (video excluded: it loads on click).
-          matchingUrlPattern: '^http://localhost:\\d+/$',
+          matchingUrlPattern: '^https://localhost:\\d+/$',
           assertions: {
             'resource-summary:script:size': ['error', { maxNumericValue: 30 * 1024 }],
             'total-byte-weight': ['error', { maxNumericValue: 600 * 1024 }],

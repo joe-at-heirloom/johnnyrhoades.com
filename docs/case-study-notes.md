@@ -4,6 +4,20 @@ A running log for the portfolio write-up (PLAN.md section 16): numbers, screensh
 
 ---
 
+## 2026-11-22: The hero wasn't slow, the lab server was
+
+**What changed.** Lighthouse CI serves the build over HTTP/2, as GitHub Pages and Cloudflare do (ADR 0026). No change to the page.
+
+**Numbers.** Home LCP, mobile, median of 3: 2.71 s → 1.74 s, performance 94–96 → 100. Show page 1.76 s, press kit 1.88 s. Staging, measured the same way: 1.78–1.96 s.
+
+**Worth telling**
+
+- *Read the breakdown before you optimize.* "The hero image" had been the open item for weeks. Lighthouse's own breakdown said the image loaded in 12 ms and 83% of LCP was render delay. Unthrottled, the hero painted at first paint, about 130 ms in.
+- *The simulation models your server, not production.* lhci's static server speaks HTTP/1.1, so the slow-4G model queued 33 early requests six at a time. Production multiplexes them over HTTP/2. Measured the way it's served, the page was already under the bar.
+- *The obvious fixes cost more than they saved.* Inlining the CSS would have meant hand-editing a CSP hash in Cloudflare on every style change. The font trims saved 1.5 KB and 5 KB.
+
+---
+
 ## 2026-11-22: The search baseline, from Ahrefs
 
 **What changed.** A search "before", measured with Ahrefs while the domain still serves Bandzoogle (`docs/search-baseline.md`). It found the gaps, and the fixes all use facts the ledger already had. His Apple Music artist page goes into `sameAs`. The structured data now ties him to Motor City Josh & The Big 3 and to John Németh's *Feelin' Freaky*, and names the band's older billing. `llms.txt` says which Johnny Rhodes he isn't.
