@@ -451,7 +451,7 @@ Written in the third person for people who book music. Everything above the fold
 2. The best live video.
 3. The proof sentence, his most-played rooms and festivals (generated).
 4. Formats: solo acoustic, trio, full band. For each: typical set length, what he brings, what he needs, and a stage plot and input list.
-5. Bios in three lengths (about 50, 150 and 350 words), each with a Copy button.
+5. Bios in three lengths (about 50, 275 and 400 words), each with a Copy button. Artists' names link to their own pages (ADR 0025).
 6. Fast facts: short, declarative, sourced sentences (section 10).
 7. Highlights and credits from the facts ledger, with source links.
 8. Press quotes, once there are real ones.
@@ -839,11 +839,11 @@ Add shows the way you always have. Three things help: pick the venue from Bandsi
 
 > Johnny Rhoades is a blues guitarist and singer from Detroit. He started at 19 in Motor City Josh's band and now plays solo acoustic, trio and full-band shows across Michigan. His album *Waiting on the Sun* came out in 2014.
 
-*Medium (about 150 words)*
+*Medium (about 150 words; about 275 since ADR 0025)*
 
 > Johnny Rhoades is a blues guitarist and singer from Detroit. He started out at 19 playing in Motor City Josh's band and has been on and off the road ever since, around the US and in Europe, Mexico and the Caribbean. He grew up on B.B. King, Albert King, Albert Collins and Ray Charles, played B.B. King's memorial celebration in Memphis, and has shared stages with Thornetta Davis, RJ Spangler, Brett Lucas, John Németh and Paul Carey. He plays a mix of blues standards and his own songs, solo acoustic, as a trio or with a full band. His album *Waiting on the Sun* came out in 2014. (The built bios now add the 2020 and 2023 Detroit Music Awards, John Németh's *Feelin' Freaky*, and Jill Jack and Julianne Ankley from the ledger. The medium bio is also the home page About; ADR 0022.)
 
-*Long (about 350 words): outline only, to write once Johnny answers*
+*Long (about 350 words; about 400 since ADR 0025): outline only, to write once Johnny answers*
 
 1. Where he started (the Blue Goose story, if confirmed).
 2. The Motor City Josh years and the records he played on.
