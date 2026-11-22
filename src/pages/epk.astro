@@ -13,10 +13,11 @@ import FactText from '../components/FactText.astro';
 import Footer from '../components/Footer.astro';
 import Header from '../components/Header.astro';
 import ProofLine from '../components/ProofLine.astro';
+import { linkBio } from '../lib/artists';
 import { bio, longBio } from '../lib/bios';
 import { EPK_FAQ, EPK_FAST_FACTS, EPK_FORMATS } from '../lib/copy';
 import { BOOKING_EMAIL } from '../lib/forms';
-import { facts, image, media, videoThumb } from '../lib/load-content';
+import { artists, facts, image, media, videoThumb } from '../lib/load-content';
 import { allShows, BUILD_NOW } from '../lib/load-shows';
 import { pastShows, proofForBio, proofLine, roomOf, upcomingShows } from '../lib/shows-data';
 import { PRESS_ZIP, absolute } from '../lib/site';
@@ -33,6 +34,10 @@ const rooms = [
 const highlights = facts.tagged('highlight');
 const formats = EPK_FORMATS.map((id) => facts.third(id)).join(' ');
 const proof = proofLine(allShows, BUILD_NOW);
+// Each bio links an artist's first mention on its own, since promoters copy one bio, not all three (ADR 0025).
+const [bioShort] = linkBio([bio(facts, 'short')], artists);
+const [bioMedium] = linkBio([bio(facts, 'medium')], artists);
+const bioLong = linkBio(longBio(facts, proofForBio(allShows, BUILD_NOW)), artists);
 const fastFacts = EPK_FAST_FACTS.map((id) => facts.get(id, 'epk'));
 const photos = media.photos.filter((p) => p.use.includes('epk')).slice(0, 6);
 const pressPhotos = media.photos.filter((p) => p.use.includes('press'));
@@ -91,21 +96,21 @@ const description = 'Press kit for Johnny Rhoades, blues guitarist and singer fr
               <h3>Short</h3>
               <CopyButton target="bio-short" label="Copy short bio" />
             </div>
-            <p id="bio-short"><FactText text={bio(facts, 'short')} /></p>
+            <p id="bio-short"><FactText parts={bioShort} /></p>
           </div>
           <div class="epk-bio">
             <div class="epk-bio-head">
               <h3>Medium</h3>
               <CopyButton target="bio-medium" label="Copy medium bio" />
             </div>
-            <p id="bio-medium"><FactText text={bio(facts, 'medium')} /></p>
+            <p id="bio-medium"><FactText parts={bioMedium} /></p>
           </div>
           <div class="epk-bio epk-bio-long">
             <div class="epk-bio-head">
               <h3>Long</h3>
               <CopyButton target="bio-long" label="Copy long bio" />
             </div>
-            <div id="bio-long">{longBio(facts, proofForBio(allShows, BUILD_NOW)).map((p) => <p><FactText text={p} /></p>)}</div>
+            <div id="bio-long">{bioLong.map((p) => <p><FactText parts={p} /></p>)}</div>
           </div>
         </section>
 

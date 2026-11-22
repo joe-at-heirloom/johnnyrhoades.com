@@ -2,10 +2,12 @@
 import AxeBuilder from '@axe-core/playwright';
 import { readFileSync } from 'node:fs';
 import { expect, test } from '@playwright/test';
+import { parseArtists } from '../../src/lib/artists';
 import { parseFacts } from '../../src/lib/facts';
 import { blockThirdParties, collectConsoleErrors } from './helpers';
 
 const unverified = parseFacts(readFileSync('src/data/facts.yaml', 'utf8')).filter((f) => f.status === 'unverified');
+const artists = parseArtists(readFileSync('src/data/artists.yaml', 'utf8'));
 const PAGES = ['/', '/shows/', '/epk/', '/shows/2026-10-23-blue-goose-inn-st-clair-shores/', '/thanks/', '/404.html'];
 
 test.beforeEach(async ({ page }) => {
@@ -27,7 +29,7 @@ test('the press kit has bios, facts with sources, highlights and booking', async
   await expect(page).toHaveTitle('Johnny Rhoades Press Kit | Detroit Blues Guitarist for Venues, Festivals and Events');
   await expect(page.getByRole('heading', { level: 1, name: 'Johnny Rhoades' })).toBeVisible();
   await expect(page.locator('#bio-short')).toContainText('Johnny Rhoades is a blues guitarist and singer from Detroit, Michigan.');
-  await expect(page.locator('#bio-medium cite')).toHaveText(['Feelin’ Freaky', 'Waiting on the Sun']);
+  await expect(page.locator('#bio-medium cite')).toHaveText(['Feelin’ Freaky', 'Breakin’ Out', 'Waiting on the Sun']);
   await expect(page.locator('#bio-long p')).toHaveCount(5);
   await expect(page.locator('#bio-long')).toContainText('Before he played the Blue Goose Inn in St. Clair Shores, he washed dishes there.');
   await expect(page.getByRole('heading', { name: 'Formats' })).toBeVisible();
@@ -37,6 +39,21 @@ test('the press kit has bios, facts with sources, highlights and booking', async
   await expect(page.locator('.epk-highlights li').first().getByRole('link', { name: 'Source' })).toHaveAttribute('href', /ferndalefriends/);
   await expect(page.getByRole('link', { name: 'Send a booking request' }).first()).toHaveAttribute('href', '/#book');
   expect(errors).toEqual([]);
+});
+
+test('the bios link each artist they name to the artist’s own page, once per bio (ADR 0025)', async ({ page }) => {
+  const expected = Object.fromEntries(artists.map((a) => [a.name, a.url]));
+  const linksIn = (selector: string) =>
+    page.locator(`${selector} a`).evaluateAll((as) => as.map((a) => [a.textContent!.replace(/ & The Big 3$/, ''), a.getAttribute('href')]));
+
+  await page.goto('/');
+  expect(Object.fromEntries(await linksIn('#about'))).toEqual(expected);
+  expect(await linksIn('#about')).toHaveLength(artists.length); // each once
+  await expect(page.locator('#about').getByRole('link', { name: 'Kelley Hunt' })).toHaveAttribute('href', 'https://kelleyhunt.com/');
+
+  await page.goto('/epk/');
+  for (const bio of ['#bio-medium', '#bio-long']) expect(Object.fromEntries(await linksIn(bio)), bio).toEqual(expected);
+  expect(await linksIn('#bio-short')).toEqual([['Motor City Josh', 'https://www.motorcityjosh.com/']]);
 });
 
 test('bios copy to the clipboard', async ({ page, context }) => {

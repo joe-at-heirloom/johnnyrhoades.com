@@ -15,6 +15,9 @@
 .about-copy .display { margin-bottom: 32px; }
 .about-copy p { color: var(--bone-2); font-size: 1.125rem; max-width: 36rem; margin-bottom: 20px; }
 .about-copy p:last-child { margin-bottom: 0; }
+/* Artists' names link to their own pages (ADR 0025): underlined like the footer's links, brighter on hover. */
+.about-copy a { text-underline-offset: 3px; text-decoration-thickness: 1px; transition: color .2s; }
+.about-copy a:hover { color: var(--bone); }
 
 @media (max-width: 900px) {
   .about { grid-template-columns: 1fr; }

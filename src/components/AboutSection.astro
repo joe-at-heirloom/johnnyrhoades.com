@@ -1,11 +1,15 @@
 ---
-/* About: the running bio, in the third person (ADR 0022). Every sentence is a fact from the ledger (src/data/facts.yaml). */
+/*
+  About: the running bio, in the third person (ADR 0022). Every sentence is a fact from the ledger (src/data/facts.yaml),
+  and the first mention of each artist links to their page (ADR 0025).
+*/
 import { Image } from 'astro:assets';
 import FactText from './FactText.astro';
+import { linkBio } from '../lib/artists';
 import { HOME_ABOUT } from '../lib/copy';
-import { facts, image } from '../lib/load-content';
+import { artists, facts, image } from '../lib/load-content';
 
-const paragraphs = HOME_ABOUT.map((ids) => ids.map((id) => facts.bio(id, 'home')).join(' '));
+const paragraphs = linkBio(HOME_ABOUT.map((ids) => ids.map((id) => facts.bio(id, 'home')).join(' ')), artists);
 ---
 
 <section class="about" id="about" aria-labelledby="about-title">
@@ -21,6 +25,6 @@ const paragraphs = HOME_ABOUT.map((ids) => ids.map((id) => facts.bio(id, 'home')
 
   <div class="about-copy">
     <h2 class="display" id="about-title">Why I Sing the Blues</h2>
-    {paragraphs.map((p) => <p><FactText text={p} /></p>)}
+    {paragraphs.map((p) => <p><FactText parts={p} /></p>)}
   </div>
 </section>

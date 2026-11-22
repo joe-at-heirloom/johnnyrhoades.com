@@ -1,0 +1,57 @@
+# Artists the bios name, linked on their first mention in each bio (ADR 0025).
+# Only an artist's own page goes in: fetched, and checked that it's them, before adding.
+#   aka: other ways the bios name them. The longer name wins where two start at the same spot.
+#
+# Named in the bios but not linked:
+#   Paul Carey         No page of his own (checked 2026-11-22). paulcarey.com is parked, and bluesdisciples.com is a
+#                      Milwaukee band of the same name.
+#   Sherrie Williams   The 2013 musicpage bio's spelling. The only Michigan blues singer close to it is Sharrie Williams
+#                      of Saginaw, and her old domain now serves a casino site. Ask Johnny which he meant.
+#   B.B. King, Albert King, Albert Collins, Ray Charles: influences, not people he's played with.
+
+- name: Motor City Josh
+  aka: [Motor City Josh & The Big 3]
+  url: https://www.motorcityjosh.com/
+  note: Checked 2026-11-22. "Motor City Josh & The Big 3", with Detroit dates. Also the url in the structured data.
+
+- name: John Németh
+  url: https://johnnemeth.com/
+  note: Checked 2026-11-22. "John Németh & The Blue Dreamers".
+
+- name: Luther Dickinson
+  url: https://www.lutherdickinson.com/
+  note: Checked 2026-11-22. North Mississippi Allstars, with a page of his production work.
+
+- name: Thornetta Davis
+  url: https://thornettadavis.com/
+  note: Checked 2026-11-22. "Thornetta Davis | Detroit's Queen of the Blues".
+
+- name: RJ Spangler
+  url: https://rjspangler.com/
+  note: Checked 2026-11-22. "RJ Spangler - Official Website", Detroit drummer and bandleader.
+
+- name: Brett Lucas
+  url: https://brettlucas.com/
+  note: Checked 2026-11-22. Detroit blues guitarist; his album won Outstanding Blues Recording at the 2020 Detroit Music Awards.
+
+- name: Pat Smillie
+  url: https://patsmillie.com/
+  note: Checked 2026-11-22. "Detroit-born songwriter", Chicago blues.
+
+- name: Jill Jack
+  url: https://www.jilljack.com/
+  note: Checked 2026-11-22. Singer-songwriter, Detroit, Michigan.
+
+- name: Julianne Ankley
+  url: https://julianneankley.com/
+  note: Checked 2026-11-22. Detroit and Michigan Music Award winner.
+
+- name: Kelley Hunt
+  url: https://kelleyhunt.com/
+  note: Checked 2026-11-22. "Kansas City native Kelley Hunt", singer, songwriter and piano player.
+
+- name: Stacia Petrie
+  url: https://staciamusic.com/
+  note: >-
+    Checked 2026-11-22. She performs as Stacia Petrie Ford now; the page calls her a stalwart of Detroit's acoustic rock
+    and blues scene. Johnny's Bandsintown has a duo show with "Stacia Ford" at Mario's, Detroit, 2024-01-27.

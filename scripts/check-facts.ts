@@ -2,7 +2,7 @@
 /*
   The facts-ledger rules (PLAN.md section 6.4), run by `npm run check`.
 
-  1. facts.yaml, media.yaml and profiles.yaml are valid. Verified facts have
+  1. facts.yaml, media.yaml, profiles.yaml and artists.yaml are valid. Verified facts have
      a source URL; unverified ones say what they need and how to detect them.
   2. Every fact a page uses (src/lib/copy.ts) has a status that's allowed there.
   3. No source file outside facts.yaml states an unverified claim (its
@@ -12,6 +12,7 @@
 */
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';
+import { parseArtists } from '../src/lib/artists.ts';
 import { FACT_USES } from '../src/lib/copy.ts';
 import { ledger, parseFacts } from '../src/lib/facts.ts';
 import { parseMedia, parseProfiles } from '../src/lib/media.ts';
@@ -25,7 +26,7 @@ try {
 } catch (err) {
   problems.push(`facts.yaml: ${err instanceof Error ? err.message : String(err)}`);
 }
-for (const [file, parse] of [['src/data/media.yaml', parseMedia], ['src/data/profiles.yaml', parseProfiles]] as const) {
+for (const [file, parse] of [['src/data/media.yaml', parseMedia], ['src/data/profiles.yaml', parseProfiles], ['src/data/artists.yaml', parseArtists]] as const) {
   try {
     parse(read(file));
   } catch (err) {

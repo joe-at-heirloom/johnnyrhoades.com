@@ -1,14 +1,17 @@
-/* Facts, media and profiles, validated once at build time, plus image lookup by path. */
+/* Facts, media, profiles and artist pages, validated once at build time, plus image lookup by path. */
 import type { ImageMetadata } from 'astro';
 import factsYaml from '../data/facts.yaml?raw';
 import mediaYaml from '../data/media.yaml?raw';
 import profilesYaml from '../data/profiles.yaml?raw';
+import artistsYaml from '../data/artists.yaml?raw';
+import { parseArtists } from './artists.ts';
 import { ledger, parseFacts } from './facts.ts';
 import { parseMedia, parseProfiles } from './media.ts';
 
 export const facts = ledger(parseFacts(factsYaml));
 export const media = parseMedia(mediaYaml);
 export const profiles = parseProfiles(profilesYaml);
+export const artists = parseArtists(artistsYaml);
 
 // Every processable image under src/assets, keyed the way media.yaml refers to them ("photos/hero.jpg").
 const modules = import.meta.glob<{ default: ImageMetadata }>('../assets/{photos,video}/**/*.jpg', { eager: true });

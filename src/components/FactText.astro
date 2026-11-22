@@ -1,11 +1,17 @@
 ---
-/* Renders ledger text, setting *titles* in <cite>. */
+/*
+  Renders ledger text, setting *titles* in <cite>. Pass `parts` instead of
+  `text` for bio text whose artist names are already linked (src/lib/artists.ts).
+*/
+import type { Segment } from '../lib/artists';
 import { segments } from '../lib/facts';
 
 interface Props {
-  text: string;
+  text?: string;
+  parts?: Segment[];
 }
-const { text } = Astro.props;
+const { text = '', parts } = Astro.props;
+const runs: Segment[] = parts ?? segments(text);
 ---
 
-{segments(text).map((s) => (s.title ? <cite>{s.text}</cite> : s.text))}
+{runs.map((s) => (s.title ? <cite>{s.text}</cite> : s.href ? <a href={s.href}>{s.text}</a> : s.text))}
