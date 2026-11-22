@@ -97,6 +97,11 @@ describe('llms.txt', () => {
     expect(quiet).toContain('No public shows are announced right now.');
   });
 
+  it('names his variants, and who he is not', () => {
+    expect(txt).toContain('Also billed as John Rhoades and the Johnny Rhoades Band, and sometimes misspelled Johnny Rhodes.');
+    expect(txt).toContain('He is not the MMA fighter or the basketball player of that name.');
+  });
+
   it('says how to book: the form, and Johnny’s email', () => {
     const booking = txt.split('## Booking\n')[1]!.split('\n## ')[0]!;
     expect(booking).toContain('- [Booking form](https://johnnyrhoades.com/#book)');

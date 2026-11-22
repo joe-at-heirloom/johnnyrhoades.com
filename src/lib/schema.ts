@@ -1,7 +1,8 @@
 /*
   Structured data (schema.org JSON-LD), PLAN.md section 9 and Appendix B.
 
-  - siteGraph: WebSite, Person (Johnny), MusicGroup (his band), MusicAlbum. On every page.
+  - siteGraph: WebSite, Person (Johnny, a member of Motor City Josh & The Big 3), MusicGroup (his band),
+    his album, and Feelin' Freaky, John Németh's album he plays on. On every page.
   - musicEvent: one per public show page. Never for private shows.
   - breadcrumbs and itemList: navigation for show pages and /shows/.
 
@@ -22,6 +23,26 @@ export const IDS = {
 type Node = Record<string, unknown>;
 
 /** `description` must come from a verified ledger fact (structured data allows nothing weaker). */
+/**
+ * Credits that tie Johnny to entities answer engines already know (PLAN.md section 10). Both are
+ * `verified` ledger facts, and SCHEMA_CREDITS in src/lib/copy.ts registers them as structured-data
+ * uses, so `npm run check` fails if either is ever downgraded.
+ */
+const MOTOR_CITY_JOSH = {
+  '@type': 'MusicGroup',
+  name: 'Motor City Josh & The Big 3',
+  url: 'https://www.motorcityjosh.com/',
+  genre: 'Blues',
+  award: ['Detroit Music Award, Outstanding Blues Artist/Group (2020)', 'Detroit Music Award, Outstanding Blues Artist/Group (2023)'],
+}; // fact motor-city-josh-detroit-music-awards
+const FEELIN_FREAKY = {
+  '@type': 'MusicAlbum',
+  name: 'Feelin’ Freaky',
+  datePublished: '2017',
+  byArtist: { '@type': 'Person', name: 'John Németh' },
+  producer: { '@type': 'Person', name: 'Luther Dickinson' },
+}; // fact nemeth-feelin-freaky
+
 export function siteGraph({ portraitUrl, sameAs, album, description }: { portraitUrl: string; sameAs: string[]; album: Media['album']; description: string }): Node {
   return {
     '@context': 'https://schema.org',
@@ -43,12 +64,14 @@ export function siteGraph({ portraitUrl, sameAs, album, description }: { portrai
         url: `${SITE_URL}/`,
         image: portraitUrl,
         homeLocation: { '@type': 'Place', name: 'Detroit, Michigan' },
+        memberOf: MOTOR_CITY_JOSH,
         sameAs,
       },
       {
         '@type': 'MusicGroup',
         '@id': IDS.band,
         name: `${ARTIST} Band`,
+        alternateName: ['John Rhoades Band'], // how older listings bill it (PLAN.md section 2)
         genre: 'Blues',
         url: `${SITE_URL}/`,
         member: { '@id': IDS.johnny },
@@ -71,6 +94,7 @@ export function siteGraph({ portraitUrl, sameAs, album, description }: { portrai
           })),
         },
       },
+      { ...FEELIN_FREAKY, contributor: { '@id': IDS.johnny } },
     ],
   };
 }

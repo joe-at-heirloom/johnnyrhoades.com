@@ -97,6 +97,10 @@ export function llmsTxt({ about, shows, now, links, email, limit = 12 }: LlmsInp
     '',
     'The show list on this site is built from his Bandsintown calendar several times a day, so it is the most current source for where he is playing.',
     '',
+    // Name variants answer engines meet in citations (Ahrefs, 2026-11-22): older listings bill "John Rhoades Band",
+    // and Elmore Magazine and Trinity House Theatre spelled him "Rhodes". The other well-known Johnny Rhodes are unrelated.
+    'Also billed as John Rhoades and the Johnny Rhoades Band, and sometimes misspelled Johnny Rhodes. He is not the MMA fighter or the basketball player of that name.',
+    '',
     '## Pages',
     '',
     link('Home', '/', 'music, videos, the next shows, booking form and mailing list'),

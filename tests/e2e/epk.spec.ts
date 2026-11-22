@@ -83,7 +83,7 @@ test('home structured data: videos, album tracks and official profiles', async (
   expect(blocks.filter((b) => b['@type'] === 'VideoObject')).toHaveLength(4);
   const graph = blocks.find((b) => b['@graph'])['@graph'] as Record<string, unknown>[];
   const person = graph.find((n) => n['@type'] === 'Person')!;
-  expect(person.sameAs).toHaveLength(3);
+  expect(person.sameAs).toHaveLength(4); // Bandsintown, YouTube, Facebook, Apple Music
   expect(person.description).toBe('Johnny Rhoades is a blues guitarist and singer from Detroit, Michigan.');
   const album = graph.find((n) => n['@type'] === 'MusicAlbum') as { track: { numberOfItems: number } };
   expect(album.track.numberOfItems).toBe(10);

@@ -51,6 +51,9 @@ export const LLMS_ABOUT = [
 /** The Person description in the site-wide structured data. Must be verified. */
 export const SCHEMA_DESCRIPTION = 'detroit-guitarist-singer';
 
+/** Credits stated as structured data in src/lib/schema.ts (memberOf, and an album he plays on). Must be verified. */
+export const SCHEMA_CREDITS = ['motor-city-josh-detroit-music-awards', 'nemeth-feelin-freaky'] as const;
+
 /** Every use, for the check script. */
 export const FACT_USES: { context: FactContext; ids: readonly string[]; where: string }[] = [
   { context: 'home', ids: HOME_ABOUT.flat(), where: 'home page About' },
@@ -61,5 +64,5 @@ export const FACT_USES: { context: FactContext; ids: readonly string[]; where: s
   { context: 'epk', ids: BIOS.medium, where: 'medium bio' },
   { context: 'epk', ids: BIOS.long, where: 'long bio' },
   { context: 'epk', ids: LLMS_ABOUT, where: '/llms.txt' },
-  { context: 'schema', ids: [SCHEMA_DESCRIPTION], where: 'structured data' },
+  { context: 'schema', ids: [SCHEMA_DESCRIPTION, ...SCHEMA_CREDITS], where: 'structured data' },
 ];

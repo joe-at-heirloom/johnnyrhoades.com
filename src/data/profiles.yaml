@@ -20,10 +20,12 @@
   note: A numbered personal-style profile; create a named artist page and move over (PLAN.md section 10)
 
 - name: Apple Music
-  url: https://music.apple.com/us/album/waiting-on-the-sun/942326904
-  kind: store
+  url: https://music.apple.com/us/artist/johnny-rhoades/942326905
+  kind: profile
   status: live
-  note: Album page. Claim Apple Music for Artists and add the artist page.
+  note: >-
+    His artist page. Apple's lookup API (2026-11-22) puts Waiting on the Sun under artist 942326905, and the page
+    ranks #2 on Google for "Johnny Rhoades" (Ahrefs). The album page is in media.yaml. Claim Apple Music for Artists.
 
 - name: Amazon
   url: https://www.amazon.com/Waiting-Sun-Johnny-Rhoades/dp/B00PQ33NZK

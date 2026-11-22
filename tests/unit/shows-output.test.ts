@@ -216,6 +216,16 @@ describe('structured data', () => {
     expect(person).toMatchObject({ sameAs: ['https://a/'], description: 'D.', alternateName: ['John Rhoades'] });
   });
 
+  it('ties Johnny to the band he plays in and the album he plays on, from verified facts', () => {
+    const album = { title: 'A', released: new Date('2014-11-02'), cover: '', coverAlt: '', appleMusic: 'https://x/', amazon: 'https://y/', tracks: [] };
+    const graph = siteGraph({ portraitUrl: 'https://johnnyrhoades.com/p.jpg', sameAs: [], album, description: 'D.' }) as { '@graph': Record<string, unknown>[] };
+    const person = graph['@graph'].find((n) => n['@type'] === 'Person')!;
+    expect(person.memberOf).toMatchObject({ '@type': 'MusicGroup', name: 'Motor City Josh & The Big 3', award: expect.arrayContaining([expect.stringContaining('(2023)')]) });
+    const freaky = graph['@graph'].find((n) => n.name === 'Feelin’ Freaky')!;
+    expect(freaky).toMatchObject({ '@type': 'MusicAlbum', byArtist: { name: 'John Németh' }, contributor: { '@id': 'https://johnnyrhoades.com/#johnny' } });
+    expect(graph['@graph'].find((n) => n['@type'] === 'MusicGroup')).toMatchObject({ alternateName: ['John Rhoades Band'] });
+  });
+
   it('numbers breadcrumbs from one', () => {
     const b = breadcrumbs([{ name: 'Home', url: 'https://x/' }, { name: 'Shows', url: 'https://x/shows/' }]) as { itemListElement: { position: number }[] };
     expect(b.itemListElement.map((i) => i.position)).toEqual([1, 2]);
