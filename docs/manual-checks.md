@@ -41,7 +41,7 @@ Set each ID as a GitHub Actions repository **variable** (not a secret; they're p
 
 ## Waiting on Johnny's answers (PLAN.md section 17)
 
-- [ ] **Press photo zip** (Phase 4). Once photographers and licenses are confirmed, add `credit` and `license` and the `press` use in `src/data/media.yaml`. The zip builds itself. *Automated now:* the zip route, and a test that it's absent without qualifying photos.
+- [x] **Press photo zip** (Phase 4). Done 2026-11-22: Kyla Pedraz cleared her four portraits for press use, so they're `press` in `src/data/media.yaml` and the zip builds itself. A test opens it and checks the four photos and their credits. Still to do: swap in her original files when they come, for print. Other photographers' photos join once they're confirmed.
 - [x] **Detroit Music Award line.** Done 2026-10-02: the wins with Motor City Josh & The Big 3 (2020, 2023) are `verified` and on the home page, the bios and the press kit highlights.
 - [ ] **Johnny's own song clips** (ADR 0016). From the Bandzoogle audio export, cut 30-second clips (m4a or mp3) into `public/audio/<slug>.m4a`, point each track's `preview` at `/audio/<slug>.m4a`, set `previewSource: own`, and remove the Apple host from `media-src` in `src/lib/security-headers.ts` and `docs/security-headers.md`.
 - [x] **Formats and the long bio.** Done 2026-10-05 from Johnny's answers: the press kit's Formats section and the long bio. (The booking email is done too: `hello@`, ADR 0021.)

@@ -2,6 +2,7 @@
 import AxeBuilder from '@axe-core/playwright';
 import { readFileSync } from 'node:fs';
 import { expect, test } from '@playwright/test';
+import { strFromU8, unzipSync } from 'fflate';
 import { parseArtists } from '../../src/lib/artists';
 import { parseFacts } from '../../src/lib/facts';
 import { blockThirdParties, collectConsoleErrors } from './helpers';
@@ -65,7 +66,7 @@ test('bios copy to the clipboard', async ({ page, context }) => {
   expect(copied).toMatch(/^Johnny Rhoades is a blues guitarist.*came out in 2014\.$/);
 });
 
-test('logos download; the press photo zip waits for confirmed credits', async ({ page, request }) => {
+test('logos and press photos download', async ({ page, request }) => {
   await page.goto('/epk/');
   for (const name of ['Download logo for dark backgrounds', 'Download logo for light backgrounds']) {
     const href = await page.getByRole('link', { name }).getAttribute('href');
@@ -73,8 +74,15 @@ test('logos download; the press photo zip waits for confirmed credits', async ({
     expect(res.status()).toBe(200);
     expect(res.headers()['content-type']).toBe('image/png');
   }
-  await expect(page.getByText('High-resolution photos are available on request from hello@johnnyrhoades.com.')).toBeVisible();
-  expect((await request.get('/press/johnny-rhoades-press-photos.zip')).status()).toBe(404);
+  // Kyla Pedraz cleared her four portraits for press use (2026-11-22).
+  await expect(page.getByRole('link', { name: 'Download press photos' })).toHaveAttribute('href', '/press/johnny-rhoades-press-photos.zip');
+  const zip = await request.get('/press/johnny-rhoades-press-photos.zip');
+  expect(zip.status()).toBe(200);
+  const files = unzipSync(new Uint8Array(await zip.body()));
+  expect(Object.keys(files).filter((f) => f.endsWith('.jpg'))).toHaveLength(4);
+  const credits = strFromU8(files['CREDITS.txt']!);
+  expect(credits.match(/Photo: Kyla Pedraz\. Cleared for press use by the photographer, with credit\./g)).toHaveLength(4);
+  expect(credits).toContain('Larger files for print are available on request from hello@johnnyrhoades.com.');
 });
 
 test('the press kit prints to two pages', async ({ page }) => {

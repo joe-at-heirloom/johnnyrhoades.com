@@ -707,7 +707,7 @@ Nothing below ships as fact until he answers.
 - [x] A default act for Bandsintown entries with no label. Not needed: unlabeled shows are billed as plain "Johnny Rhoades", and the act is read from the label he already types in front of the venue name (ADR 0020).
 - [x] Which booking email to publish. Answered 2026-10-05: `hello@johnnyrhoades.com`, his work email (ADR 0021).
 - [x] Whether to publish a phone number, and a response time he can keep. Answered 2026-10-05: no phone number; he replies "very quickly", which the booking form's "I'll get back to you soon" already says.
-- [ ] Original high-resolution files and photographer credits for every photo. Answered 2026-10-05: Kyla Pedraz took the posed portraits (credited in `media.yaml`). Still need her OK for press use and the original files.
+- [ ] Original high-resolution files and photographer credits for every photo. Answered 2026-10-05: Kyla Pedraz took the posed portraits (credited in `media.yaml`). Her OK for press use came 2026-11-22, so her four are in the press photo zip. Still need her original files, for print.
 - [ ] A stage plot and input list for each format. Answered 2026-10-05: he'll make a stage plot and send it.
 - [ ] Access to Spotify for Artists and Apple Music for Artists, and who distributed *Waiting on the Sun*. Answered 2026-10-05: he doesn't use Spotify; CD Baby distributed the album. Still open: Apple Music for Artists, and claiming both profiles through CD Baby.
 - [x] Registrar, Bandzoogle and Bandsintown logins, and any email currently running on the domain. Answered 2026-10-05: Joe owns the domain (DNS on Cloudflare); Bandsintown is connected; email is Johnny's Zoho (ADR 0013). Bandzoogle still matters for the exports before cutover.

@@ -58,14 +58,16 @@ videos:
 # shape: portrait | landscape. Gallery photos need it: it decides their place in the grid (src/lib/gallery.ts).
 # Press downloads need a confirmed credit and license (PLAN.md section 17).
 # Johnny, 2026-10-05: "Kyla Pedraz took those photos"; Joe, the same day: the posed portraits. Credited below.
-# Her OK for press use (a license) and the original files are still to come, so none of them is `press` yet.
+# Joe, 2026-11-22: Kyla is OK with press use, so her four are `press`. The zip uses the files here (1600 px on the long
+# side, the portrait 2205 × 2947); her originals, for print, are still to come.
 # Credits read from watermarks are marked as such until the photographer confirms.
 photos:
   - file: photos/gallery/seated-studio.jpg
     shape: portrait
     alt: Johnny seated with a hollow-body guitar in front of a wall of amplifiers, black and white
     credit: Kyla Pedraz
-    use: [gallery, epk]
+    license: Cleared for press use by the photographer, with credit
+    use: [gallery, epk, press]
   - file: photos/gallery/blues-by-the-bay.jpg
     shape: landscape
     alt: Johnny and another guitarist raising their fists onstage at a festival tent
@@ -83,7 +85,8 @@ photos:
     shape: landscape
     alt: Johnny sitting with his guitar in a room lined with books, black and white
     credit: Kyla Pedraz
-    use: [gallery, epk]
+    license: Cleared for press use by the photographer, with credit
+    use: [gallery, epk, press]
   - file: photos/gallery/bar-stage.jpg
     shape: portrait
     alt: Johnny and a bandmate playing a small bar stage under purple lights
@@ -101,7 +104,8 @@ photos:
     shape: landscape
     alt: Johnny standing by a wooden fence holding his guitar, black and white
     credit: Kyla Pedraz
-    use: [gallery, epk]
+    license: Cleared for press use by the photographer, with credit
+    use: [gallery, epk, press]
   - file: photos/gallery/backstage.jpg
     shape: portrait
     alt: Johnny with his arm around a friend in an empty theater
@@ -110,7 +114,8 @@ photos:
   - file: photos/portrait.jpg
     alt: Sepia portrait of Johnny Rhoades standing by a vine-covered fence, guitar at his side
     credit: Kyla Pedraz
-    use: [epk]
+    license: Cleared for press use by the photographer, with credit
+    use: [epk, press]
   - file: photos/hero.jpg
     alt: Johnny Rhoades onstage in a blue suit and sunglasses, playing a cream Stratocaster
     use: [epk]
