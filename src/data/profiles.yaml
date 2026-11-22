@@ -53,3 +53,11 @@
   kind: profile
   status: to_create
   note: Once there are independent references
+
+# Checked and left out (2026-11-22, from the Ahrefs results for his name, docs/search-baseline.md):
+#   musicpage.com/johnrhoadesband   His (Joe), a 2013 profile as "John Rhoades Band". musicpage.com answers 503 on
+#                                   every page, so there's nothing to link or update. Last archived copy:
+#                                   https://web.archive.org/web/20220517113849/https://www.musicpage.com/johnrhoadesband
+#   soundcloud.com/johnny-rhoades-639062848   Not his (Joe).
+#   johnrhoadesmusic.com            His old site, named on musicpage and his Kickstarter. The domain is unregistered;
+#                                   only those two pages ever linked to it, so it isn't worth buying back.

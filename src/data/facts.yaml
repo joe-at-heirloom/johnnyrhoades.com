@@ -231,3 +231,75 @@
   status: confirmed_by_johnny
   sources:
     - note: Johnny, 2026-10-05 ("I can provide small PA. For about 50-100 person room.")
+
+# Found 2026-11-22 through the #3 search result for his name: his 2013 musicpage profile, as "John Rhoades Band".
+# Joe says the profile is his; musicpage.com is down, so the source is the Wayback Machine's last copy. Johnny
+# saying the bio is his and still right would move these to confirmed_by_johnny.
+
+- id: kickstarter-first-record
+  third: In 2014, 54 backers pledged $3,001 on Kickstarter to fund his first full-length record of original songs.
+  status: verified
+  sources:
+    - url: https://www.kickstarter.com/projects/442874774/johnny-rhoades-new-cd-campaign
+      note: >-
+        Kickstarter, "Johnny Rhoades' New CD Campaign" by John Rhoades: $3,001 of a $3,000 goal from 54 backers,
+        March 2 to April 6, 2014. He calls it his "first full length original, rock, modern blues record". It doesn't
+        name the album. Waiting on the Sun came out November 2, 2014, and the campaign's last update is October 18, 2014,
+        so ask Johnny before naming it.
+
+- id: waiting-on-the-sun-producer
+  third: Motor City Josh produced *Waiting on the Sun*, recorded at The Sound Shop.
+  status: unverified
+  needs: >-
+    Johnny to confirm. His 2014 Kickstarter says the record "will be produced & recorded by Motor City Josh at The
+    Sound Shop", but it doesn't name the album (kickstarter-first-record).
+  detect: Sound Shop
+
+- id: ep-breakin-out
+  third: Before *Waiting on the Sun* he put out an EP, *Breakin’ Out*, his first recordings as a singer.
+  status: unverified
+  needs: Johnny to confirm it, and the year.
+  detect: Breakin’ Out
+  sources:
+    - url: https://web.archive.org/web/20220517113849/https://www.musicpage.com/johnrhoadesband
+      note: >-
+        His musicpage profile calls it his debut EP, made after he left Motor City Josh's band in 2010, and lists three
+        tracks: "Breakin’ Out", "Mary Ann" and "Make Me a Pallet on Your Floor".
+
+- id: kelley-hunt
+  third: He has toured the Midwest and the West Coast as guitarist for Kansas singer and pianist Kelley Hunt.
+  status: unverified
+  needs: Johnny to confirm, and the years.
+  detect: Kelley Hunt
+  sources:
+    - url: https://web.archive.org/web/20220517113849/https://www.musicpage.com/johnrhoadesband
+      note: His musicpage profile (2013) says he was touring with her then.
+
+- id: sherrie-williams-stacia-petrie
+  third: He has played guitar for singers Sherrie Williams and Stacia Petrie.
+  status: unverified
+  needs: Johnny to confirm.
+  detect: Stacia Petrie
+  sources:
+    - url: https://web.archive.org/web/20220517113849/https://www.musicpage.com/johnrhoadesband
+      note: His musicpage profile (2013), alongside Thornetta Davis, who is in played-with.
+
+- id: western-michigan-jazz
+  third: He majored in jazz studies at Western Michigan University.
+  status: unverified
+  needs: Johnny to confirm.
+  detect: Western Michigan
+  sources:
+    - url: https://web.archive.org/web/20220517113849/https://www.musicpage.com/johnrhoadesband
+      note: His musicpage profile (2013) says he was home on spring break from Western Michigan in 2006 when he joined Motor City Josh.
+
+- id: brett-lucas-first-sit-in
+  third: At 16 he sat in at the Blue Goose Inn for the first time, invited by his guitar teacher Brett Lucas on the day of their first lesson.
+  status: unverified
+  needs: Johnny to confirm. It would go with blue-goose-dishes in the long bio.
+  detect: first lesson
+  sources:
+    - url: https://web.archive.org/web/20220517113849/https://www.musicpage.com/johnrhoadesband
+      note: >-
+        His musicpage profile (2013): lessons at Jerry Luck Studios in Eastpointe, where he met Brett Lucas; Lucas had a
+        gig at the Blue Goose that night and invited him to sit in. "He was 16 years old."
