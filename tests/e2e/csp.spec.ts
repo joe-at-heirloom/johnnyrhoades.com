@@ -88,7 +88,7 @@ test('the home page works under the policy: video, strum, lightbox, forms, analy
   expect(errors).toEqual([]);
 });
 
-for (const path of ['/shows/', '/shows/2026-10-23-blue-goose-inn-st-clair-shores/', '/epk/', '/thanks/', '/404.html']) {
+for (const path of ['/shows/', '/shows/2026-10-23-blue-goose-inn-st-clair-shores/', '/epk/', '/jam/', '/thanks/', '/404.html']) {
   test(`${path} works under the policy`, async ({ page }) => {
     await serveWithHeaders(page);
     const errors = collectConsoleErrors(page);

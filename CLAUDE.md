@@ -34,6 +34,7 @@ Available now:
 - `npm run sync`: pull Bandsintown into `src/data/shows.json` (needs `BANDSINTOWN_APP_ID`; flags: `--capture`, `--force`, `--dry-run`, `--now`)
 - `npm run sync:fixtures`: the same, offline, from `tests/fixtures/bandsintown/` (the real capture from 2026-10-05; see its README)
 
+- `npm run jam:sounds`: generate the blues maker's sounds with ElevenLabs from `src/data/jam.yaml` and tune them into samples every three semitones (needs ffmpeg, and `ELEVENLABS_API_KEY` for new sounds; spends credits; `--only <ids>`, `--force`, `--measure` to re-trim and retune from the committed originals without API calls; ADR 0030). Output is committed. Rerun `npm test` after
 - `python3 scripts/make-poster-fonts.py`: regenerate the static poster fonts (needs fonttools; output is committed)
 - `node --experimental-strip-types scripts/make-textures.ts`: regenerate the print textures in `src/assets/textures/` (ADR 0015; output is committed). They're applied in `src/styles/texture.css`
 - `python3 scripts/trim-web-font.py`: regenerate the trimmed web font from `src/assets/fonts/source/` (needs fonttools and brotli)

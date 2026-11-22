@@ -1,0 +1,56 @@
+# The sounds the blues maker plays (/jam/, ADR 0030).
+#
+# Each one is generated once by ElevenLabs' sound-effects model, from the
+# prompt below, by `npm run jam:sounds` (needs ELEVENLABS_API_KEY locally;
+# the key never reaches the site). The script trims each file, measures its
+# real pitch, and writes the result to src/data/jam-sounds.json. The browser
+# then sequences them on a 12-bar grid and repitches each note from the
+# measured pitch, so everything lands on the beat and in key.
+#
+# Pitched sounds name the note they ask for (`note`). The measured pitch is
+# what's used, not the asked-for note; the script warns when they disagree
+# by more than a semitone, which usually means it's worth regenerating.
+#
+# Fields: id, part, tone, prompt, seconds, and optionally note or loop.
+
+sounds:
+  # Drums: sticks
+  - { id: sticks-kick, part: drums, tone: sticks, seconds: 1, prompt: "Single kick drum hit, vintage 1960s jazz kit, felt beater, warm and round, dry studio recording, one hit only" }
+  - { id: sticks-snare, part: drums, tone: sticks, seconds: 1, prompt: "Single snare drum backbeat hit with sticks, vintage Ludwig snare, crisp with a little ring, dry studio recording, one hit only" }
+  - { id: sticks-hat, part: drums, tone: sticks, seconds: 0.5, prompt: "Single closed hi-hat tick with a stick, vintage thin cymbals, dry studio recording, one hit only" }
+  - { id: sticks-ride, part: drums, tone: sticks, seconds: 1.5, prompt: "Single ride cymbal ping with a stick tip, dark vintage ride cymbal, dry studio recording, one hit only" }
+  # Drums: brushes
+  - { id: brushes-kick, part: drums, tone: brushes, seconds: 1, prompt: "Single soft kick drum hit, feathered, small vintage jazz bass drum, muffled and warm, dry studio recording, one hit only" }
+  - { id: brushes-snare, part: drums, tone: brushes, seconds: 0.8, prompt: "Single wire brush slap on a snare drum, jazz brushes, soft crack, dry studio recording, one hit only" }
+  - { id: brushes-sweep, part: drums, tone: brushes, seconds: 0.6, prompt: "Short wire brush swish across a snare drum head, jazz brushes, soft, dry studio recording, single stroke" }
+  - { id: brushes-ride, part: drums, tone: brushes, seconds: 1.5, prompt: "Single soft ride cymbal tap with a wire brush, dark vintage cymbal, dry studio recording, one hit only" }
+
+  # Bass: two notes per tone, so a walking line never stretches a sample far
+  - { id: upright-e, part: bass, tone: upright, note: E1, seconds: 1.5, prompt: "Single plucked upright double bass note, low E (41 Hz, the lowest string), warm woody thump, gut strings, no other instruments, dry studio recording" }
+  - { id: upright-a, part: bass, tone: upright, note: A1, seconds: 1.5, prompt: "Single plucked upright double bass note, A (55 Hz), warm woody thump, gut strings, no other instruments, dry studio recording" }
+  - { id: electric-e, part: bass, tone: electric, note: E1, seconds: 1.5, prompt: "Single fingerstyle electric bass note, low open E string (41 Hz), vintage Precision bass with flatwounds, round and warm, no other instruments, dry studio recording" }
+  - { id: electric-a, part: bass, tone: electric, note: A1, seconds: 1.5, prompt: "Single fingerstyle electric bass note, open A string (55 Hz), vintage Precision bass with flatwounds, round and warm, no other instruments, dry studio recording" }
+
+  # Guitar: single notes, layered into the shuffle's two-note comp
+  - { id: clean-e, part: guitar, tone: clean, note: E2, seconds: 2.5, prompt: "Single picked note on a hollowbody electric guitar, low open E string, clean tube amp, warm and round, no other instruments, dry recording" }
+  - { id: clean-a, part: guitar, tone: clean, note: A2, seconds: 2.5, prompt: "Single picked note on a hollowbody electric guitar, open A string (110 Hz), clean tube amp, warm and round, no other instruments, dry recording" }
+  - { id: crunch-e, part: guitar, tone: crunch, note: E2, seconds: 2.5, prompt: "Single picked note on an electric guitar, low open E string, small tube amp turned up to a gritty crunch, Chicago blues tone, no other instruments, dry recording" }
+  - { id: crunch-a, part: guitar, tone: crunch, note: A2, seconds: 2.5, prompt: "Single picked note on an electric guitar, open A string (110 Hz), small tube amp turned up to a gritty crunch, Chicago blues tone, no other instruments, dry recording" }
+  - { id: acoustic-e, part: guitar, tone: acoustic, note: E2, seconds: 2.5, prompt: "Single picked note on a steel-string acoustic guitar, low open E string, Delta blues, no other instruments, dry close-mic recording" }
+  - { id: acoustic-a, part: guitar, tone: acoustic, note: A3, seconds: 2.5, prompt: "Single picked note on a steel-string acoustic guitar, A on the G string, second fret (220 Hz), Delta blues, no other instruments, dry close-mic recording" }
+
+  # Keys: single notes, stacked into chords
+  - { id: piano-e, part: keys, tone: piano, note: E3, seconds: 2.5, prompt: "Single note on an old upright piano, E below middle C (165 Hz), slightly honky-tonk, no other instruments, dry recording" }
+  - { id: piano-a, part: keys, tone: piano, note: A3, seconds: 2.5, prompt: "Single note on an old upright piano, A below middle C (220 Hz), slightly honky-tonk, no other instruments, dry recording" }
+  - { id: organ-e, part: keys, tone: organ, note: E3, seconds: 3, prompt: "Single sustained note on a Hammond B3 organ, E below middle C (165 Hz), drawbars 888000000, slow Leslie, no other instruments, dry recording" }
+  - { id: organ-a, part: keys, tone: organ, note: A3, seconds: 3, prompt: "Single sustained note on a Hammond B3 organ, A below middle C (220 Hz), drawbars 888000000, slow Leslie, no other instruments, dry recording" }
+
+  # Lead: fills on the turnaround and answers between bars
+  - { id: harp-e, part: lead, tone: harp, note: E4, seconds: 2, prompt: "Single sustained note on a blues harmonica, E above middle C (330 Hz), through a bullet mic, slightly distorted, Chicago blues, no other instruments, dry recording" }
+  - { id: harp-a, part: lead, tone: harp, note: A4, seconds: 2, prompt: "Single sustained note on a blues harmonica, A above middle C (440 Hz), through a bullet mic, slightly distorted, Chicago blues, no other instruments, dry recording" }
+  - { id: sax-e, part: lead, tone: sax, note: E3, seconds: 2, prompt: "Single sustained note on a tenor saxophone, E below middle C (165 Hz), breathy and warm, rhythm and blues, no other instruments, dry recording" }
+  - { id: sax-a, part: lead, tone: sax, note: A3, seconds: 2, prompt: "Single sustained note on a tenor saxophone, A below middle C (220 Hz), breathy and warm, rhythm and blues, no other instruments, dry recording" }
+
+  # Room: loops under the band
+  - { id: room-bar, part: room, tone: bar, seconds: 20, loop: true, prompt: "Ambience of a small neighborhood bar on a weeknight, quiet murmur of conversation, glasses clinking, no music" }
+  - { id: room-vinyl, part: room, tone: vinyl, seconds: 12, loop: true, prompt: "Vinyl record surface noise, soft crackle and hiss of an old 78, no music" }

@@ -44,6 +44,9 @@
   letter-spacing: .02em;
   color: var(--muted);
 }
+/* The way to the blues maker (ADR 0030) */
+.strum-more { margin-right: 18px; color: var(--muted); font-size: .9rem; text-underline-offset: 3px; min-height: 44px; display: inline-flex; align-items: center; }
+.strum-more:hover { color: var(--bone); }
 .speaker {
   display: inline-flex; align-items: center; gap: 10px;
   padding: 6px 4px; border: 0; background: none;

@@ -4,6 +4,19 @@ A running log for the portfolio write-up (PLAN.md section 16): numbers, screensh
 
 ---
 
+## 2026-11-22: The blues maker
+
+**What changed.** `/jam/` makes a 12-bar blues: key, feel, tempo, quick change, and a tone (or nothing) for drums, bass, guitar, keys, fills and the room. The 28 sounds were generated once with ElevenLabs' sound-effects model, and the browser plays them as a band (ADR 0030).
+
+**Worth telling**
+
+- *Generated once, played forever.* No server, no key on the site, no per-visitor cost. A song only downloads the samples its key and feel use.
+- *The model doesn't take requests, so the notes are tuned afterwards.* Asked for E1, A1, E3, A3 and so on, it mostly returned C, in whatever octave it liked. Writing the frequency into the prompt didn't help, and the harmonica came back on C5 five times running (C is the commonest harp key). So the script measures each original's pitch with YIN, then pitch-shifts it with TD-PSOLA into a tuned sample every three semitones: 78 samples from 18 originals, each measured again and within 15 cents. In the browser no note bends more than a semitone and a half, down from up to 14 with the raw recordings.
+- *The harmonica found a bug in the shifter.* Every harp note failed to tune, even one semitone from the original. Snapping pitch marks to the biggest swing flips between peaks and troughs on a buzzy sound, so the grains landed half a period out of line. Snapping to the positive peak of a smoothed copy fixed it.
+- *Call and response, at last.* ADR 0018 was waiting on Johnny's licks for the guitar to answer the visitor. Here the fills answer in bars 3–4, 7–8 and 11–12, and his real licks can replace them later.
+
+---
+
 ## 2026-11-22: The next page arrives before the click
 
 **What changed.** Pages tell Chrome and Edge to fetch a linked page's HTML when someone hovers over it or starts to tap it, so the click lands at once (Speculation Rules, ADR 0029). It's a small JSON block in each page's `<head>`, allowed by its hash in the CSP: no JavaScript.

@@ -1,4 +1,4 @@
-/* /sitemap-0.xml: home, /shows/, /epk/ and indexable show pages (src/lib/discovery.ts). */
+/* /sitemap-0.xml: home, /shows/, /epk/, /jam/ and indexable show pages (src/lib/discovery.ts). */
 import type { APIRoute } from 'astro';
 import { sitemapEntries, sitemapXml } from '../lib/discovery';
 import { allShows, BUILD_NOW } from '../lib/load-shows';

@@ -5,7 +5,7 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { LLMS_ABOUT } from '../../src/lib/copy.ts';
-import { AI_CRAWLERS, llmsTxt, robotsTxt, sitemapEntries, sitemapIndexXml, sitemapXml } from '../../src/lib/discovery.ts';
+import { AI_CRAWLERS, llmsTxt, robotsTxt, SITEMAP_PAGES, sitemapEntries, sitemapIndexXml, sitemapXml } from '../../src/lib/discovery.ts';
 import { ledger, parseFacts } from '../../src/lib/facts.ts';
 import { BOOKING_EMAIL } from '../../src/lib/forms.ts';
 import { asSnapshot, changedUrls, indexNowBody, type ShowsSnapshot } from '../../src/lib/indexnow.ts';
@@ -22,30 +22,32 @@ describe('sitemap', () => {
   const entries = sitemapEntries(shows, NOW);
   const locs = entries.map((e) => e.loc);
 
-  it('lists home, /shows/ and /epk/ first, and never /thanks/ or the 404 page', () => {
-    expect(locs.slice(0, 3)).toEqual(['https://johnnyrhoades.com/', 'https://johnnyrhoades.com/shows/', 'https://johnnyrhoades.com/epk/']);
+  const PAGES = SITEMAP_PAGES.length;
+
+  it('lists home, /shows/, /epk/ and /jam/ first, and never /thanks/ or the 404 page', () => {
+    expect(locs.slice(0, PAGES)).toEqual(['https://johnnyrhoades.com/', 'https://johnnyrhoades.com/shows/', 'https://johnnyrhoades.com/epk/', 'https://johnnyrhoades.com/jam/']);
     expect(locs.some((l) => /thanks|404/.test(l))).toBe(false);
   });
 
   it('lists show pages until 30 days after the show, with lastmod from updatedAt', () => {
     const indexable = (s: Show) => s.public && s.start >= '2026-09-01' && at(s.start).plus({ days: 30 }) > NOW;
     const expected = shows.filter(indexable).map((s) => `https://johnnyrhoades.com/shows/${s.slug}/`);
-    expect(locs.slice(3).sort()).toEqual(expected.sort());
-    for (const e of entries.slice(3)) {
+    expect(locs.slice(PAGES).sort()).toEqual(expected.sort());
+    for (const e of entries.slice(PAGES)) {
       const show = shows.find((s) => e.loc.endsWith(`/${s.slug}/`))!;
       expect(e.lastmod).toBe(show.updatedAt);
     }
   });
 
   it('drops a show page once it is more than 30 days old, and never lists aliases or private shows', () => {
-    const first = entries[3]!;
+    const first = entries[PAGES]!;
     const show = shows.find((s) => first.loc.endsWith(`/${s.slug}/`))!;
     const later = at(show.start).plus({ days: 31 });
     expect(sitemapEntries(shows, later).map((e) => e.loc)).not.toContain(first.loc);
     const aliases = shows.flatMap((s) => s.aliases);
     expect(locs.some((l) => aliases.some((a) => l.includes(a)))).toBe(false);
     const hidden = { ...bySlug(first.loc.split('/').at(-2)!), public: false };
-    expect(sitemapEntries([hidden], NOW).map((e) => e.loc)).toHaveLength(3);
+    expect(sitemapEntries([hidden], NOW).map((e) => e.loc)).toHaveLength(PAGES);
   });
 
   it('writes valid sitemap XML and a sitemap index', () => {

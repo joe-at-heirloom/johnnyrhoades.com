@@ -1,6 +1,6 @@
 /*
   Lighthouse CI against the budgets in PLAN.md section 12: mobile, on the home
-  page, a show page and the press kit. `npm run lhci` builds first; CI runs
+  page, a show page, the press kit and the blues maker. `npm run lhci` builds first; CI runs
   `lhci autorun` on the build it already has.
 
   The show page is the first one in the built sitemap, so this measures what
@@ -25,7 +25,7 @@ module.exports = {
     collect: {
       startServerCommand: `node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/serve-dist.ts ${PORT}`,
       startServerReadyPattern: 'Serving dist',
-      url: ['/', show, '/epk/'].filter(Boolean).map((path) => `https://localhost:${PORT}${path}`),
+      url: ['/', show, '/epk/', '/jam/'].filter(Boolean).map((path) => `https://localhost:${PORT}${path}`),
       numberOfRuns: 3,
       chromePath,
       // The certificate is a throwaway self-signed one, made by serve-dist.ts for each run.

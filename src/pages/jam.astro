@@ -1,0 +1,116 @@
+---
+/*
+  The blues maker (ADR 0030): pick a key, a feel and a band, and it plays a
+  12-bar blues around and around. The sounds are one-shots generated once
+  with ElevenLabs (src/data/jam.yaml, `npm run jam:sounds`) and sequenced in
+  the browser by src/scripts/jam.ts, which only downloads when the page does.
+  The form is a plain GET form, so a song is a link.
+*/
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import { DEFAULT_SONG, FEELS, FEEL_INFO, KEYS, PARTS, PART_LABELS, TONES, TONE_LABELS, chordName, type MeasuredSound } from '../lib/jam';
+import measured from '../data/jam-sounds.json';
+import { absolute } from '../lib/site';
+
+// Each sound's hashed URL (cached for a year under /_astro/).
+const urls = import.meta.glob<string>('../assets/jam/*.mp3', { query: '?url', import: 'default', eager: true });
+const sounds = (measured.sounds as MeasuredSound[]).map((s) => {
+  const url = urls[`../assets/jam/${s.file}`];
+  if (!url) throw new Error(`jam-sounds.json names ${s.file}, but it isn't in src/assets/jam/. Run npm run jam:sounds.`);
+  return { ...s, url };
+});
+const json = JSON.stringify(sounds).replace(/</g, '\\u003c');
+const song = DEFAULT_SONG;
+const info = FEEL_INFO[song.feel];
+const description = 'Make a 12-bar blues: pick the key, the feel, the tempo and the band, and it plays until you stop it.';
+---
+
+<BaseLayout
+  title="Make a 12-bar blues · Johnny Rhoades"
+  description={description}
+  canonical={absolute('/jam/')}
+  social={{ title: 'Make a 12-bar blues', description, image: absolute('/assets/img/og-image.jpg'), imageWidth: 1200, imageHeight: 630 }}
+>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <Header solid />
+  <main id="main" class="page jam" data-jam>
+    <div class="wrap">
+      <header class="jam-head">
+        <p class="epk-kicker">Blues maker</p>
+        <h1 class="display">Make a <span class="jam-nowrap">12-bar</span> <em>blues</em></h1>
+        <p class="lede">Pick a key, a feel and a band. It plays the 12 bars around and around until you stop it, and you can change anything while it plays.</p>
+      </header>
+
+      <form class="jam-form" method="get" action="/jam/" data-jam-form>
+        <div class="jam-transport">
+          <button class="btn btn-red jam-play" type="submit" aria-pressed="false" data-jam-play>Play</button>
+          <p class="jam-status" role="status" data-jam-status></p>
+        </div>
+
+        <ol class="jam-chart" aria-label="The 12 bars">
+          {Array.from({ length: 12 }, (_, i) => (
+            <li class="jam-bar" data-jam-bar>
+              <span class="jam-bar-n" aria-hidden="true">{i + 1}</span>
+              <span class="jam-chord" data-jam-chord>{chordName(song, i)}</span>
+            </li>
+          ))}
+        </ol>
+
+        <div class="jam-grid">
+          <fieldset class="jam-field">
+            <legend>Key</legend>
+            <div class="jam-options">
+              {KEYS.map((k) => (
+                <label class="jam-option"><input type="radio" name="key" value={k} checked={k === song.key} /><span>{k}</span></label>
+              ))}
+            </div>
+          </fieldset>
+
+          <fieldset class="jam-field">
+            <legend>Feel</legend>
+            <div class="jam-options">
+              {FEELS.map((f) => (
+                <label class="jam-option"><input type="radio" name="feel" value={f} checked={f === song.feel} /><span>{FEEL_INFO[f].label}</span></label>
+              ))}
+            </div>
+          </fieldset>
+
+          <div class="jam-field">
+            <label class="jam-legend" for="jam-tempo">Tempo</label>
+            <div class="jam-tempo">
+              <input id="jam-tempo" type="range" name="bpm" min={info.min} max={info.max} step="1" value={song.bpm} data-jam-tempo />
+              <output for="jam-tempo" data-jam-tempo-out>{song.bpm} bpm</output>
+            </div>
+            <label class="jam-check"><input type="checkbox" name="change" value="quick" /><span>Quick change (bar 2 goes to the IV)</span></label>
+          </div>
+
+          {PARTS.map((part) => (
+            <fieldset class="jam-field">
+              <legend>{PART_LABELS[part]}</legend>
+              <div class="jam-options">
+                {TONES[part].map((t) => (
+                  <label class="jam-option"><input type="radio" name={part} value={t} checked={song.parts[part] === t} /><span>{TONE_LABELS[t]}</span></label>
+                ))}
+                <label class="jam-option"><input type="radio" name={part} value="off" checked={song.parts[part] === null} /><span>Off</span></label>
+              </div>
+            </fieldset>
+          ))}
+        </div>
+        <noscript><p class="jam-note">The blues maker needs JavaScript to play.</p></noscript>
+      </form>
+
+      <p class="jam-note">
+        Every sound here was generated with ElevenLabs’ sound-effects model, one note or drum hit at a time, and the browser plays them as a band. It isn’t Johnny or his band. To hear the real thing, <a class="text-link" href="/#shows">come to a show</a>.
+      </p>
+    </div>
+  </main>
+  <Footer />
+
+  <script type="application/json" id="jam-sounds" set:html={json} />
+  <script>
+    import { initJam } from '../scripts/jam';
+    const root = document.querySelector<HTMLElement>('[data-jam]');
+    if (root) initJam(root);
+  </script>
+</BaseLayout>

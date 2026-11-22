@@ -14,9 +14,9 @@ import { absolute, showPath } from './site.ts';
 export type SitemapEntry = { loc: string; lastmod?: string };
 
 /** Pages every build lists. /thanks/, the 404 page and redirect stubs never appear. */
-export const SITEMAP_PAGES = ['/', '/shows/', '/epk/'];
+export const SITEMAP_PAGES = ['/', '/shows/', '/epk/', '/jam/'];
 
-/** Home, /shows/, /epk/, and show pages until INDEX_DAYS_AFTER days after the show, with lastmod from updatedAt. */
+/** Home, /shows/, /epk/, /jam/, and show pages until INDEX_DAYS_AFTER days after the show, with lastmod from updatedAt. */
 export function sitemapEntries(shows: Show[], now: DateTime): SitemapEntry[] {
   const showPages = shows
     .filter((s) => isIndexable(s, now))

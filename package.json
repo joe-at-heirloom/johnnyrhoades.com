@@ -23,7 +23,8 @@
     "lint:html": "html-validate \"dist/**/*.html\"",
     "indexnow": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/indexnow.ts",
     "check:redirects": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/check-redirects.ts",
-    "previews": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/fetch-previews.ts"
+    "previews": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/fetch-previews.ts",
+    "jam:sounds": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/make-jam-sounds.ts"
   },
   "dependencies": {
     "@resvg/resvg-js": "^2.6.2",
