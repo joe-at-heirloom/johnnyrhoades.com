@@ -84,12 +84,14 @@
         May 27, 2015, before the Beale Street procession, with Németh on the bill (newsflare.com/video/46934).
 
 - id: played-with
-  third: He has played with Thornetta Davis, RJ Spangler, Brett Lucas, Pat Smillie and Paul Carey, among others.
-  bio: Along the way he’s shared stages with Thornetta Davis, RJ Spangler, Brett Lucas, Pat Smillie and Paul Carey, among others.
+  third: He has played with Thornetta Davis, RJ Spangler, Brett Lucas, Pat Smillie, Paul Carey, Sherrie Williams and Stacia Petrie, among others.
+  bio: Along the way he’s shared stages with Thornetta Davis, RJ Spangler, Brett Lucas, Pat Smillie, Paul Carey, Sherrie Williams and Stacia Petrie, among others.
   status: confirmed_by_johnny
   sources:
     - note: Johnny's bio. It also names John Németh, who has his own fact (nemeth-feelin-freaky).
     - note: Johnny, 2026-10-05, added Pat Smillie. His Bandsintown has about 85 shows with him, 2022–2025.
+    - url: https://web.archive.org/web/20220517113849/https://www.musicpage.com/johnrhoadesband
+      note: His musicpage bio (2013) adds Sherrie Williams and Stacia Petrie, as singers he played guitar for.
 
 - id: nemeth-tours
   third: With John Németh’s band he toured Spain, Norway, Denmark and Scotland in 2015 and 2016, and Mexico in 2016.
@@ -134,6 +136,7 @@
 
 - id: album-waiting-on-the-sun
   third: His album *Waiting on the Sun* came out in 2014.
+  bio: "*Waiting on the Sun* came out that November."
   status: verified
   sources:
     - url: https://music.apple.com/us/album/waiting-on-the-sun/942326904
@@ -232,74 +235,65 @@
   sources:
     - note: Johnny, 2026-10-05 ("I can provide small PA. For about 50-100 person room.")
 
-# Found 2026-11-22 through the #3 search result for his name: his 2013 musicpage profile, as "John Rhoades Band".
-# Joe says the profile is his; musicpage.com is down, so the source is the Wayback Machine's last copy. Johnny
-# saying the bio is his and still right would move these to confirmed_by_johnny.
+# From his 2013 musicpage profile, the #3 search result for his name (Ahrefs, 2026-11-22), and the Kickstarter it led
+# to. The profile is his own published bio, as "John Rhoades Band": Joe confirmed it's his, 2026-11-22, and asked for
+# it in the bio (ADR 0025). musicpage.com is down, so the source is the Wayback Machine's last copy. Where it said
+# "currently" in 2013, the claim is in the past tense here.
+
+- id: brett-lucas-first-sit-in
+  third: At 16 he sat in at the Blue Goose Inn for the first time, invited by his guitar teacher, Brett Lucas, on the day of their first lesson.
+  bio: At 16 he sat in on its stage for the first time, invited by his guitar teacher, Brett Lucas, on the day of their first lesson.
+  status: confirmed_by_johnny
+  sources:
+    - url: https://web.archive.org/web/20220517113849/https://www.musicpage.com/johnrhoadesband
+      note: >-
+        His musicpage bio (2013): lessons at Jerry Luck Studios in Eastpointe, where he met Brett Lucas; Lucas had a
+        gig at the Blue Goose that night and invited him to sit in. "He was 16 years old." The bio wording leans on
+        blue-goose-dishes, so it follows it.
+
+- id: western-michigan-jazz
+  third: He studied jazz at Western Michigan University.
+  bio: He went on to study jazz at Western Michigan University.
+  status: confirmed_by_johnny
+  sources:
+    - url: https://web.archive.org/web/20220517113849/https://www.musicpage.com/johnrhoadesband
+      note: His musicpage bio (2013) says he majored in jazz studies there, and was home on spring break in 2006 when he joined Motor City Josh.
+
+- id: kelley-hunt
+  third: He has toured the Midwest and the West Coast as guitarist for Kansas singer and pianist Kelley Hunt.
+  bio: He’s also toured the Midwest and the West Coast as guitarist for Kansas singer and pianist Kelley Hunt.
+  status: confirmed_by_johnny
+  sources:
+    - url: https://web.archive.org/web/20220517113849/https://www.musicpage.com/johnrhoadesband
+      note: His musicpage bio (2013) says he was touring with her then. The years aren't known, so the bio gives none.
+
+- id: ep-breakin-out
+  third: His first record under his own name was an EP, *Breakin’ Out*, which was also the first he sang on.
+  status: confirmed_by_johnny
+  sources:
+    - url: https://web.archive.org/web/20220517113849/https://www.musicpage.com/johnrhoadesband
+      note: >-
+        His musicpage bio (2013) calls it his debut EP, made after he started fronting his own band, and "the
+        guitarist's first recording as vocalist". Tracks: "Breakin’ Out", "Mary Ann" and "Make Me a Pallet on Your
+        Floor". The year isn't known, so the bio gives none.
 
 - id: kickstarter-first-record
-  third: In 2014, 54 backers pledged $3,001 on Kickstarter to fund his first full-length record of original songs.
+  third: In 2014, 54 backers on Kickstarter funded his first full-length record of original songs.
+  bio: In 2014, 54 backers on Kickstarter funded a full-length album of originals.
   status: verified
   sources:
     - url: https://www.kickstarter.com/projects/442874774/johnny-rhoades-new-cd-campaign
       note: >-
         Kickstarter, "Johnny Rhoades' New CD Campaign" by John Rhoades: $3,001 of a $3,000 goal from 54 backers,
-        March 2 to April 6, 2014. He calls it his "first full length original, rock, modern blues record". It doesn't
-        name the album. Waiting on the Sun came out November 2, 2014, and the campaign's last update is October 18, 2014,
-        so ask Johnny before naming it.
+        March 2 to April 6, 2014, for "my first full length original blues/rock album (yet to be named)". Waiting on
+        the Sun, his only full-length album, came out November 2, 2014, and the campaign's last update is October 18,
+        2014. The bio sets the two side by side and doesn't say they're the same record.
 
 - id: waiting-on-the-sun-producer
-  third: Motor City Josh produced *Waiting on the Sun*, recorded at The Sound Shop.
+  third: Motor City Josh produced *Waiting on the Sun* at the Sound Shop, and co-wrote most of its songs.
   status: unverified
   needs: >-
-    Johnny to confirm. His 2014 Kickstarter says the record "will be produced & recorded by Motor City Josh at The
-    Sound Shop", but it doesn't name the album (kickstarter-first-record).
+    Johnny to confirm. The Kickstarter describes the plan before recording ("Motor City Josh will be producing the
+    record", "most of the songs were written by myself and Motor City Josh", with Alex Lyon on bass and David Dionise
+    on drums), and the album wasn't named yet. Apple Music lists no credits.
   detect: Sound Shop
-
-- id: ep-breakin-out
-  third: Before *Waiting on the Sun* he put out an EP, *Breakin’ Out*, his first recordings as a singer.
-  status: unverified
-  needs: Johnny to confirm it, and the year.
-  detect: Breakin’ Out
-  sources:
-    - url: https://web.archive.org/web/20220517113849/https://www.musicpage.com/johnrhoadesband
-      note: >-
-        His musicpage profile calls it his debut EP, made after he left Motor City Josh's band in 2010, and lists three
-        tracks: "Breakin’ Out", "Mary Ann" and "Make Me a Pallet on Your Floor".
-
-- id: kelley-hunt
-  third: He has toured the Midwest and the West Coast as guitarist for Kansas singer and pianist Kelley Hunt.
-  status: unverified
-  needs: Johnny to confirm, and the years.
-  detect: Kelley Hunt
-  sources:
-    - url: https://web.archive.org/web/20220517113849/https://www.musicpage.com/johnrhoadesband
-      note: His musicpage profile (2013) says he was touring with her then.
-
-- id: sherrie-williams-stacia-petrie
-  third: He has played guitar for singers Sherrie Williams and Stacia Petrie.
-  status: unverified
-  needs: Johnny to confirm.
-  detect: Stacia Petrie
-  sources:
-    - url: https://web.archive.org/web/20220517113849/https://www.musicpage.com/johnrhoadesband
-      note: His musicpage profile (2013), alongside Thornetta Davis, who is in played-with.
-
-- id: western-michigan-jazz
-  third: He majored in jazz studies at Western Michigan University.
-  status: unverified
-  needs: Johnny to confirm.
-  detect: Western Michigan
-  sources:
-    - url: https://web.archive.org/web/20220517113849/https://www.musicpage.com/johnrhoadesband
-      note: His musicpage profile (2013) says he was home on spring break from Western Michigan in 2006 when he joined Motor City Josh.
-
-- id: brett-lucas-first-sit-in
-  third: At 16 he sat in at the Blue Goose Inn for the first time, invited by his guitar teacher Brett Lucas on the day of their first lesson.
-  status: unverified
-  needs: Johnny to confirm. It would go with blue-goose-dishes in the long bio.
-  detect: first lesson
-  sources:
-    - url: https://web.archive.org/web/20220517113849/https://www.musicpage.com/johnrhoadesband
-      note: >-
-        His musicpage profile (2013): lessons at Jerry Luck Studios in Eastpointe, where he met Brett Lucas; Lucas had a
-        gig at the Blue Goose that night and invited him to sit in. "He was 16 years old."

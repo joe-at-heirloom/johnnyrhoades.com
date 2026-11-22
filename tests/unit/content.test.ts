@@ -62,10 +62,11 @@ describe('bios', () => {
   it('come in the lengths the plan asks for', () => {
     expect(wordCount(bio(facts, 'short'))).toBeLessThanOrEqual(60);
     expect(wordCount(bio(facts, 'medium'))).toBeGreaterThan(90);
-    expect(wordCount(bio(facts, 'medium'))).toBeLessThanOrEqual(170);
-    // About 350 words; the show count from the data adds a dozen more.
+    // About 275 words since his 2013 bio went in (ADR 0025); it's also the home page About.
+    expect(wordCount(bio(facts, 'medium'))).toBeLessThanOrEqual(280);
+    // About 400 words; the show count from the data adds a dozen more.
     expect(wordCount(bio(facts, 'long'))).toBeGreaterThan(260);
-    expect(wordCount(bio(facts, 'long'))).toBeLessThanOrEqual(380);
+    expect(wordCount(bio(facts, 'long'))).toBeLessThanOrEqual(420);
   });
 
   it('put the show count at the head of the long bio’s last paragraph, only when there is one', () => {

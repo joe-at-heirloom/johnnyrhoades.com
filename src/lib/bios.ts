@@ -16,18 +16,19 @@ import type { Ledger } from './facts.ts';
 import { plain } from './facts.ts';
 
 export const RUNNING_BIO = [
-  ['detroit-guitarist-singer', 'started-with-motor-city-josh', 'toured-us-europe-mexico-caribbean', 'motor-city-josh-detroit-music-awards'],
-  ['influences', 'bb-king-memorial', 'nemeth-feelin-freaky', 'played-with', 'jill-jack-julianne-ankley'],
-  ['covers-and-originals', 'album-waiting-on-the-sun'],
+  ['detroit-guitarist-singer', 'blue-goose-dishes', 'brett-lucas-first-sit-in', 'western-michigan-jazz'],
+  ['started-with-motor-city-josh', 'toured-us-europe-mexico-caribbean', 'motor-city-josh-detroit-music-awards'],
+  ['influences', 'bb-king-memorial', 'nemeth-feelin-freaky', 'kelley-hunt', 'played-with', 'jill-jack-julianne-ankley'],
+  ['covers-and-originals', 'ep-breakin-out', 'kickstarter-first-record', 'album-waiting-on-the-sun'],
 ] as const;
 
-/** About 350 words: where he started, the Motor City Josh years, the road, his own bands, today, the record. */
+/** About 400 words: where he started, the Motor City Josh years, the road, his own bands, today, the records. */
 export const LONG_BIO = [
-  ['detroit-guitarist-singer', 'blue-goose-dishes', 'started-with-motor-city-josh', 'toured-us-europe-mexico-caribbean'],
+  ['detroit-guitarist-singer', 'blue-goose-dishes', 'brett-lucas-first-sit-in', 'western-michigan-jazz', 'started-with-motor-city-josh', 'toured-us-europe-mexico-caribbean'],
   ['motor-city-josh-detroit-music-awards', 'motor-city-josh-albums'],
-  ['influences', 'bb-king-memorial', 'nemeth-feelin-freaky', 'nemeth-tours'],
+  ['influences', 'bb-king-memorial', 'nemeth-feelin-freaky', 'nemeth-tours', 'kelley-hunt'],
   ['formats', 'antifreeze-festival-2017', 'cliff-bells-2017', 'lucas-rhoades-band-the-fed', 'jill-jack-julianne-ankley', 'played-with'],
-  ['covers-and-originals', 'album-waiting-on-the-sun'],
+  ['covers-and-originals', 'ep-breakin-out', 'kickstarter-first-record', 'album-waiting-on-the-sun'],
 ] as const;
 
 export const BIOS = {
