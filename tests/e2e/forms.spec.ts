@@ -4,6 +4,7 @@
   Formspree or Google.
 */
 import { expect, test, type Page } from '@playwright/test';
+import { SITE_NOW } from '../../playwright.config';
 import { analyticsEvents, blockThirdParties, fakeAnalytics } from './helpers';
 
 const BOOKING = 'https://formspree.io/f/test-booking';
@@ -20,6 +21,9 @@ async function fillBooking(page: Page) {
 
 test.describe('forms', () => {
   test.beforeEach(async ({ page }) => {
+    // The date field's minimum is the browser's today, so the booking date below has to be in its future.
+    // Pin the browser to the build's date; on the real clock these tests broke once Oct 24 had passed.
+    await page.clock.setFixedTime(new Date(SITE_NOW));
     await blockThirdParties(page);
     await fakeAnalytics(page);
   });
