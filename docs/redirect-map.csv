@@ -5,3 +5,4 @@ from,to,status,note
 /track/3178744/girl-you-must-be-crazy,/#music,301,Bandzoogle track page
 /track/3178745/heartbreakin-woman,/#music,301,Bandzoogle track page
 /track/3178746/let-myself-go,/#music,301,Bandzoogle track page
+/track/*,/#music,301,Any other Bandzoogle track page or slug variant (a splat; was a Cloudflare rule before ADR 0027)

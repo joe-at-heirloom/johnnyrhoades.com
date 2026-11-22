@@ -1,8 +1,10 @@
 ---
 /*
   One page per public show (PLAN.md section 7.2), plus a redirect stub for
-  every old slug in `aliases`. GitHub Pages can't redirect, so stubs use a
-  meta refresh and a canonical link.
+  every old slug in `aliases`. On Cloudflare the old slug answers with a real
+  301 instead: the build reads each stub's meta refresh into dist/_redirects
+  (ADR 0027). The stub, with its meta refresh and canonical link, is the
+  fallback for any other host.
 */
 import type { GetStaticPaths } from 'astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';

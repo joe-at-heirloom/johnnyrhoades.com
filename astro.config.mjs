@@ -1,9 +1,12 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
+import edgeFiles from './src/integrations/edge-files.ts';
 
 export default defineConfig({
   site: 'https://johnnyrhoades.com',
   trailingSlash: 'always',
+  // dist/_headers and dist/_redirects for Cloudflare Workers (ADR 0027).
+  integrations: [edgeFiles()],
   build: {
     format: 'directory',
   },

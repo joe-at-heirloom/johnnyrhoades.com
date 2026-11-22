@@ -1,12 +1,13 @@
 /*
-  Phase 6: the draft security headers (src/lib/security-headers.ts) don't
-  break anything. Every page from the test server is served with the exact
-  Content-Security-Policy and Permissions-Policy Cloudflare will add, then
-  each interactive part is used, and any violation or console error fails.
+  Phase 6: the security headers don't break anything. Every page from the test
+  server is served with the headers in the build's own dist/_headers, the file
+  Cloudflare Workers serves them from (ADR 0027), then each interactive part is
+  used, and any violation or console error fails.
 */
 import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { expect, test, type Page } from '@playwright/test';
+import { headersFor, parseHeadersFile } from '../../src/lib/edge';
 import { CSP, PERMISSIONS_POLICY } from '../../src/lib/security-headers';
 import { SITE_URL } from '../../playwright.config';
 import { blockThirdParties, collectConsoleErrors, loadEverything } from './helpers';
@@ -33,7 +34,11 @@ async function serveWithHeaders(page: Page) {
     const request = route.request();
     if (request.resourceType() !== 'document' || !request.url().startsWith(SITE_URL)) return route.fallback();
     const response = await route.fetch();
-    await route.fulfill({ response, headers: { ...response.headers(), 'content-security-policy': CSP, 'permissions-policy': PERMISSIONS_POLICY } });
+    const fromFile = headersFor(new URL(request.url()).pathname, parseHeadersFile(readFileSync('dist/_headers', 'utf8')));
+    // The file must carry the policy this module defines; then serve exactly what it says.
+    expect(fromFile['Content-Security-Policy']).toBe(CSP);
+    expect(fromFile['Permissions-Policy']).toBe(PERMISSIONS_POLICY);
+    await route.fulfill({ response, headers: { ...response.headers(), ...Object.fromEntries(Object.entries(fromFile).map(([k, v]) => [k.toLowerCase(), v])) } });
   });
   await page.addInitScript(() => {
     const w = window as unknown as { __violations: string[] };

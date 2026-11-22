@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 /*
-  Serves the built site (dist/) over HTTP/2 with gzip, the way GitHub Pages and
-  Cloudflare do, so Lighthouse CI measures the protocol visitors get (ADR 0026).
+  Serves the built site (dist/) over HTTP/2 with gzip, the way Cloudflare does,
+  so Lighthouse CI measures the protocol visitors get (ADR 0026). Responses carry
+  the headers from dist/_headers, with Workers' default Cache-Control (ADR 0027).
 
   Lighthouse simulates slow 4G from the requests it sees. Over HTTP/1.1 (the
   static server built into lhci) it allows six connections at a time and queues
@@ -17,8 +18,10 @@ import { createSecureServer } from 'node:http2';
 import { tmpdir } from 'node:os';
 import { extname, join, resolve, sep } from 'node:path';
 import { gzipSync } from 'node:zlib';
+import { headersFor, parseHeadersFile } from '../src/lib/edge.ts';
 
 const ROOT = resolve('dist');
+const RULES = parseHeadersFile(readFileSync(join(ROOT, '_headers'), 'utf8'));
 const PORT = Number(process.argv[2] ?? 4510);
 
 const TYPES: Record<string, string> = {
@@ -56,6 +59,7 @@ function fileFor(urlPath: string): string | null {
   } catch {
     return null;
   }
+  if (path === '/_headers' || path === '/_redirects') return null; // read by Cloudflare, never served
   const full = resolve(ROOT, `.${path.endsWith('/') ? `${path}index.html` : path}`);
   if (full !== ROOT && !full.startsWith(ROOT + sep)) return null;
   try {
@@ -70,7 +74,8 @@ const server = createSecureServer({ ...tls, allowHTTP1: true }, (req, res) => {
   const file = found ?? join(ROOT, '404.html');
   const ext = extname(file);
   let body = readFileSync(file);
-  const headers: Record<string, string> = { 'content-type': TYPES[ext] ?? 'application/octet-stream', 'cache-control': 'max-age=600' };
+  const path = (req.url ?? '/').split('?')[0]!;
+  const headers: Record<string, string> = { ...headersFor(path, RULES), 'content-type': TYPES[ext] ?? 'application/octet-stream' };
   if (COMPRESSIBLE.has(ext) && /\bgzip\b/.test(String(req.headers['accept-encoding'] ?? ''))) {
     body = gzipSync(body);
     headers['content-encoding'] = 'gzip';

@@ -7,7 +7,9 @@ describe('redirect map', () => {
 
   it('covers every URL found on the old site, once each', () => {
     expect(rows.map((r) => r.from)).toContain('/home');
-    expect(rows.filter((r) => r.from.startsWith('/track/'))).toHaveLength(5);
+    expect(rows.filter((r) => r.from.startsWith('/track/') && !r.from.includes('*'))).toHaveLength(5);
+    // And a catch-all for any track page the crawl missed (ADR 0027).
+    expect(rows).toContainEqual(expect.objectContaining({ from: '/track/*', to: '/#music' }));
     expect(new Set(rows.map((r) => r.from)).size).toBe(rows.length);
     expect(rows.every((r) => r.status === 301)).toBe(true);
   });
