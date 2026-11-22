@@ -1,0 +1,23 @@
+// Cloudflare Workers hosting (ADR 0027). Static assets only: there's no Worker
+// script, so every response is a static file, and the build's dist/_headers and
+// dist/_redirects apply to all of them (src/lib/edge.ts). Deployed by the deploy
+// job in .github/workflows/site.yml.
+{
+  "$schema": "https://unpkg.com/wrangler@4.158.0/config-schema.json",
+  "name": "johnnyrhoades",
+  "compatibility_date": "2026-11-05",
+  "assets": {
+    "directory": "./dist",
+    // trailingSlash: 'always' in astro.config.mjs. /epk and /shows get 301s from _redirects.
+    "html_handling": "force-trailing-slash",
+    // dist/404.html, with a 404 status.
+    "not_found_handling": "404-page"
+  },
+  // Only the custom domains below serve the site: no *.workers.dev copy, no preview URLs.
+  "workers_dev": false,
+  "preview_urls": false,
+  // Staging. At launch (docs/runbook-launch.md) this becomes johnnyrhoades.com;
+  // www reaches it through a Cloudflare redirect rule, since a custom domain
+  // matches one exact hostname.
+  "routes": [{ "pattern": "new.johnnyrhoades.com", "custom_domain": true }]
+}

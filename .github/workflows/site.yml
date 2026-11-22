@@ -1,5 +1,5 @@
-# Sync shows from Bandsintown, build, deploy to GitHub Pages, then ping
-# IndexNow (PLAN.md section 12).
+# Sync shows from Bandsintown, build, deploy to Cloudflare Workers, then ping
+# IndexNow (PLAN.md section 12, ADR 0027).
 #
 # - Every three hours: sync. Build and deploy only if the shows changed.
 # - Nightly: sync, then always rebuild, so shows that have passed roll off.
@@ -14,8 +14,9 @@
 # secret exists, the sync step is skipped and the site builds from the
 # committed src/data/shows.json (ADR 0006).
 #
-# Staging lives at new.johnnyrhoades.com (Settings → Pages → custom domain)
-# until cutover; docs/runbook-launch.md.
+# The deploy needs two repository secrets, CLOUDFLARE_API_TOKEN and
+# CLOUDFLARE_ACCOUNT_ID (docs/runbook-launch.md). Where the site is served
+# (staging at new.johnnyrhoades.com until cutover) is set in wrangler.jsonc.
 name: Site
 
 on:
@@ -28,8 +29,6 @@ on:
 
 permissions:
   contents: write # the sync commits src/data/shows.json
-  pages: write
-  id-token: write
 
 concurrency:
   group: site
@@ -87,6 +86,8 @@ jobs:
       PUBLIC_FORMSPREE_SIGNUP: ${{ vars.PUBLIC_FORMSPREE_SIGNUP }}
       PUBLIC_GA_ID: ${{ vars.PUBLIC_GA_ID }}
       SITE_NOINDEX: ${{ vars.SITE_NOINDEX }}
+      # Set to 300 for the first day after launch, then delete (docs/security-headers.md).
+      SITE_HSTS_MAX_AGE: ${{ vars.SITE_HSTS_MAX_AGE }}
     outputs:
       indexnow_urls: ${{ steps.indexnow.outputs.urls }}
     # Three-hourly runs only rebuild when the shows changed; everything else always does.
@@ -108,26 +109,60 @@ jobs:
           key: posters-${{ hashFiles('src/lib/posters/**', 'src/assets/fonts/poster/**') }}-${{ github.run_id }}
           restore-keys: posters-${{ hashFiles('src/lib/posters/**', 'src/assets/fonts/poster/**') }}-
 
-      - name: Build with Astro
-        uses: withastro/action@v6
+      - uses: actions/setup-node@v7
         with:
           node-version: 24
+          cache: npm
+
+      - run: npm ci
+
+      # Also writes dist/_headers and dist/_redirects (src/integrations/edge-files.ts).
+      - name: Build with Astro
+        run: npm run build
 
       # Before the deploy, while the old /shows.json is still live: which show pages are new or changed (ADR 0012).
       - name: Plan IndexNow
         id: indexnow
         run: npm run indexnow -- plan
 
+      - uses: actions/upload-artifact@v7
+        with:
+          name: site
+          path: dist
+          retention-days: 3
+
   deploy:
-    needs: build
+    needs: [sync, build]
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+    environment: cloudflare
     steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v5
+      # For wrangler.jsonc, at the same commit as the build.
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ needs.sync.outputs.sha || github.sha }}
+
+      - uses: actions/download-artifact@v8
+        with:
+          name: site
+          path: dist
+
+      - name: Check the Cloudflare secrets
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          if [ -z "$CLOUDFLARE_API_TOKEN" ] || [ -z "$CLOUDFLARE_ACCOUNT_ID" ]; then
+            echo "::error title=No Cloudflare secrets::Add CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID to the repository secrets (docs/runbook-launch.md)."
+            exit 1
+          fi
+
+      - name: Deploy to Cloudflare Workers
+        uses: cloudflare/wrangler-action@v4
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          wranglerVersion: "4.158.0"
+          command: deploy
 
   indexnow:
     needs: [build, deploy]

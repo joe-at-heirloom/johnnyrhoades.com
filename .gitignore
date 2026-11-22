@@ -17,3 +17,6 @@ blob-report/
 .playwright-mcp/
 .netlify/
 .cache/
+
+# Wrangler's local state from `wrangler dev` (ADR 0027)
+.wrangler/
