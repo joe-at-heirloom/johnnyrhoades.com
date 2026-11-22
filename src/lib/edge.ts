@@ -3,7 +3,9 @@
   Both are written into dist/ after every build by src/integrations/edge-files.ts.
 
   - _headers: the security headers from src/lib/security-headers.ts on every
-    response, a year's cache for content-hashed files, and noindex on staging.
+    response, with the inline stylesheet and speculation rules allowed by hash
+    (ADR 0028, ADR 0029), a year's cache for content-hashed files, and noindex
+    on staging.
   - _redirects: the old Bandzoogle URLs (docs/redirect-map.csv) and every changed
     show slug, as real 301s. Workers follows a redirect even where a file exists
     at that path, so the meta-refresh stubs Astro still builds for old slugs are
@@ -13,7 +15,7 @@
   deploy time) are checked by the unit tests.
 */
 import { createHash } from 'node:crypto';
-import { cspWithStyleHashes, SECURITY_HEADERS } from './security-headers.ts';
+import { cspWithHashes, SECURITY_HEADERS } from './security-headers.ts';
 
 // docs/redirect-map.csv is read by src/lib/redirects.ts (parseRedirectMap), which also checks the live site after launch.
 
@@ -27,19 +29,25 @@ export const HASHED_CACHE = 'public, max-age=31536000, immutable';
 
 type HeaderRule = { path: string; headers: Record<string, string> };
 
+
+export type InlineHashes = { style: string[]; script: string[] };
+
+const sha256 = (text: string) => createHash('sha256').update(text, 'utf8').digest('base64');
+
 /**
- * The sha256 (base64) of every inline <style> in the given pages, for the CSP
- * (ADR 0028). A browser hashes the element's text exactly as written, so this
- * does too: no trimming.
+ * The sha256 (base64) of every inline <style> and <script type="speculationrules">
+ * in the given pages, for the CSP (ADR 0028, ADR 0029). A browser hashes the
+ * element's text exactly as written, so this does too: no trimming. Other inline
+ * scripts are never allowed, so they aren't hashed (a test fails if one appears).
  */
-export function styleHashes(htmls: readonly string[]): string[] {
-  const hashes = new Set<string>();
+export function inlineHashes(htmls: readonly string[]): InlineHashes {
+  const style = new Set<string>();
+  const script = new Set<string>();
   for (const html of htmls) {
-    for (const [, css] of html.matchAll(/<style(?:\s[^>]*)?>([\s\S]*?)<\/style>/g)) {
-      hashes.add(createHash('sha256').update(css!, 'utf8').digest('base64'));
-    }
+    for (const [, body] of html.matchAll(/<style(?:\s[^>]*)?>([\s\S]*?)<\/style>/g)) style.add(sha256(body!));
+    for (const [, body] of html.matchAll(/<script type="speculationrules"[^>]*>([\s\S]*?)<\/script>/g)) script.add(sha256(body!));
   }
-  return [...hashes].sort();
+  return { style: [...style].sort(), script: [...script].sort() };
 }
 
 /**
@@ -47,8 +55,8 @@ export function styleHashes(htmls: readonly string[]): string[] {
  * page-level noindex. `hstsMaxAge` overrides the one-year HSTS for the first
  * day after launch (docs/security-headers.md, "Rolling it out").
  */
-export function headerRules({ noindex, hstsMaxAge, styleHashes = [] }: { noindex: boolean; hstsMaxAge?: number; styleHashes?: readonly string[] }): HeaderRule[] {
-  const security: Record<string, string> = { ...SECURITY_HEADERS, 'Content-Security-Policy': cspWithStyleHashes(styleHashes) };
+export function headerRules({ noindex, hstsMaxAge, hashes = { style: [], script: [] } }: { noindex: boolean; hstsMaxAge?: number; hashes?: InlineHashes }): HeaderRule[] {
+  const security: Record<string, string> = { ...SECURITY_HEADERS, 'Content-Security-Policy': cspWithHashes(hashes) };
   if (hstsMaxAge !== undefined) {
     if (!Number.isInteger(hstsMaxAge) || hstsMaxAge < 0) throw new Error(`HSTS max-age must be a whole number of seconds, not ${hstsMaxAge}`);
     security['Strict-Transport-Security'] = security['Strict-Transport-Security']!.replace(/max-age=\d+/, `max-age=${hstsMaxAge}`);

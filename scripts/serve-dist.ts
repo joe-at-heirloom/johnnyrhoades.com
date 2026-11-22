@@ -75,7 +75,9 @@ const server = createSecureServer({ ...tls, allowHTTP1: true }, (req, res) => {
   const ext = extname(file);
   let body = readFileSync(file);
   const path = (req.url ?? '/').split('?')[0]!;
-  const headers: Record<string, string> = { ...headersFor(path, RULES), 'content-type': TYPES[ext] ?? 'application/octet-stream' };
+  // _headers wins over the default type, as on Cloudflare.
+  const fromRules = Object.fromEntries(Object.entries(headersFor(path, RULES)).map(([name, value]) => [name.toLowerCase(), value]));
+  const headers: Record<string, string> = { 'content-type': TYPES[ext] ?? 'application/octet-stream', ...fromRules };
   if (COMPRESSIBLE.has(ext) && /\bgzip\b/.test(String(req.headers['accept-encoding'] ?? ''))) {
     body = gzipSync(body);
     headers['content-encoding'] = 'gzip';

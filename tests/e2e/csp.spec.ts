@@ -7,7 +7,7 @@
 import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { expect, test, type Page } from '@playwright/test';
-import { headersFor, parseHeadersFile, styleHashes } from '../../src/lib/edge';
+import { headersFor, inlineHashes, parseHeadersFile } from '../../src/lib/edge';
 import { CSP, PERMISSIONS_POLICY } from '../../src/lib/security-headers';
 import { SITE_URL } from '../../playwright.config';
 import { blockThirdParties, collectConsoleErrors, loadEverything } from './helpers';
@@ -35,9 +35,11 @@ async function serveWithHeaders(page: Page) {
     if (request.resourceType() !== 'document' || !request.url().startsWith(SITE_URL)) return route.fallback();
     const response = await route.fetch();
     const fromFile = headersFor(new URL(request.url()).pathname, parseHeadersFile(readFileSync('dist/_headers', 'utf8')));
-    // The file must carry the policy this module defines, plus the inline stylesheet's hash (ADR 0028);
-    // then serve exactly what it says. A wrong hash would leave the page unstyled and fail the checks below.
+    // The file must carry the policy this module defines, plus the hashes of the inline stylesheet and
+    // speculation rules (ADR 0028, ADR 0029); then serve exactly what it says. A wrong hash would leave
+    // the page unstyled or the rules ignored, with a violation, and fail the checks below.
     expect(fromFile['Content-Security-Policy']).toMatch(/style-src 'self' 'sha256-[A-Za-z0-9+/]+=*'/);
+    expect(fromFile['Content-Security-Policy']).toMatch(/script-src 'self' \S+ 'sha256-[A-Za-z0-9+/]+=*'/);
     expect(fromFile['Content-Security-Policy']!.replace(/ 'sha256-[^']+'/g, '')).toBe(CSP);
     expect(fromFile['Permissions-Policy']).toBe(PERMISSIONS_POLICY);
     await route.fulfill({ response, headers: { ...response.headers(), ...Object.fromEntries(Object.entries(fromFile).map(([k, v]) => [k.toLowerCase(), v])) } });
@@ -115,11 +117,28 @@ test('no built page has an inline script or style the policy would block', () =>
     const html = readFileSync(file, 'utf8');
     for (const [, attrs = '', body = ''] of html.matchAll(/<script([^>]*)>([\s\S]*?)<\/script>/g)) {
       const dataBlock = /type="application\/(ld\+)?json"/.test(attrs);
-      if (!dataBlock && body.trim()) problems.push(`${file}: inline script`);
+      const rules = /type="speculationrules"/.test(attrs); // allowed by hash, checked below
+      if (!dataBlock && !rules && body.trim()) problems.push(`${file}: inline script`);
     }
-    for (const hash of styleHashes([html])) if (!csp.includes(`'sha256-${hash}'`)) problems.push(`${file}: a <style> the CSP doesn't allow`);
+    const hashes = inlineHashes([html]);
+    for (const hash of hashes.style) if (!csp.includes(`'sha256-${hash}'`)) problems.push(`${file}: a <style> the CSP doesn't allow`);
+    for (const hash of hashes.script) if (!csp.includes(`'sha256-${hash}'`)) problems.push(`${file}: speculation rules the CSP doesn't allow`);
     if (/\sstyle="/.test(html)) problems.push(`${file}: style attribute`);
     if (/\son[a-z]+="/.test(html)) problems.push(`${file}: inline event handler`);
   }
   expect(problems).toEqual([]);
+});
+
+test('hovering a link prefetches the page, so the click lands from the prefetch (ADR 0029)', async ({ page }) => {
+  await serveWithHeaders(page);
+  await page.goto('/');
+  const link = page.locator('a[href="/epk/"]').first();
+  await link.scrollIntoViewIfNeeded();
+  await link.hover();
+  // "moderate" eagerness starts after a short hover; give the prefetch time to finish.
+  await page.waitForTimeout(1500);
+  await link.click();
+  await page.waitForURL('**/epk/');
+  const delivery = await page.evaluate(() => (performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming & { deliveryType?: string }).deliveryType);
+  expect(delivery).toBe('navigational-prefetch');
 });

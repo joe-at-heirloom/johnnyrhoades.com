@@ -8,9 +8,10 @@
   The policy allows only what the site uses: its own files, YouTube's
   privacy-enhanced player once someone presses play, Apple's song clips once
   someone presses play on a track, Formspree, and Google Analytics (ADR 0023). No inline scripts (astro.config.mjs keeps every script
-  external). The stylesheet is inline (ADR 0028), so the build adds its
-  sha256 to style-src (cspWithStyleHashes, used by src/lib/edge.ts). JSON-LD
-  and the Tonight data island are data blocks, which CSP doesn't apply to.
+  external). The stylesheet and the speculation rules are inline (ADR 0028,
+  ADR 0029), so the build adds their sha256s to style-src and script-src
+  (cspWithHashes, used by src/lib/edge.ts). JSON-LD and the Tonight data
+  island are data blocks, which CSP doesn't apply to.
 */
 
 const YOUTUBE = 'https://www.youtube-nocookie.com';
@@ -44,10 +45,18 @@ const serialize = (directives: Record<string, string[]>) =>
 /** The policy as written above, before the build adds the inline stylesheet's hash. */
 export const CSP = serialize(CSP_DIRECTIVES);
 
-/** The policy the site is served with: style-src also allows each inline <style> by its sha256 (base64). */
-export function cspWithStyleHashes(hashes: readonly string[]): string {
-  const styleSrc = [...CSP_DIRECTIVES['style-src']!, ...[...new Set(hashes)].sort().map((h) => `'sha256-${h}'`)];
-  return serialize({ ...CSP_DIRECTIVES, 'style-src': styleSrc });
+const withHashes = (sources: string[], hashes: readonly string[]) => [...sources, ...[...new Set(hashes)].sort().map((h) => `'sha256-${h}'`)];
+
+/**
+ * The policy the site is served with: style-src also allows the inline stylesheet,
+ * and script-src the inline speculation rules, each by its sha256 (base64).
+ */
+export function cspWithHashes({ style = [], script = [] }: { style?: readonly string[]; script?: readonly string[] }): string {
+  return serialize({
+    ...CSP_DIRECTIVES,
+    'script-src': withHashes(CSP_DIRECTIVES['script-src']!, script),
+    'style-src': withHashes(CSP_DIRECTIVES['style-src']!, style),
+  });
 }
 
 const off = ['accelerometer', 'camera', 'geolocation', 'gyroscope', 'magnetometer', 'microphone', 'payment', 'usb', 'browsing-topics'];

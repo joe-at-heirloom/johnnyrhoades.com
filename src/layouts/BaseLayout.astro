@@ -11,6 +11,7 @@ import { siteGraph } from '../lib/schema';
 import { SCHEMA_DESCRIPTION } from '../lib/copy';
 import { NOINDEX, absolute } from '../lib/site';
 import { PUBLIC_CONFIG } from '../lib/public-config';
+import { SPECULATION_RULES } from '../lib/speculation';
 
 interface Props {
   title: string;
@@ -61,6 +62,8 @@ const portraitImage = await getImage({ src: portrait, width: 1200, format: 'jpg'
     <link rel="apple-touch-icon" href="/assets/img/apple-touch-icon.png" />
     <link rel="alternate" type="application/rss+xml" title="Johnny Rhoades: new shows" href="/shows/feed.xml" />
     <link rel="preload" href={archivoUrl} as="font" type="font/woff2" crossorigin />
+    {/* Prefetch the next page on hover or tap (ADR 0029). Allowed by its hash in the CSP, built into dist/_headers. */}
+    <script is:inline type="speculationrules" set:html={JSON.stringify(SPECULATION_RULES)} />
     <JsonLd data={siteGraph({
         portraitUrl: absolute(portraitImage.src),
         sameAs: sameAs(profiles),

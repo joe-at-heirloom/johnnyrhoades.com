@@ -12,30 +12,45 @@ import {
   redirectsFile,
   SLASH_REDIRECTS,
   stubRedirects,
-  styleHashes,
+  inlineHashes,
   type Redirect,
 } from '../../src/lib/edge.ts';
 import { parseRedirectMap } from '../../src/lib/redirects.ts';
-import { CSP, cspWithStyleHashes, SECURITY_HEADERS } from '../../src/lib/security-headers.ts';
+import { CSP, cspWithHashes, SECURITY_HEADERS } from '../../src/lib/security-headers.ts';
+import { SPECULATION_RULES } from '../../src/lib/speculation.ts';
 
 describe('_headers', () => {
   const file = headersFile(headerRules({ noindex: false }));
   const rules = parseHeadersFile(file);
 
-  it('hashes each inline stylesheet exactly as written, once', () => {
+  it('hashes each inline stylesheet and speculation rules block exactly as written, once', () => {
     // echo -n 'a{color:red}' | openssl dgst -sha256 -binary | base64
     const red = '6hWWMOcF+mJesSJGYhmK2lkIIEw9Xc5XKGLPVzh8yxs=';
-    expect(styleHashes(['<style>a{color:red}</style>', '<html><style data-x="1">a{color:red}</style></html>'])).toEqual([red]);
-    expect(styleHashes(['<style> a{color:red}</style>'])).not.toEqual([red]); // whitespace counts
-    expect(styleHashes(['<p>no styles</p>'])).toEqual([]);
+    const page = '<html><style data-x="1">a{color:red}</style><script type="speculationrules">{}</script><script type="application/ld+json">{"a":1}</script></html>';
+    const hashes = inlineHashes(['<style>a{color:red}</style>', page]);
+    expect(hashes.style).toEqual([red]);
+    expect(hashes.script).toHaveLength(1); // the speculation rules only, never JSON-LD
+    expect(inlineHashes(['<style> a{color:red}</style>']).style).not.toEqual([red]); // whitespace counts
+    expect(inlineHashes(['<p>nothing inline</p>'])).toEqual({ style: [], script: [] });
   });
 
-  it('allows the inline stylesheet by hash, and only that', () => {
-    const csp = headersFor('/', parseHeadersFile(headersFile(headerRules({ noindex: false, styleHashes: ['abc=', 'abc='] }))))['Content-Security-Policy']!;
+  it('allows the inline blocks by hash, and only those', () => {
+    const csp = headersFor('/', parseHeadersFile(headersFile(headerRules({ noindex: false, hashes: { style: ['abc=', 'abc='], script: ['xyz='] } }))))['Content-Security-Policy']!;
     expect(csp).toContain("style-src 'self' 'sha256-abc='; ");
+    expect(csp).toContain("script-src 'self' https://www.googletagmanager.com 'sha256-xyz='; ");
     expect(csp).not.toContain('unsafe-inline');
-    expect(csp.replace(" 'sha256-abc='", '')).toBe(CSP);
-    expect(cspWithStyleHashes([])).toBe(CSP);
+    expect(csp.replace(/ 'sha256-[^']+'/g, '')).toBe(CSP);
+    expect(cspWithHashes({})).toBe(CSP);
+  });
+
+  it('prefetches same-site pages only, on intent, and never downloads', () => {
+    const [rule] = SPECULATION_RULES.prefetch;
+    expect(SPECULATION_RULES).not.toHaveProperty('prerender'); // prefetch runs nothing: no analytics hits, no sound
+    expect(rule!.eagerness).toBe('moderate');
+    const [sameSite, notFiles, notMarked] = rule!.where.and;
+    expect(sameSite).toEqual({ href_matches: '/*' });
+    for (const ext of ['ics', 'zip', 'png', 'xml', 'json']) expect(JSON.stringify(notFiles)).toContain(`/*.${ext}`);
+    expect(JSON.stringify(notMarked)).toContain('[download]');
   });
 
   it('puts every security header on every response', () => {

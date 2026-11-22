@@ -3,8 +3,8 @@
   Workers (src/lib/edge.ts, ADR 0027). It runs inside `astro build`, so every
   build has them: local, end to end, Lighthouse and the deploy.
 
-  The CSP allows the inline stylesheet by its hash (ADR 0028), so the hashes
-  come from every HTML file the build wrote.
+  The CSP allows the inline stylesheet and speculation rules by hash (ADR 0028,
+  ADR 0029), so the hashes come from every HTML file the build wrote.
 
   Build variables:
   - SITE_NOINDEX=true (staging) adds X-Robots-Tag: noindex to every response.
@@ -14,7 +14,7 @@ import { readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { AstroIntegration } from 'astro';
-import { headerRules, headersFile, redirectsFile, SLASH_REDIRECTS, stubRedirects, styleHashes } from '../lib/edge.ts';
+import { headerRules, headersFile, inlineHashes, redirectsFile, SLASH_REDIRECTS, stubRedirects } from '../lib/edge.ts';
 import { parseRedirectMap } from '../lib/redirects.ts';
 
 /** Every HTML file in the build, for the inline stylesheets' hashes. */
@@ -48,14 +48,14 @@ export default function edgeFiles(): AstroIntegration {
       'astro:build:done': ({ dir, logger }) => {
         const dist = fileURLToPath(dir);
         const hsts = process.env.SITE_HSTS_MAX_AGE;
-        const hashes = styleHashes(htmlFiles(dist));
-        const rules = headerRules({ noindex: process.env.SITE_NOINDEX === 'true', hstsMaxAge: hsts ? Number(hsts) : undefined, styleHashes: hashes });
+        const hashes = inlineHashes(htmlFiles(dist));
+        const rules = headerRules({ noindex: process.env.SITE_NOINDEX === 'true', hstsMaxAge: hsts ? Number(hsts) : undefined, hashes });
         writeFileSync(join(dist, '_headers'), headersFile(rules));
 
         const map = parseRedirectMap(readFileSync('docs/redirect-map.csv', 'utf8'));
         const aliases = stubRedirects(showPages(dist));
         writeFileSync(join(dist, '_redirects'), redirectsFile([...map, ...SLASH_REDIRECTS, ...aliases]));
-        logger.info(`_headers: ${rules.length} rules, ${hashes.length} inline stylesheet hash${hashes.length === 1 ? '' : 'es'}. _redirects: ${map.length} from the redirect map, ${aliases.length} changed show slugs.`);
+        logger.info(`_headers: ${rules.length} rules; inline hashes: ${hashes.style.length} style, ${hashes.script.length} speculation rules. _redirects: ${map.length} from the redirect map, ${aliases.length} changed show slugs.`);
       },
     },
   };
