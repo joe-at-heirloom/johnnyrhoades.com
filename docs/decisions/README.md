@@ -29,3 +29,4 @@ Short notes on choices that shape the code, so the reasoning survives. One file 
 | [0024](0024-the-guitar-plays-by-default-and-in-tune.md) | The guitar plays by default, and in tune | Accepted |
 | [0025](0025-his-2013-bio-and-links-to-the-artists.md) | His 2013 bio goes in, and the bios link the artists they name | Accepted |
 | [0026](0026-lighthouse-over-http2.md) | Lighthouse CI serves the build over HTTP/2 | Accepted |
+| [0027](0027-cloudflare-workers-hosting.md) | Host on Cloudflare Workers, not GitHub Pages | Accepted |

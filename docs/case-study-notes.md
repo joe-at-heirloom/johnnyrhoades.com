@@ -4,6 +4,24 @@ A running log for the portfolio write-up (PLAN.md section 16): numbers, screensh
 
 ---
 
+## 2026-11-22: From GitHub Pages to Cloudflare Workers
+
+**What changed.** Joe suggested Cloudflare Workers, and the site moved its hosting there (ADR 0027): static assets only, no Worker script. The build now writes `dist/_headers` and `dist/_redirects`. Ready in the repo; it goes live when the deploy secrets are in.
+
+**Numbers.**
+- The launch runbook's cutover went from five dashboard redirect rules, a header Transform Rule, two cache rules, a GitHub verified domain and a certificate wait to one redirect rule, for `www`.
+- The generated files hold 2 header rules and 9 redirects today, against Cloudflare's limits of 100 and 2,100.
+- The build is 153 files against the free plan's 20,000.
+
+**Worth telling**
+
+- *The config that used to live in a dashboard is now code.* The security headers were text to paste into Cloudflare by hand, with a test that the doc matched the code. Now the build writes them, the CSP test serves the built file, and the Lighthouse server does too. The doc can't drift from what's served, because what's served is generated.
+- *The constraint that shaped the design: no Worker script.* Cloudflare applies `_headers` and `_redirects` only to static files. A script, even a tiny one to redirect `www`, would have meant setting every header in code. One dashboard rule for `www` was the cheaper trade.
+- *Reuse the build's own answer.* Changed show URLs were already meta-refresh stub pages. Rather than recompute which shows have old slugs, the build reads the stubs back into real 301s, so the logic lives in one place.
+- *Checked before it ships.* `wrangler dev` served the real build locally: the headers, the immutable cache, every redirect, the 404, and `_headers` itself never served.
+
+---
+
 ## 2026-11-22: The hero wasn't slow, the lab server was
 
 **What changed.** Lighthouse CI serves the build over HTTP/2, as GitHub Pages and Cloudflare do (ADR 0026). No change to the page.

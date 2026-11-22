@@ -174,7 +174,7 @@ describe('security headers', () => {
     expect(PERMISSIONS_POLICY).toContain('camera=()');
   });
 
-  it('are quoted exactly in the Cloudflare doc', () => {
+  it('are quoted exactly in docs/security-headers.md', () => {
     const doc = readFileSync('docs/security-headers.md', 'utf8');
     for (const [name, value] of Object.entries(SECURITY_HEADERS)) expect(doc).toContain(`| \`${name}\` | \`${value}\` |`);
   });

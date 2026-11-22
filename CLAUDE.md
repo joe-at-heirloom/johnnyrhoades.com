@@ -10,7 +10,7 @@ The idea in one line: every public gig Johnny adds in Bandsintown becomes a page
 
 ## Stack
 
-- Astro (static output) with TypeScript strict, deployed to GitHub Pages by `.github/workflows/site.yml`. Cloudflare sits in front for DNS, redirects, headers, cache and email routing.
+- Astro (static output) with TypeScript strict, served by Cloudflare Workers static assets (`wrangler.jsonc`, ADR 0027) and deployed by `.github/workflows/site.yml`. The build writes `dist/_headers` (security headers, caching) and `dist/_redirects` (the redirect map, changed show slugs) from `src/lib/edge.ts`.
 - Show data: `scripts/sync-shows.ts` pulls the Bandsintown API into `src/data/shows.json`, which is committed.
 - Posters: satori and @resvg/resvg-js at build time.
 - Tests: Vitest (unit), Playwright with axe-core (end to end), Lighthouse CI, html-validate, lychee.
@@ -79,8 +79,8 @@ Before calling any task done, run `npm run check && npm test && npm run build`. 
 - Pushes made with `GITHUB_TOKEN` don't trigger other workflows, so sync, build and deploy are jobs in one workflow.
 - GitHub disables scheduled workflows in public repos after 60 days without activity. The weekly heartbeat commit exists for this; don't remove it.
 - Cron runs in UTC and can start late.
-- With Actions-based Pages deploys, the custom domain is set in repo settings and a `CNAME` file is ignored.
-- GitHub Pages can't do redirects or headers. Those are Cloudflare rules documented in `docs/runbook-launch.md`. The only redirects the app generates are alias stubs for changed show slugs.
+- Workers applies `_headers` and `_redirects` only to static files, so there's no Worker script; don't add one without moving the headers into it (ADR 0027). Headers and redirects change in `src/lib/security-headers.ts`, `src/lib/edge.ts` and `docs/redirect-map.csv`, never in the Cloudflare dashboard. The one dashboard rule is `www` → apex.
+- Wrangler isn't a project dependency: the deploy job pins it in `wrangler-action`. To check the config or the built files locally: `npx wrangler@4.158.0 dev` (serves `dist/` the way Workers will) or `npx wrangler@4.158.0 deploy --dry-run`.
 - Satori takes TTF, OTF or WOFF (not WOFF2) and doesn't reliably handle variable-font axes. Use the static instances in `src/assets/fonts/poster/`.
 - Bandsintown: model against the captured payloads in `tests/fixtures/`, not assumptions. Johnny never fills in titles; he labels the act in front of the venue name ("Solo Acoustic @ The Whiskey Six"), so never ask him to change that (ADR 0020).
 

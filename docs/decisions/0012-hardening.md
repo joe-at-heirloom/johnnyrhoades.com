@@ -1,6 +1,6 @@
 # 0012: Hardening: discovery files, security headers and quality gates
 
-**Status:** Accepted, 2026-09-30 (Phase 6)
+**Status:** Accepted, 2026-09-30 (Phase 6) The security headers, caching and redirects moved from Cloudflare dashboard rules into files the build writes (ADR 0027).
 
 ## Context
 

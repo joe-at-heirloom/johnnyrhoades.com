@@ -177,8 +177,7 @@ flowchart LR
     B --> O["Pages, posters, ICS,<br/>RSS, JSON, sitemap"]
   end
   API --> S
-  O --> GP["GitHub Pages"]
-  GP --> CF["Cloudflare: DNS, 301s,<br/>headers, cache, email"]
+  O --> CF["Cloudflare Workers static assets:<br/>_headers, _redirects, DNS"]
   CF --> V["Visitors, Google, Bing,<br/>AI crawlers"]
   O --> IN["IndexNow ping for new<br/>and changed show URLs"]
 ```
@@ -186,21 +185,21 @@ flowchart LR
 | Concern | Choice | Why |
 |---|---|---|
 | Framework | Astro, static output, TypeScript strict | The existing HTML ports into components almost line for line, ships zero JavaScript by default, builds hundreds of pages quickly, and has a built-in image pipeline. |
-| Hosting | GitHub Pages, deployed by Actions | Free, the repo is the portfolio, and deploy history is public. |
-| Edge | Cloudflare (free plan) proxying GitHub Pages | Adds what Pages can't do: real 301 redirects, security headers, cache rules, email routing and Turnstile. |
+| Hosting | Cloudflare Workers static assets, deployed by Actions with Wrangler (ADR 0027; GitHub Pages until 2026-11-22) | Free and unlimited for static files. The build writes the headers and redirects as files (`_headers`, `_redirects`), so they're reviewed and tested like code. The DNS was already on Cloudflare. |
+| Edge | Cloudflare (free plan): DNS, the `www` redirect rule, Turnstile later | Johnny's email stays on Zoho; Cloudflare never touches MX (ADR 0013). |
 | Show data | Bandsintown API at build time, snapshot committed to the repo | Johnny already keeps it current. Committed history survives API changes, and the commits keep scheduled workflows alive. |
 | Dates and times | luxon, zone `America/Detroit` | DST-safe conversion of venue-local times. |
 | Posters | satori + @resvg/resvg-js | Templates in JSX, PNGs at build time, no headless browser. |
-| Forms | Formspree (ADR 0023), behind a small interface a Cloudflare Worker can replace later | GitHub Pages has no server. |
+| Forms | Formspree (ADR 0023), behind a small interface a Cloudflare Worker can replace later | The site is static files with no server. |
 | Mailing list | For now, signups are emailed through Formspree with their ZIP and region (ADR 0023). Kit or Buttondown later | Real list management, a ZIP custom field, RSS-to-email, when Joe wants a list. |
 | Analytics | Google Analytics 4 (ADR 0023: real domain only, after the page is idle, GPC and DNT honored), Google Search Console, Bing Webmaster Tools | The conversion events the case study needs. |
 | Testing | Vitest, Playwright with axe-core, Lighthouse CI, lychee, html-validate | Quality gates that double as portfolio evidence. |
 | Editing (optional) | Pages CMS | A friendly editor for bios, facts and quotes on a static GitHub site, with no server to run. |
 
-**GitHub Pages constraints this design works around**
+**Platform notes this design works around**
 
-- No server-side redirects and no custom headers. Cloudflare rules handle both (section 14).
-- When deploying with a custom Actions workflow, set the custom domain in Settings → Pages; a `CNAME` file is ignored. Jekyll doesn't run, so `_astro/` needs no `.nojekyll`.
+- Workers applies `_headers` and `_redirects` only to static files, not to anything a Worker script returns. So there's no script, and both files are written by the build (`src/lib/edge.ts`, ADR 0027).
+- A Worker's custom domain matches one exact hostname, so `www` reaches the apex through a Cloudflare redirect rule.
 - Commits pushed with the default `GITHUB_TOKEN` don't trigger other workflows, so sync, build and deploy are jobs in one workflow.
 - Scheduled workflows in public repos are disabled after 60 days without repository activity. The weekly sync heartbeat prevents that (section 6.2).
 - Cron schedules run in UTC and can start late under load. Nothing depends on exact timing.
@@ -574,8 +573,8 @@ Answer engines describe the artists they can identify with confidence and verify
 **Deploy (`site.yml`)**
 
 - Triggers: push to `main`, manual dispatch, a schedule every three hours, and a nightly schedule. Use `github.event.schedule` to tell the two schedules apart: the three-hourly run deploys only when the sync changed something, and the nightly run always rebuilds so past shows roll off.
-- Jobs: sync (commit if changed), build (restore the poster cache), deploy with the official Astro and Pages actions (check the Astro docs for current versions), then IndexNow.
-- Permissions: `contents: write`, `pages: write`, `id-token: write`, plus a concurrency group so runs never overlap.
+- Jobs: sync (commit if changed), build (restore the poster cache, build, upload `dist/`), deploy with `cloudflare/wrangler-action` and the `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` secrets (ADR 0027), then IndexNow.
+- Permissions: `contents: write`, plus a concurrency group so runs never overlap.
 
 ---
 
@@ -606,17 +605,17 @@ Custom events: `booking_submit`, `booking_error`, `list_signup`, `poster_downloa
 3. Crawl the current site and list every URL (`/home`, `/music`, track pages, anything in its sitemap) in `docs/redirect-map.csv` with its new target.
 4. Verify the Search Console domain property with a DNS TXT record now, to start the baseline.
 5. Move DNS to Cloudflare and recreate every existing record, still pointing at Bandzoogle. Lower the TTLs.
-6. Verify the domain in GitHub (account settings, Pages, verified domains) to prevent takeover.
+6. Create a Cloudflare API token for deploys, and add it and the account ID to the repository secrets (ADR 0027).
 
 **Staging**
 
-7. Set `new.johnnyrhoades.com` as the Pages custom domain. Run the whole site there with `noindex` and review it on real phones.
+7. Serve `new.johnnyrhoades.com` from the Worker (a custom domain in `wrangler.jsonc`). Run the whole site there with `noindex` and review it on real phones.
 
-**Cutover**
+**Cutover** (the step-by-step is `docs/runbook-launch.md`)
 
-8. Switch the Pages custom domain to `johnnyrhoades.com`. Apex A records: `185.199.108.153`, `185.199.109.153`, `185.199.110.153`, `185.199.111.153`. AAAA records: `2606:50c0:8000::153`, `2606:50c0:8001::153`, `2606:50c0:8002::153`, `2606:50c0:8003::153`. A `www` CNAME to `<user>.github.io`. Keep them DNS-only (grey cloud) until GitHub issues the certificate, then turn on Enforce HTTPS.
-9. Turn on the Cloudflare proxy with SSL mode Full (strict). If GitHub later reports certificate trouble, switch to DNS-only briefly while it renews.
-10. Add Cloudflare redirect rules (`www` to the apex, then every row of the redirect map, for example `/home` to `/` and `/music` to `/#music`), the security headers and the cache rule.
+8. Point the Worker's custom domain at `johnnyrhoades.com` in `wrangler.jsonc`, after removing the Bandzoogle records on the apex. Cloudflare issues the certificate itself.
+9. A proxied placeholder record for `www`, and one redirect rule from `www` to the apex. Always Use HTTPS on.
+10. Nothing else in the dashboard: the redirect map (`/home` to `/`, the track pages to `/#music`), the security headers and the caching ship in the deploy, as `dist/_redirects` and `dist/_headers`.
 11. Remove `noindex`. Submit the sitemap to Search Console and Bing Webmaster Tools. Ping IndexNow.
 
 **After launch**
@@ -682,7 +681,7 @@ Each phase is sized for one or two Claude Code sessions and ends with acceptance
 ## 16. Portfolio packaging
 
 - **README.** A screenshot, the one-line idea, the architecture diagram, how Johnny uses it (Bandsintown only), Lighthouse scores, links to the decision records, and licensing: code under MIT; photos and music all rights reserved by their owners.
-- **Decision records** in `docs/decisions/`: GitHub Pages behind Cloudflare; Bandsintown as the source of truth with committed snapshots; build-time posters; the facts ledger; which pages earn their place; skipping Google Business Profile.
+- **Decision records** in `docs/decisions/`: static hosting on Cloudflare Workers (ADR 0027, after GitHub Pages); Bandsintown as the source of truth with committed snapshots; build-time posters; the facts ledger; which pages earn their place; skipping Google Business Profile.
 - **Case study outline.** The problem, the constraints (a working musician who won't touch a CMS, and a free host), the approach, the build, the results at 30, 60 and 90 days, and what's next.
 - **Capture as you go** in `docs/case-study-notes.md`: before-and-after screenshots, Lighthouse before and after, a screen recording of a gig added in Bandsintown going live as a page and poster, a grid of generated posters, and AI answers before and after.
 - **A stretch idea that fits Joe's background:** an iOS home-screen widget showing Johnny's next show, reading `/shows.json`.

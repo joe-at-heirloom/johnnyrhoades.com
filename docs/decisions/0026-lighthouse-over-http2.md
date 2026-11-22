@@ -1,6 +1,6 @@
 # 0026: Lighthouse CI serves the build over HTTP/2
 
-**Status:** Accepted, 2026-11-22. Refines ADR 0012 (the Lighthouse budgets); the LCP warning stays a warning.
+**Status:** Accepted, 2026-11-22. Refines ADR 0012 (the Lighthouse budgets); the LCP warning stays a warning. Since ADR 0027 the server also sends the build's `dist/_headers`, as Cloudflare Workers does.
 
 ## Context
 
