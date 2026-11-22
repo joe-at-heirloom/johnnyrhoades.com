@@ -115,8 +115,9 @@ describe('media and profiles', () => {
       'https://www.youtube.com/@johnnyrhoades86',
       'https://www.facebook.com/profile.php?id=100085365311010',
       'https://music.apple.com/us/artist/johnny-rhoades/942326905',
+      'https://www.instagram.com/johnnyrhoadesmusic/',
     ]);
-    expect(liveLinks(profiles).map((p) => p.name)).toEqual(['Bandsintown', 'YouTube', 'Facebook', 'Apple Music', 'Amazon']);
+    expect(liveLinks(profiles).map((p) => p.name)).toEqual(['Bandsintown', 'YouTube', 'Facebook', 'Apple Music', 'Amazon', 'Instagram']);
   });
 
   it('formats ISO 8601 durations', () => {

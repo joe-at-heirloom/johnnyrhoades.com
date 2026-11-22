@@ -17,7 +17,10 @@
   url: https://www.facebook.com/profile.php?id=100085365311010
   kind: profile
   status: live
-  note: A numbered personal-style profile; create a named artist page and move over (PLAN.md section 10)
+  note: >-
+    A Musician/band Page (checked 2026-11-22): Waterford Township, hello@johnnyrhoades.com and johnnyrhoades.com on it,
+    255 followers, last post November 2024. It has no username yet, so its address is a number: give it one
+    (johnnyrhoadesmusic, to match Instagram) and post the shows there.
 
 - name: Apple Music
   url: https://music.apple.com/us/artist/johnny-rhoades/942326905
@@ -38,8 +41,10 @@
   note: Johnny doesn't use Spotify (2026-10-05). CD Baby distributed the album, so the CD Baby account is where to start.
 
 - name: Instagram
+  url: https://www.instagram.com/johnnyrhoadesmusic/
   kind: profile
-  status: to_create
+  status: live
+  note: Found through Google AI Mode (2026-11-22). Its bio links johnnyrhoades.com; 478 followers, 21 posts.
 
 - name: MusicBrainz
   kind: profile

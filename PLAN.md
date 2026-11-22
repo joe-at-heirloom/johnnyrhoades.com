@@ -514,9 +514,9 @@ Answer engines describe the artists they can identify with confidence and verify
 | YouTube (`@johnnyrhoades86`) | Live | Keep, and check eligibility for an Official Artist Channel |
 | Apple Music | Live: artist page (`/artist/942326905`), in `sameAs` since 2026-11-22. It's the #2 result for his name | Claim Apple Music for Artists |
 | Amazon | Album page | Add the artist page if one exists |
-| Facebook | Numbered personal-style profile. The #1 result for his name is Facebook's people search | Create a named artist page and move over |
+| Facebook | Live: a Musician/band Page without a username (checked 2026-11-22), last post November 2024. The #1 result for his name is Facebook's people search | Give the Page a username and post the shows there |
 | Spotify | Not found | Claim Spotify for Artists |
-| Instagram | Not found | Create a matching handle |
+| Instagram | Live: @johnnyrhoadesmusic, linking to the site (found 2026-11-22) | Keep; post the shows there |
 | MusicBrainz | Missing | Create artist and release entries |
 | Discogs | Missing | Create entries, including his guitar credits on Motor City Josh albums |
 | Wikidata | Missing | Create once there are independent references |
