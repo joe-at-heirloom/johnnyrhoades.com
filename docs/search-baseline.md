@@ -10,7 +10,31 @@ Where johnnyrhoades.com and Johnny stand in search, measured with Ahrefs on 2026
 | Organic keywords, US | 0 |
 | Organic traffic, US (estimated) | 0 |
 | Referring domains | 25, of which one was editorial, and it's lost (see Backlinks) |
-| johnnyrhoades.com in the top 10 for "johnny rhoades" | No |
+| johnnyrhoades.com in the top 10 for "johnny rhoades" | No, in Ahrefs' snapshot. Search Console disagrees (next section) |
+
+## What Google itself reports
+
+Search Console, the Domain property, for the three months to 2026-11-22. This is the old Bandzoogle site, since staging is `noindex`. It's Google's own count, so it beats the Ahrefs estimates above.
+
+| Measure | Value |
+|---|---|
+| Clicks from Google search | 18 |
+| Impressions | 345 |
+| Click-through rate | 5.2% |
+| Average position | 6.5 |
+| Pages indexed | 4 (9 more known but not indexed) |
+| Core Web Vitals | No data yet: too few visits |
+
+| Query | Clicks | Impressions |
+|---|---|---|
+| johnny rhoades | 4 | 35 |
+| johnny roads | 0 | 26 |
+| rhoades | 0 | 19 |
+| john rhoades | 0 | 15 |
+| johnny road, johnny detroit, johnny rags | 0 | 3 each |
+| johnnie rhoads, jhonny rhodes, thoades | 0 | 1 each |
+
+The site does show up for his name. Ahrefs' snapshot missed it: average position 6.5 puts it on the first page. Misspellings ("roads", "road", "rhodes") account for about a quarter of the impressions and none of the clicks. Sitemaps: only Bandzoogle's `sitemap.xml`, submitted in 2022, so swap it for `sitemap-index.xml` at launch (runbook step 17).
 
 ## Who ranks for his name
 
