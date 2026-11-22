@@ -98,7 +98,7 @@ describe('llms.txt', () => {
   });
 
   it('names his variants, and who he is not', () => {
-    expect(txt).toContain('Also billed as John Rhoades and the Johnny Rhoades Band, and sometimes misspelled Johnny Rhodes.');
+    expect(txt).toContain('Also billed as John Rhoades and the Johnny Rhoades Band, and sometimes misspelled Johnny Rhodes or Johnny Roads.');
     expect(txt).toContain('He is not the MMA fighter or the basketball player of that name.');
   });
 
