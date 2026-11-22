@@ -20,16 +20,16 @@ Where johnnyrhoades.com and Johnny stand in search, measured with Ahrefs on 2026
 |---|---|---|---|
 | 1 | facebook.com/public/Johnny-Rhoades | 100 | Facebook's people search, not a page of his |
 | 2 | music.apple.com/us/artist/johnny-rhoades/942326905 | 97 | His Apple Music artist page |
-| 3 | musicpage.com/johnrhoadesband | 34 | "John Rhoades Band". Not confirmed as his |
+| 3 | musicpage.com/johnrhoadesband | 34 | His, a 2013 profile as "John Rhoades Band" (Joe, 2026-11-22). The whole site is down now |
 | 4 | cliffbells.com/shows/johnny-rhoades-band/ | 47 | A venue's page for one of his shows |
 | 5 | Wikipedia, Johnny Rhodes (fighter) | 97 | Someone else |
 | 6 | Two LinkedIn profiles | 99 | Other John Rhoadeses |
 | 7 | Videos: "Walkin' Blues", Johnny Rhoades Band (bluesinthed, 2017); Clinton Macomb Public Library, Music at Main | | Other people's uploads of him |
 | 8 | Norwich University baseball coach | 46 | Someone else |
 | 9 | allaboutjazz.com/tag-johnny-rhoades | 80 | A tag page. Not checked |
-| 10 | soundcloud.com/johnny-rhoades-639062848 | 94 | Not confirmed as his |
+| 10 | soundcloud.com/johnny-rhoades-639062848 | 94 | Not his (Joe, 2026-11-22) |
 
-Three results are certainly him and three more might be. None is his own site, and the strongest is a page he hasn't claimed.
+Four results are him and one more might be. None is his own site, and the strongest is a page he hasn't claimed.
 
 ## Keywords
 
@@ -92,10 +92,18 @@ On 2026-11-22, all from facts already in the ledger:
 6. **List public shows where Detroit looks:** the Detroit Blues Society calendar, Pure Michigan events and Metro Times. Each listing is a link while it's up, and the Pure Michigan one was the best link this domain ever had.
 7. **GigSalad, Johnny's call.** It ranks for "blues bands near me" with city pages for blues bands and acoustic guitarists, and it's where people booking private events look. Read its fees and terms first.
 8. **MusicBrainz and Discogs** (PLAN.md section 10), including his credit on *Feelin' Freaky*. Wikidata and answer engines lean on these.
-9. **Ask Johnny about three results:** musicpage.com/johnrhoadesband (#3), soundcloud.com/johnny-rhoades-639062848 (#10) and the All About Jazz tag page (#9). If the first two are his, point them here and add them to `profiles.yaml`. If they aren't, leave them out.
+9. **Point his Kickstarter here.** His 2014 campaign page (DR 92) is still up, and its creator bio linked johnrhoadesmusic.com, a domain nobody owns now. After launch, Johnny can change that link in his Kickstarter profile to johnnyrhoades.com.
 10. **After launch:** verify the site in Ahrefs Webmaster Tools (free) or set up a Site Audit project on the Lite plan, and rerun this baseline on day 28 and day 90.
 
 Not targets: "johnny rhodes" (other people's searches), "blues bands near me" and "live blues near me" (map pack and aggregators, covered by items 6 and 7), and "detroit blues" (answered by an AI Overview on the genre's history).
+
+## What the #3 result turned up
+
+Joe confirmed the musicpage profile is Johnny's. musicpage.com now answers 503 on every page, so it can't be updated and will likely drop out of Google, but the Wayback Machine kept a copy from 2022-05-17. It holds Johnny's own 2013 bio, which names his old site, johnrhoadesmusic.com. That led to his Kickstarter for his first full-length record: 54 backers, $3,001, spring 2014.
+
+The bio has five things the ledger didn't: an EP, *Breakin’ Out*; touring with Kelley Hunt; playing for Sherrie Williams and Stacia Petrie; jazz studies at Western Michigan; and his first sit-in at the Blue Goose at 16. They're in `facts.yaml` as `unverified`, together with the Kickstarter's line that Motor City Josh would produce the record, so none of it is on the site. If Johnny says the bio is his and still right, they become `confirmed_by_johnny`. The Kickstarter totals are `verified`.
+
+The old domain is unregistered. Only musicpage and Kickstarter ever linked to it, so it isn't worth buying back for search.
 
 ## How to rerun
 
