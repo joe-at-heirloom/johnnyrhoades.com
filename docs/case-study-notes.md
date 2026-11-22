@@ -4,13 +4,26 @@ A running log for the portfolio write-up (PLAN.md section 16): numbers, screensh
 
 ---
 
+## 2026-11-22: The next page arrives before the click
+
+**What changed.** Pages tell Chrome and Edge to fetch a linked page's HTML when someone hovers over it or starts to tap it, so the click lands at once (Speculation Rules, ADR 0029). It's a small JSON block in each page's `<head>`, allowed by its hash in the CSP: no JavaScript.
+
+**Worth telling**
+
+- *Prefetch, not prerender, on purpose.* Prerendering would run the next page, so Google Analytics would count visits that never happened, and the guitar could wake up on a page nobody opened. Prefetching only fetches the HTML.
+- *Proved, not assumed.* An end-to-end test hovers a link, clicks, and checks that the browser reports the page as `navigational-prefetch`.
+- *The textbook way cost 0.9 s in the lab.* The usual delivery is a response header pointing at a rules file. An A/B test on the same build read home LCP 2.63 s with it and 1.73 s without, though nothing waited on the file. The simulation charged the hero for its extra request and connection. Inline, hashed into the CSP like the stylesheet, there's no request and no difference.
+- *The A/B tests corrected an earlier claim.* They showed this machine's Lighthouse batches vary by about 0.3 s, so the press kit gain credited to inlining the stylesheet was within the noise. The home page gain held. ADR 0028 now says so.
+
+---
+
 ## 2026-11-22: The stylesheet goes inline
 
 **What changed.** The stylesheet is inline in every page, and the CSP allows it by a sha256 the build computes (ADR 0028). That was possible only once the headers became a file the build writes.
 
 **Numbers** (Lighthouse CI, mobile, median of 3, over HTTP/2):
-- Press kit LCP 1905 → 1605 ms.
-- Home LCP 1800 → 1726 ms.
+- Press kit LCP 1905 → 1605 ms, though later runs put that within the noise (see the entry above).
+- Home LCP 1800 → 1726 ms, steady across every batch since.
 - Show page unchanged at 1455 ms.
 - 100 everywhere.
 

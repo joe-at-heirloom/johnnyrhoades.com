@@ -23,7 +23,9 @@ Lighthouse CI, mobile, median of 3, over HTTP/2:
 | Press kit | 1080 → 982 ms | 1905 → 1605 ms |
 | Show page | 940 → 941 ms | 1455 → 1455 ms |
 
-Performance, accessibility, best practices and SEO are 100 on all three. The gain is smaller than the 455 ms Lighthouse once estimated, because that estimate was made over HTTP/1.1 (ADR 0026), where every request queued.
+Performance, accessibility, best practices and SEO are 100 on all three.
+
+**Correction, same day:** later A/B runs for ADR 0029 read the press kit at 1.80–1.83 s on this same setup. On this machine, batches vary by about 0.3 s, so treat the press kit's gain as within the noise. The home page's ~75 ms gain held in every batch: 1.73 s, against 1.80 s before. The gain is smaller than the 455 ms Lighthouse once estimated, because that estimate was made over HTTP/1.1 (ADR 0026), where every request queued.
 
 - **The trade:** the styles no longer cache across pages, so each page's HTML is about 10 KB (compressed) heavier. That's fine for a site where most visits are one or two pages, and first visits get faster.
 - **The hash can't go stale:** it's computed from the files the build just wrote. The CSP end-to-end test loads every page under the served policy, so a mismatch would show as a violation, and another test fails if any built page has a `<style>` the policy doesn't allow.

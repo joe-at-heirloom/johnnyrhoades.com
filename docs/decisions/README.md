@@ -31,3 +31,4 @@ Short notes on choices that shape the code, so the reasoning survives. One file 
 | [0026](0026-lighthouse-over-http2.md) | Lighthouse CI serves the build over HTTP/2 | Accepted |
 | [0027](0027-cloudflare-workers-hosting.md) | Host on Cloudflare Workers, not GitHub Pages | Accepted |
 | [0028](0028-inline-the-stylesheet.md) | Inline the stylesheet, allowed by its hash | Accepted |
+| [0029](0029-prefetch-on-intent.md) | Prefetch the next page on intent, with Speculation Rules | Accepted |

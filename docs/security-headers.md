@@ -21,11 +21,11 @@ On every response (`/*` in `_headers`):
 
 The policy served is this one, plus a `'sha256-…'` in `style-src` for the inline stylesheet (ADR 0028). The build hashes every `<style>` it wrote, so the hash can't go stale.
 
-Staging builds (`SITE_NOINDEX=true`) also send `X-Robots-Tag: noindex`.
+`script-src` likewise gets a `'sha256-…'` for the inline speculation rules, which prefetch a page when someone hovers over or starts to tap a link to it (ADR 0029). Staging builds (`SITE_NOINDEX=true`) also send `X-Robots-Tag: noindex`.
 
 What each part of the policy is for:
 
-- **`script-src`**: the site's own bundles and Google's `gtag.js`, which the site loads after the page is idle, on the real domain only (ADR 0023). No inline scripts anywhere: `astro.config.mjs` sets `assetsInlineLimit: 0`, so Astro never inlines a small script, and the policy needs no hashes that change every build. JSON-LD and the Tonight data island are data blocks, which CSP doesn't apply to.
+- **`script-src`**: the inline speculation rules by their sha256 (ADR 0029; JSON, not code), the site's own bundles and Google's `gtag.js`, which the site loads after the page is idle, on the real domain only (ADR 0023). No inline scripts anywhere: `astro.config.mjs` sets `assetsInlineLimit: 0`, so Astro never inlines a small script, and the policy needs no hashes that change every build. JSON-LD and the Tonight data island are data blocks, which CSP doesn't apply to.
 - **`style-src`**: the site's own files, and the stylesheet inlined in each page, allowed by its sha256 and nothing else. There's no `'unsafe-inline'`, so an injected `<style>` or `style=` attribute is still blocked.
 - **`connect-src`**: both forms (Formspree), and the hosts Google Analytics sends hits to. The wildcards are Google's own documented policy for GA4, which picks a regional collection host (`region1.google-analytics.com` and the like).
 - **`form-action`**: Formspree, for the no-JavaScript posts.
