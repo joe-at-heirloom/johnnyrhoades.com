@@ -46,7 +46,13 @@ export function venueZone(region: string, country: string): string {
 export function localToIso(local: string, zone: string): string {
   const dt = DateTime.fromISO(local, { zone, setZone: true });
   if (!dt.isValid) throw new Error(`Invalid date "${local}": ${dt.invalidExplanation ?? dt.invalidReason}`);
-  return dt.toISO({ suppressMilliseconds: true }) ?? local;
+  // Luxon resolves an ambiguous time from the offset in effect when the code runs, so the same show
+  // came out an hour apart depending on the season of the build. Pick the first instance explicitly:
+  // if the same wall-clock time also happened an hour earlier, use that one.
+  const wall = "yyyy-MM-dd'T'HH:mm:ss";
+  const earlier = dt.minus({ hours: 1 });
+  const chosen = earlier.toFormat(wall) === dt.toFormat(wall) ? earlier : dt;
+  return chosen.toISO({ suppressMilliseconds: true }) ?? local;
 }
 
 const inZone = (iso: string, zone: string) => DateTime.fromISO(iso, { setZone: true }).setZone(zone);

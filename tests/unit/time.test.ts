@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { Settings } from 'luxon';
 import { clockTime, localDate, localToIso, longDate, shortDate, slugTime, titleDate, venueZone } from '../../src/lib/time.ts';
 
 const DET = 'America/Detroit';
@@ -15,6 +16,21 @@ describe('localToIso', () => {
     expect(localToIso('2026-11-01T20:00:00', DET)).toBe('2026-11-01T20:00:00-05:00');
     // 1:30 am happens twice that night; we take the first (daylight) one.
     expect(localToIso('2026-11-01T01:30:00', DET)).toBe('2026-11-01T01:30:00-04:00');
+  });
+
+  it('resolves that ambiguous hour the same way whatever the season of the build', () => {
+    // Luxon's own guess follows the offset at "now", so a build in winter used to pick standard time.
+    const real = Settings.now;
+    try {
+      for (const now of ['2026-07-15T12:00:00Z', '2026-12-15T12:00:00Z']) {
+        Settings.now = () => Date.parse(now);
+        expect(localToIso('2026-11-01T01:30:00', DET), `built ${now}`).toBe('2026-11-01T01:30:00-04:00');
+        expect(localToIso('2026-11-01T00:30:00', DET), `built ${now}`).toBe('2026-11-01T00:30:00-04:00');
+        expect(localToIso('2026-11-01T02:30:00', DET), `built ${now}`).toBe('2026-11-01T02:30:00-05:00');
+      }
+    } finally {
+      Settings.now = real;
+    }
   });
 
   // DST starts Sunday, March 14, 2027.
