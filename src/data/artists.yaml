@@ -5,8 +5,6 @@
 # Named in the bios but not linked:
 #   Paul Carey         No page of his own (checked 2026-11-22). paulcarey.com is parked, and bluesdisciples.com is a
 #                      Milwaukee band of the same name.
-#   Sherrie Williams   The 2013 musicpage bio's spelling. The only Michigan blues singer close to it is Sharrie Williams
-#                      of Saginaw, and her old domain now serves a casino site. Ask Johnny which he meant.
 #   B.B. King, Albert King, Albert Collins, Ray Charles: influences, not people he's played with.
 
 - name: Motor City Josh
@@ -49,6 +47,12 @@
 - name: Kelley Hunt
   url: https://kelleyhunt.com/
   note: Checked 2026-11-22. "Kansas City native Kelley Hunt", singer, songwriter and piano player.
+
+- name: Sharrie Williams
+  url: https://www.facebook.com/OfficialSharrieWilliams
+  note: >-
+    Checked 2026-11-22. "Sharrie Williams Official", a musician page, posting from Bay City in October 2026, with a
+    Saginaw-area number. Her own page: her old domain, sharriewilliams.com, now serves a casino site, so don't use it.
 
 - name: Stacia Petrie
   url: https://staciamusic.com/

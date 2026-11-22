@@ -101,7 +101,7 @@ Not targets: "johnny rhodes" (other people's searches), "blues bands near me" an
 
 Joe confirmed the musicpage profile is Johnny's. musicpage.com now answers 503 on every page, so it can't be updated and will likely drop out of Google, but the Wayback Machine kept a copy from 2022-05-17. It holds Johnny's own 2013 bio, which names his old site, johnrhoadesmusic.com. That led to his Kickstarter for his first full-length record: 54 backers, $3,001, spring 2014.
 
-The bio has five things the ledger didn't: an EP, *Breakin’ Out*; touring with Kelley Hunt; playing for Sherrie Williams and Stacia Petrie; jazz studies at Western Michigan; and his first sit-in at the Blue Goose at 16. They're all in his bio now, along with the Kickstarter (ADR 0025), and each artist the bio names links to their own page. One claim stays out until Johnny confirms it: the Kickstarter's plan for Motor City Josh to produce the record.
+The bio has five things the ledger didn't: an EP, *Breakin’ Out*; touring with Kelley Hunt; playing for Sharrie Williams and Stacia Petrie; jazz studies at Western Michigan; and his first sit-in at the Blue Goose at 16. They're all in his bio now, along with the Kickstarter (ADR 0025), and each artist the bio names links to their own page. One claim stays out until Johnny confirms it: the Kickstarter's plan for Motor City Josh to produce the record.
 
 The old domain is unregistered. Only musicpage and Kickstarter ever linked to it, so it isn't worth buying back for search.
 
