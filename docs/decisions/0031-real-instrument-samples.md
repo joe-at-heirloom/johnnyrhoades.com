@@ -1,6 +1,6 @@
 # 0031: Real instrument samples from MuseScore General
 
-**Status:** Accepted, 2026-11-24. Replaces the instrument and drum sounds of ADR 0030 (generated with ElevenLabs and retuned); the room loops stay generated.
+**Status:** Accepted, 2026-11-24. Replaces the instrument and drum sounds of ADR 0030 (generated with ElevenLabs and retuned); the room loops stay generated. ADR 0032 moves the drums, basses, guitars, piano and sax on to deeper libraries; the organ and harmonica stay here.
 
 ## Context
 

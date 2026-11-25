@@ -1,22 +1,41 @@
 ---
 /*
-  Where the blues maker's sounds come from, and their licenses (ADR 0031).
-  The instrument samples are rendered from MuseScore General, whose MIT
-  license asks that its acknowledgements and copyright notices travel with
-  any derivative work; the samples are served from this page, so the notice
-  is here, word for word, read from the copy kept beside them.
+  Where the blues maker's sounds come from, and their licenses (ADRs 0031
+  and 0032). Read from the manifest, so a source can't be added without
+  being credited here. Two need attribution (CC BY: the Salamander piano and
+  the MTG sax); MuseScore General's MIT license asks that its notice travel
+  with any derivative work, and the samples are served from this page, so
+  that notice is here word for word, read from the copy beside them.
 */
+import { parse } from 'yaml';
+import manifestYaml from '../data/jam.yaml?raw';
 import raw from '../assets/jam/LICENSE-MuseScore_General.md?raw';
+import { parseJamManifest } from '../lib/jam-manifest';
 
+const manifest = parseJamManifest(parse(manifestYaml));
+const used = (id: string) =>
+  [...manifest.tones.filter((t) => t.from === id).map((t) => t.name), ...new Set(manifest.drums.filter((d) => d.from === id).map((d) => `${d.tone} drums`))].join(', ');
+const libraries = Object.entries(manifest.libraries).map(([id, lib]) => ({ ...lib, used: used(id) }));
+const soundfontParts = used('soundfont');
 // The words exactly; only the spaces some lines end with are dropped.
 const license = raw.replace(/[ \t]+$/gm, '');
 ---
 
 <details class="jam-credits">
   <summary>Sound credits and licenses</summary>
-  <p>
-    Instruments and drums: <a class="text-link" href="https://musescore.org/en/handbook/soundfonts">MuseScore General</a> soundfont, version 0.2, by S. Christian Collins, from FluidR3 by Frank Wen and FluidR3Mono by Michael Cowgill, with the Splendid Grand piano (public domain). MIT license, below. Rendered note by note with FluidSynth.
-  </p>
-  <p>Room sounds (the bar and the old record): generated with ElevenLabs’ sound-effects model.</p>
+  <p>The instruments are real recordings, rendered note by note:</p>
+  <ul>
+    {
+      libraries.map((lib) => (
+        <li>
+          <a class="text-link" href={lib.url.replace(/\/(releases|archive)\/.*$/, '')}>{lib.name}</a> by {lib.by}, {lib.license}: {lib.used}.
+        </li>
+      ))
+    }
+    <li>
+      <a class="text-link" href="https://musescore.org/en/handbook/soundfonts">MuseScore General</a> soundfont, version 0.2, by S. Christian Collins, from FluidR3 by Frank Wen and FluidR3Mono by Michael Cowgill, MIT license (below): {soundfontParts}.
+    </li>
+  </ul>
+  <p>The piano and the tenor sax are derived from the Salamander Grand Piano and MTG Solo Sax SFZ instruments. The room sounds (the bar and the old record) were generated with ElevenLabs’ sound-effects model.</p>
   <pre class="jam-license">{license}</pre>
 </details>

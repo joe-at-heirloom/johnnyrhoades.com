@@ -23,20 +23,20 @@ export const FADER = { min: -48, max: 6, step: 0.5 } as const;
 const strip = (db: number, send: number, pan = 0): Strip => ({ db, pan, tone: 0, send, mute: false, solo: false });
 
 /**
- * The starting mix: the bass and drums up front, guitar and keys under them,
+ * The starting mix (set by the meters with the sampled kits, ADR 0032): the bass and drums up front, guitar and keys under them,
  * the fills just behind them, the room well under the band. Panned the way a
  * small band stands: guitar a little left, keys a little right.
  */
 export const DEFAULT_MIX: Mix = {
   strips: {
-    drums: strip(-2, 0.08),
-    bass: strip(-0.5, 0),
+    drums: strip(-7, 0.08),
+    bass: strip(-3, 0),
     guitar: strip(-6, 0.18, -0.25),
     keys: strip(-10, 0.22, 0.25),
     lead: strip(-5.5, 0.25, 0.1),
     room: strip(-10.5, 0),
   },
-  master: { db: -1, room: 0.35, drive: 0.15 },
+  master: { db: -3, room: 0.35, drive: 0.15 },
 };
 
 export const cloneMix = (m: Mix): Mix => ({ strips: Object.fromEntries(PARTS.map((p) => [p, { ...m.strips[p] }])) as Mix['strips'], master: { ...m.master } });

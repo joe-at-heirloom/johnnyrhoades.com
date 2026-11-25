@@ -20,12 +20,14 @@ import {
   TONES,
   autoSection,
   barEvents,
-  COUNT_IN,
+  COUNT_IN as COUNT_IN_BEATS,
   humanize,
   RELEASE,
+  SAMPLE_GAIN,
   chordName,
   degreeName,
-  drumSampleId,
+  pickDrum,
+  pieceOf,
   FEEL_INFO,
   parseSong,
   pickSample,
@@ -53,8 +55,8 @@ type Loaded = { buffer: AudioBuffer; offset: number };
 
 const playingText = (s: Song) => `Playing a ${FEEL_INFO[s.feel].label.toLowerCase()} in ${s.key}, ${s.bpm} bpm.`;
 
-/** A drummer counts in by clicking sticks; the closed hi-hat is the nearest thing in the kit. */
-const COUNT_IN_SOUND = 'sticks-hat';
+/** A drummer counts in by clicking sticks; the closed hi-hat of the sticks kit is the nearest thing in the kit. */
+const COUNT_IN = { kit: 'sticks', piece: 'hat' } as const;
 const LIGHT_S = 0.09; // how long a part's drawing stays marked for a note
 
 const LOOKAHEAD_S = 0.3; // schedule a bar once its downbeat is this close
@@ -251,32 +253,56 @@ export function initJam(root: HTMLElement): void {
     return p;
   }
 
-  /** The one sample an event plays, and the rate that tunes it. */
-  function sampleFor(e: JamEvent, s: Song): { id: string; rate: number } | null {
+  // Repeated notes take the recordings of them in turn (where there's more than one), so no two hits are the same.
+  const turns = new Map<string, number>();
+  const nextTake = (key: string) => {
+    const n = turns.get(key) ?? 0;
+    turns.set(key, n + 1);
+    return n;
+  };
+
+  /** The one sample an event plays (its loudness layer, its take in turn), and the rate that tunes it. */
+  function sampleFor(e: JamEvent, s: Song, take = 0): { id: string; rate: number } | null {
     const tone = s.parts[e.part];
     if (!tone) return null;
-    if (e.drum) return { id: drumSampleId(tone, e.drum), rate: 1 };
+    if (e.drum) {
+      const hit = pickDrum(sounds, tone, e.drum, { gain: e.gain, take });
+      return hit && { id: hit.id, rate: 1 };
+    }
     const picked = pickSample(
       sounds.filter((x) => x.part === e.part && x.tone === tone),
       e.midi ?? 60,
+      { gain: e.gain, take },
     );
     return picked && { id: picked.sound.id, rate: picked.rate };
   }
 
-  /** Only what this song can play, in its key and feel, in any kind of chorus: a few dozen samples, not the library. */
+  /** Every recording an event could play: all the layers and takes of its note or drum. */
+  function recordingsFor(e: JamEvent, s: Song): string[] {
+    const tone = s.parts[e.part];
+    if (!tone) return [];
+    const one = sampleFor(e, s);
+    if (!one) return [];
+    const picked = byId.get(one.id);
+    return sounds
+      .filter((x) => x.part === e.part && x.tone === tone && (e.drum ? !!picked && pieceOf(x) === pieceOf(picked) : Math.abs((x.midi ?? -99) - (picked?.midi ?? 99)) < 0.5))
+      .map((x) => x.id);
+  }
+
+  /** Only what this song can play, in its key and feel, in any kind of chorus: not the whole library. */
   const load = (s: Song) => {
     const ids = new Set<string>();
-    for (const section of SECTIONS) for (let bar = 0; bar < 24; bar++) for (const e of barEvents(s, bar, section)) ids.add(sampleFor(e, s)?.id ?? '');
+    for (const section of SECTIONS) for (let bar = 0; bar < 24; bar++) for (const e of barEvents(s, bar, section)) for (const id of recordingsFor(e, s)) ids.add(id);
     if (s.parts.room) ids.add(`room-${s.parts.room}`);
-    ids.add(COUNT_IN_SOUND);
-    ids.delete('');
+    for (const x of sounds) if (x.part === 'drums' && x.tone === COUNT_IN.kit && pieceOf(x) === COUNT_IN.piece) ids.add(x.id);
     return Promise.all([...ids].map(loadSound));
   };
 
   /** Play one event at audio time `when`. */
-  function voice(e: JamEvent, when: number, spb: number, gainScale = 1, forced?: { id: string; rate: number }) {
+  function voice(e: JamEvent, at: number, spb: number, gainScale = 1, forced?: { id: string; rate: number }) {
     if (!ctx) return;
-    const sample = forced ?? sampleFor(e, song);
+    const when = at + (e.delay ?? 0); // a strummed or rolled chord's later notes
+    const sample = forced ?? sampleFor(e, song, nextTake(`${e.part}:${e.drum ?? Math.round(e.midi ?? 0)}`));
     if (!sample) return;
     const { id, rate } = sample;
     const got = ready.get(id); // never wait on a fetch mid-song: a tone still loading just sits out
@@ -292,7 +318,7 @@ export function initJam(root: HTMLElement): void {
     } else src.playbackRate.value = rate;
     const g = ctx.createGain();
     const end = when + e.beats * spb;
-    const level = Math.min(1, e.gain * gainScale);
+    const level = Math.min(1, e.gain * gainScale) * SAMPLE_GAIN;
     // A quick fade in, then the note's length, then it lets go on its own curve and rings into the
     // next one (RELEASE in src/lib/jam.ts). Drums don't let go early: each hit plays out.
     g.gain.setValueAtTime(0, start);
@@ -529,10 +555,11 @@ export function initJam(root: HTMLElement): void {
     soundingChorus = Math.floor(bar / 12);
     // Count it in, then the band comes in on one.
     const spb = secondsPerBeat(song.bpm);
-    nextBarAt = audio.currentTime + 0.1 + COUNT_IN.length * spb;
-    COUNT_IN.forEach((beat, i) =>
-      voice({ at: beat, part: 'drums', drum: 'hat', gain: i === 0 ? 0.7 : 0.55, beats: 0.5 }, nextBarAt + beat * spb, spb, 1, { id: COUNT_IN_SOUND, rate: 1 }),
-    );
+    nextBarAt = audio.currentTime + 0.1 + COUNT_IN_BEATS.length * spb;
+    COUNT_IN_BEATS.forEach((beat, i) => {
+      const click = pickDrum(sounds, COUNT_IN.kit, COUNT_IN.piece, { gain: 0.7, take: i });
+      if (click) voice({ at: beat, part: 'drums', drum: 'hat', gain: i === 0 ? 0.7 : 0.55, beats: 0.5 }, nextBarAt + beat * spb, spb, 1, { id: click.id, rate: 1 });
+    });
     schedule();
     showLeader(soundingChorus);
     frame = requestAnimationFrame(drawLights);

@@ -7,7 +7,7 @@
   them, and the player keeps the band's fills out of your way
   (`lastPlayed`). The scale and the ranges are in src/lib/sit-in.ts.
 */
-import { pickSample, type JamEvent, type Key, type MeasuredSound, type Part } from '../lib/jam';
+import { pickSample, SAMPLE_GAIN, type JamEvent, type Key, type MeasuredSound, type Part } from '../lib/jam';
 import { SIT_IN, bendFromDrag, padForKey, pads, spoken, type SitInInstrument } from '../lib/sit-in';
 
 type Loaded = { buffer: AudioBuffer; offset: number };
@@ -75,7 +75,7 @@ export function initSitIn(root: HTMLElement, deps: SitInDeps): SitIn {
     const gain = ctx.createGain();
     const now = ctx.currentTime;
     gain.gain.setValueAtTime(0, now);
-    gain.gain.linearRampToValueAtTime(0.75, now + 0.005);
+    gain.gain.linearRampToValueAtTime(0.75 * SAMPLE_GAIN, now + 0.005);
     src.connect(gain).connect(out);
     src.start(now, got.offset);
     held.set(id, { src, gain, rate: picked.rate, ctx });

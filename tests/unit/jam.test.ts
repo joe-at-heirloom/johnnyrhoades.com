@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { parse } from 'yaml';
 import { describe, expect, it } from 'vitest';
-import { hzToMidi, levelTo, loudness, midiToName, noteToMidi, notePitch, onsetIndex, tailIndex, yin } from '../../src/lib/audio-analysis';
+import { bandPower, checkPitch, hzToMidi, levelTo, loudness, midiToName, noteToMidi, notePitch, onsetIndex, tailIndex, yin } from '../../src/lib/audio-analysis';
 import {
   DEFAULT_SONG,
   FEELS,
@@ -13,6 +13,10 @@ import {
   COUNT_IN,
   humanize,
   legato,
+  layerFor,
+  pickDrum,
+  pieceOf,
+  STRUM_S,
   autoSection,
   startBar,
   SECTIONS,
@@ -20,7 +24,6 @@ import {
   type JamEvent,
   chordName,
   degreeName,
-  drumSampleId,
   noteAtOrAbove,
   SAMPLE_STEP,
   sampleNotes,
@@ -31,7 +34,7 @@ import {
   type MeasuredSound,
   type Song,
 } from '../../src/lib/jam';
-import { DRUM_PIECES, parseJamManifest } from '../../src/lib/jam-manifest';
+import { DRUM_PIECES, parseJamManifest, sampleId } from '../../src/lib/jam-manifest';
 
 const RATE = 44100;
 const tone = (hz: number, seconds: number, harmonics = [1, 0.5, 0.3]) => {
@@ -81,6 +84,24 @@ describe('audio analysis', () => {
     expect(loudness(new Float32Array(10))).toBe(-Infinity);
   });
 
+  it('checks a note is the one it should be: in tune, and in the right octave', () => {
+    const at = (hz: number, harmonics: number[]) => tone(hz, 1.2, harmonics);
+    expect(checkPitch(at(110, [1, 0.5, 0.3]), RATE, 45)).toEqual({ cents: expect.closeTo(0, 0) });
+    // A low note with a weak fundamental is still that note.
+    expect('cents' in checkPitch(at(41.2, [0.25, 1, 0.4]), RATE, 28)).toBe(true);
+    // A sample really an octave up isn't.
+    expect(checkPitch(at(82.4, [1, 0.5, 0.3]), RATE, 28)).toEqual({ error: 'sounds 1 octave up' });
+    // Nor is one an octave down, unless it's an organ's drawbars.
+    expect(checkPitch(at(55, [1, 0.5]), RATE, 45)).toEqual({ error: 'sounds 1 octave down' });
+    expect('cents' in checkPitch(at(55, [1, 0.5]), RATE, 45, { anyOctave: true })).toBe(true);
+    expect(checkPitch(new Float32Array(RATE), RATE, 45)).toEqual({ error: 'no clear pitch' });
+  });
+
+  it('measures the power at one frequency', () => {
+    const x = tone(100, 1, [1]);
+    expect(bandPower(x, RATE, 100)).toBeGreaterThan(bandPower(x, RATE, 150) + 40);
+  });
+
   it('finds no pitch in noise', () => {
     let s = 1;
     const noise = Float32Array.from({ length: RATE }, () => ((s = (s * 1664525 + 1013904223) % 4294967296) / 4294967296) * 2 - 1);
@@ -93,37 +114,59 @@ describe('the manifest and the measured sounds', () => {
   const manifest = parseJamManifest(parse(readFileSync('src/data/jam.yaml', 'utf8')));
   const measured: { sounds: MeasuredSound[] } = JSON.parse(readFileSync('src/data/jam-sounds.json', 'utf8'));
 
-  it('renders every pitched tone the page offers from the soundfont, and generates the room loops', () => {
+  it('renders every tone and kit the page offers, from a pinned source, and generates the room loops', () => {
     for (const part of ['bass', 'guitar', 'keys', 'lead'] as const)
       for (const t of TONES[part]) expect(manifest.tones.filter((x) => x.part === part && x.tone === t), `${part}/${t}`).toHaveLength(1);
-    for (const kit of TONES.drums) expect(manifest.drums.filter((d) => d.tone === kit).map((d) => d.id).sort(), kit).toEqual(DRUM_PIECES.map((p) => drumSampleId(kit, p)).sort());
+    for (const kit of TONES.drums) expect(manifest.drums.filter((d) => d.tone === kit).map((d) => d.piece).sort(), kit).toEqual([...DRUM_PIECES].sort());
     expect(manifest.generated.map((g) => g.tone).sort()).toEqual([...TONES.room].sort());
     expect(manifest.soundfont.url).toMatch(/^https:\/\/ftp\.osuosl\.org\/pub\/musescore\//);
+    // Libraries only from their makers' own releases, each pinned by checksum, and only licenses that let the samples be served.
+    for (const [id, lib] of Object.entries(manifest.libraries)) {
+      expect(lib.url, id).toMatch(/^https:\/\/github\.com\/sfzinstruments\//);
+      expect(lib.license, id).toMatch(/^(CC0 1\.0|CC BY [34]\.0)$/);
+    }
   });
 
-  it('has every drum and room sound, and a sample in tune at every note each pitched tone needs', () => {
+  it('has every drum and room sound, and every note each pitched tone needs, at every layer and take, in tune', () => {
     const ids = new Set(measured.sounds.map((s) => s.id));
-    for (const s of [...manifest.drums, ...manifest.generated]) expect(ids.has(s.id), s.id).toBe(true);
-    for (const part of ['bass', 'guitar', 'keys', 'lead'] as const)
-      for (const t of TONES[part]) {
-        const got = measured.sounds.filter((s) => s.part === part && s.tone === t);
-        expect(got.map((s) => Math.round(s.midi!)), `${part}/${t}`).toEqual(sampleNotes(part, t));
-        // Rendered at the note, and measured within 25 cents of it.
-        for (const s of got) expect(Math.abs(s.midi! - Math.round(s.midi!)) * 100, s.id).toBeLessThanOrEqual(25);
-      }
+    for (const g of manifest.generated) expect(ids.has(g.id), g.id).toBe(true);
+    for (const d of manifest.drums) {
+      const hits = measured.sounds.filter((s) => s.part === 'drums' && s.tone === d.tone && s.piece === d.piece);
+      expect(hits, `${d.tone} ${d.piece}`).toHaveLength(d.layers.length * d.takes);
+    }
+    for (const t of manifest.tones) {
+      const got = measured.sounds.filter((s) => s.part === t.part && s.tone === t.tone);
+      expect(got, `${t.part}/${t.tone}`).toHaveLength(sampleNotes(t.part, t.tone).length * t.layers.length * t.takes);
+      expect([...new Set(got.map((s) => s.key))], `${t.part}/${t.tone}`).toEqual(sampleNotes(t.part, t.tone));
+      // Within half a semitone of its note, measured; the browser tunes from the measurement.
+      for (const s of got) expect(Math.abs(s.midi! - s.key!) * 100, s.id).toBeLessThanOrEqual(50);
+    }
   });
 
-  it('keeps the soundfont’s license beside the samples', () => {
+  it('keeps the licenses beside the samples', () => {
     const license = readFileSync('src/assets/jam/LICENSE-MuseScore_General.md', 'utf8');
     expect(license).toContain('shared under the MIT license');
     expect(license).toContain('Permission is hereby granted, free of charge');
+    const credits = readFileSync('src/assets/jam/CREDITS.md', 'utf8');
+    for (const lib of Object.values(manifest.libraries)) {
+      expect(credits, lib.name).toContain(lib.name);
+      expect(credits, lib.name).toContain(lib.license);
+    }
   });
 
-  it('rejects a tone twice over, an unknown tone, and a duplicate id', () => {
+  it('rejects a tone twice over, an unknown tone, a missing library, and layers out of order', () => {
     const base = parse(readFileSync('src/data/jam.yaml', 'utf8'));
     expect(() => parseJamManifest({ ...base, tones: [...base.tones, base.tones[0]] })).toThrow(/listed twice/);
     expect(() => parseJamManifest({ ...base, tones: [{ ...base.tones[0], tone: 'tuba' }] })).toThrow(/unknown/);
-    expect(() => parseJamManifest({ ...base, drums: [...base.drums, base.drums[0]] })).toThrow(/duplicate id/);
+    expect(() => parseJamManifest({ ...base, drums: [...base.drums, base.drums[0]] })).toThrow(/listed twice/);
+    expect(() => parseJamManifest({ ...base, tones: [{ ...base.tones[0], from: 'nowhere' }] })).toThrow(/isn't in libraries/);
+    expect(() => parseJamManifest({ ...base, tones: [{ ...base.tones[0], layers: [100, 50] }] })).toThrow(/soft to hard/);
+  });
+
+  it('names samples by layer and take only when there are several', () => {
+    expect(sampleId('upright-40', 0, 1, 0, 1)).toBe('upright-40');
+    expect(sampleId('upright-40', 2, 3, 1, 2)).toBe('upright-40-l2-t1');
+    expect(sampleId('sticks-crash', 1, 2, 0, 1)).toBe('sticks-crash-l1');
   });
 
   it('levels every note of a tone to within 3.5 dB, and the room loops to the same level', () => {
@@ -133,9 +176,23 @@ describe('the manifest and the measured sounds', () => {
     for (const s of measured.sounds.filter((s) => s.part === 'room')) expect(Math.abs(s.db! + 26), s.id).toBeLessThanOrEqual(1);
   });
 
-  it('has a sample for every drum piece in every kit', () => {
-    const ids = new Set(measured.sounds.map((s) => s.id));
-    for (const kit of TONES.drums) for (const piece of ['kick', 'snare', 'hat', 'ride', 'crash', 'rim'] as const) expect(ids.has(drumSampleId(kit, piece))).toBe(true);
+  it('never makes a harder-played layer quieter than a softer one of the same note', () => {
+    const groups = new Map<string, MeasuredSound[]>();
+    for (const s of measured.sounds) if (s.layer !== undefined) groups.set(`${s.tone}/${s.key ?? s.piece}`, [...(groups.get(`${s.tone}/${s.key ?? s.piece}`) ?? []), s]);
+    for (const [k, g] of groups) {
+      const mean = (l: number) => g.filter((s) => s.layer === l).reduce((a, s) => a + s.db!, 0) / g.filter((s) => s.layer === l).length;
+      const layers = [...new Set(g.map((s) => s.layer!))].sort();
+      // A hard layer may be quieter by the measurement's noise, not by the ceiling's 5 dB or more.
+      expect(mean(layers.at(-1)!) - mean(layers[0]!), k).toBeGreaterThan(-4);
+    }
+  });
+
+  it('has hits for every drum piece in every kit, at every layer', () => {
+    for (const kit of TONES.drums)
+      for (const piece of DRUM_PIECES) {
+        expect(pickDrum(measured.sounds, kit, piece, { gain: 0.1 }), `${kit} ${piece}`).not.toBeNull();
+        expect(pickDrum(measured.sounds, kit, piece, { gain: 1 })!.layer ?? 0).toBeGreaterThanOrEqual(pickDrum(measured.sounds, kit, piece, { gain: 0.1 })!.layer ?? 0);
+      }
   });
 
   it('never bends a note more than a semitone and a half in the browser, in any key or feel', () => {
@@ -316,10 +373,6 @@ describe('choosing a sample', () => {
     expect(sampleNotes('drums', 'sticks')).toEqual([]);
     for (const n of [sampleNotes('lead', 'harp'), sampleNotes('keys', 'organ')]) expect(n.slice(1).map((v, i) => v - n[i]!)).toEqual(n.slice(1).map(() => SAMPLE_STEP));
   });
-  it('gives brushes the sweep for the hi-hat', () => {
-    expect(drumSampleId('brushes', 'hat')).toBe('brushes-sweep');
-    expect(drumSampleId('sticks', 'hat')).toBe('sticks-hat');
-  });
 });
 
 describe('the bass line', () => {
@@ -472,5 +525,51 @@ describe('the arrangement', () => {
           expect(e.gain).toBeLessThanOrEqual(1.1);
         }
     expect(parts(at(DEFAULT_SONG, 12, 'solo'))).toEqual(new Set(['drums', 'bass', 'guitar', 'keys', 'lead']));
+  });
+});
+
+describe('loudness layers, takes and strums', () => {
+  const note = (id: string, midi: number, layer: number, take = 0): MeasuredSound => ({ id, part: 'bass', tone: 'upright', file: `${id}.mp3`, midi, layer, take, seconds: 1 });
+  const pool = [note('a-soft', 40, 0), note('a-hard-1', 40, 1, 0), note('a-hard-2', 40, 1, 1), note('b-soft', 43, 0), note('b-hard', 43, 1)];
+
+  it('splits the range of how hard a note is played evenly across the layers', () => {
+    expect([0, 0.3, 0.49, 0.5, 0.9, 1].map((g) => layerFor(g, 2))).toEqual([0, 0, 0, 1, 1, 1]);
+    expect(layerFor(0.5, 3)).toBe(1);
+    expect(layerFor(0.9, 1)).toBe(0);
+  });
+
+  it('plays a soft note from the soft recording and a hard one from the hard, taking turns between takes', () => {
+    expect(pickSample(pool, 40, { gain: 0.3 })!.sound.id).toBe('a-soft');
+    expect([0, 1, 2, 3].map((take) => pickSample(pool, 40, { gain: 0.9, take })!.sound.id)).toEqual(['a-hard-1', 'a-hard-2', 'a-hard-1', 'a-hard-2']);
+    expect(pickSample(pool, 42, { gain: 0.9 })!.sound.id).toBe('b-hard');
+    expect(pickSample(pool, 42, { gain: 0.9 })!.rate).toBeCloseTo(Math.pow(2, -1 / 12));
+  });
+
+  it('picks drum hits the same way, by piece, and gives brushes the sweep for the hi-hat', () => {
+    const kit = (id: string, piece: string, layer = 0, take = 0): MeasuredSound => ({ id, part: 'drums', tone: id.split('-')[0]!, file: '', piece: piece as MeasuredSound['piece'], layer, take, seconds: 1 });
+    const drums = [kit('sticks-snare-1', 'snare', 0), kit('sticks-snare-2', 'snare', 1, 0), kit('sticks-snare-3', 'snare', 1, 1), kit('brushes-sweep', 'sweep'), kit('sticks-kick', 'kick')];
+    expect(pickDrum(drums, 'sticks', 'snare', { gain: 0.2 })!.id).toBe('sticks-snare-1');
+    expect([0, 1].map((take) => pickDrum(drums, 'sticks', 'snare', { gain: 0.9, take })!.id)).toEqual(['sticks-snare-2', 'sticks-snare-3']);
+    expect(pickDrum(drums, 'brushes', 'hat')!.id).toBe('brushes-sweep');
+    expect(pickDrum(drums, 'brushes', 'ride')).toBeNull();
+    // Older files name the piece only in their id.
+    expect(pieceOf({ id: 'sticks-ride', part: 'drums', tone: 'sticks', file: '', seconds: 1 })).toBe('ride');
+  });
+
+  it('strums the guitar: down low to high on the beat, up high to low off it, and rolls piano chords', () => {
+    const bar = barEvents(DEFAULT_SONG, 12, 'head');
+    const chord = (at: number) => bar.filter((e) => e.part === 'guitar' && Math.abs(e.at - at) < 1e-6).sort((a, b) => (a.delay ?? 0) - (b.delay ?? 0));
+    const down = chord(0);
+    expect(down.map((e) => e.midi)).toEqual([...down.map((e) => e.midi)].sort((a, b) => a! - b!));
+    expect(down.map((e) => e.delay)).toEqual(down.map((_, i) => i * STRUM_S.down));
+    const up = chord(2 / 3);
+    expect(up.map((e) => e.midi)).toEqual([...up.map((e) => e.midi)].sort((a, b) => b! - a!));
+    expect(up[0]!.delay).toBe(0);
+    const keysChord = bar.filter((e) => e.part === 'keys');
+    expect(Math.max(...keysChord.map((e) => e.delay ?? 0))).toBeCloseTo(3 * STRUM_S.roll);
+    // Never a smear: the widest strum stays under 40 ms.
+    for (let b = 0; b < 24; b++) for (const e of barEvents(DEFAULT_SONG, b, 'solo')) expect(e.delay ?? 0).toBeLessThan(0.04);
+    // Single notes and drums aren't strummed.
+    expect(bar.filter((e) => e.part === 'drums' || e.part === 'bass').every((e) => e.delay === undefined)).toBe(true);
   });
 });

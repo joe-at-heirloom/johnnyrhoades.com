@@ -89,7 +89,7 @@ A new page has to pass one of two tests: **it builds itself from data Johnny alr
 | `/shows/` | Build | All upcoming shows plus the archive. The parent of every show page and the clearest proof of how much he plays. |
 | `/shows/<yyyy-mm-dd>-<venue>-<town>/` | Build, generated | One per public show. A link to share, a candidate for Google's event results, local search coverage ("live blues St. Clair Shores"), and the home of its poster. No upkeep. |
 | `/epk/` | Build | The link Johnny pastes into every booking email. A different reader, a third-person voice, printable. |
-| `/jam/` | Build (ADR 0030) | The blues maker: pick a style or build a band, lead it chorus by chorus, sit in on the pads, mix it and record a take. For people who played with the strum and want more. Real recorded instrument samples (MuseScore General, MIT, ADR 0031); room sounds generated with ElevenLabs. |
+| `/jam/` | Build (ADR 0030) | The blues maker: pick a style or build a band, lead it chorus by chorus, sit in on the pads, mix it and record a take. For people who played with the strum and want more. Real recorded instrument samples from free libraries and MuseScore General (ADRs 0031, 0032); room sounds generated with ElevenLabs. |
 | `/thanks/`, `/404` | Build (utility) | Form confirmation without JavaScript, and a useful dead end. |
 | Separate Music, Videos, Photos or About pages | No | One album, four videos and ten photos read better as sections of one page. |
 | One page per venue | No | Thin pages. Venue details live on show pages. |

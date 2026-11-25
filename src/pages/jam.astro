@@ -4,9 +4,10 @@
   lead it: call the next chorus (the tune, a solo, break it down, stop time)
   or take it home. Sit in on the pads, mix it on the console, record a take.
 
-  The instruments are real recorded samples from the MuseScore General
-  soundfont (MIT), rendered note by note, and the room sounds were generated
-  with ElevenLabs (src/data/jam.yaml, `npm run jam:sounds`, ADR 0031). They're
+  The instruments are real recordings rendered note by note from free
+  sampled-instrument libraries and the MuseScore General soundfont, and the
+  room sounds were generated with ElevenLabs (src/data/jam.yaml,
+  `npm run jam:sounds`, ADRs 0031 and 0032). They're
   played as a band in the browser by
   src/scripts/jam.ts, which only downloads with this page. The song is a
   plain GET form and the mix rides along, so a song is a link.
@@ -162,7 +163,7 @@ const description = 'Make a 12-bar blues and lead the band: pick a style or buil
       <Mixer />
 
       <p class="jam-note">
-        The instruments are real recordings, one note or drum hit at a time, from the free MuseScore General soundfont, and the bar and the old record were made with ElevenLabs. Your browser plays them as a band. It isn’t Johnny or his band: to hear the real thing, <a class="text-link" href="/#shows">come to a show</a>.
+        The instruments are real recordings, sampled note by note at several strengths, from free instrument libraries (two drum kits, two basses, an archtop guitar, a grand piano, a tenor sax) and the MuseScore General soundfont (the organ and the harmonica). The bar and the old record were made with ElevenLabs. Your browser plays them as a band. It isn’t Johnny or his band: to hear the real thing, <a class="text-link" href="/#shows">come to a show</a>.
       </p>
       <SoundCredits />
     </div>

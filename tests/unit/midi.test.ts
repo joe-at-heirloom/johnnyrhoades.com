@@ -51,3 +51,17 @@ describe('notes in a row', () => {
     expect(slotStart(2, 1, 0.5)).toBe(3);
   });
 });
+
+describe('controllers and velocities', () => {
+  it('sets controllers before the first note, and plays each note at its own velocity', () => {
+    const f = [...notesMidi({ channel: 0, program: 0, notes: [40, 40, 40], velocity: [60, 64, 0], cc: { 100: 127, 107: 0 }, seconds: 0.5, tail: 0.5 })];
+    const firstOn = f.indexOf(0x90);
+    const cc100 = f.findIndex((b, i) => b === 0xb0 && f[i + 1] === 100);
+    expect(cc100).toBeGreaterThan(-1);
+    expect(cc100).toBeLessThan(firstOn);
+    expect(f[cc100 + 2]).toBe(127);
+    const ons = f.flatMap((b, i) => (b === 0x90 ? [f[i + 2]] : []));
+    // A velocity of 0 would be a note off, so it plays at 1.
+    expect(ons).toEqual([60, 64, 1]);
+  });
+});

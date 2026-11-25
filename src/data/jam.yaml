@@ -1,54 +1,113 @@
-# The sounds the blues maker plays (/jam/, ADRs 0030 and 0031).
+# The sounds the blues maker plays (/jam/, ADRs 0030, 0031 and 0032).
 #
 # `npm run jam:sounds` builds them all into src/assets/jam/ and
 # src/data/jam-sounds.json:
 #
-# - The instruments and drums are real recorded samples from the MuseScore
-#   General soundfont (MIT; FluidR3Mono, and the public-domain Splendid Grand
-#   piano), rendered note by note with FluidSynth, dry (no reverb or chorus).
-#   Each pitched tone gets a sample every SAMPLE_STEP semitones across what its
-#   part plays (sampleNotes in src/lib/jam.ts), at its true pitch. The
-#   soundfont isn't committed: download it to .cache/soundfont/ (url below);
-#   the script checks its sha256.
-# - The two room loops were generated once with ElevenLabs' sound-effects
-#   model; their originals are in src/assets/jam-source/.
-#
-# Presets are General MIDI program numbers, counted from 0. Drum kits are on
-# channel 10: Jazz is program 32, Brush is 40.
+# - Instruments and drum kits are rendered from real recordings: deeply
+#   sampled instrument libraries (rendered with sfizz) where a free one does
+#   the part best, and the MuseScore General soundfont (with FluidSynth) for
+#   the rest. Each is recorded dry at one or more loudness layers (`layers`:
+#   the velocities played) and in `takes` (repeats, slightly varied, so the
+#   library's own round robins and layers come through and repeated notes
+#   differ). Pitched tones get a note every SAMPLE_STEP semitones across what
+#   their part plays (sampleNotes in src/lib/jam.ts), and every note is
+#   checked for pitch and octave. None of the sources are committed: they're
+#   downloaded to .cache/ from the URLs here, and the script checks each
+#   one's sha256.
+# - The two room loops were generated once with ElevenLabs; their originals
+#   are in src/assets/jam-source/.
 
 soundfont:
   file: MuseScore_General.sf3
   url: https://ftp.osuosl.org/pub/musescore/soundfont/MuseScore_General/MuseScore_General.sf3
   sha256: 5b85b6c2c61d10b2b91cddd41efcce7b25cd31c8271d511c73afafbef20b6fa3
 
-# Pitched tones: held this many seconds, at this velocity, then let go.
-tones:
-  - { part: bass, tone: upright, preset: 32, name: Acoustic Bass, velocity: 105, seconds: 1.4 }
-  - { part: bass, tone: electric, preset: 33, name: Fingered Bass, velocity: 100, seconds: 1.4 }
-  - { part: guitar, tone: crunch, preset: 29, name: Overdrive Guitar, velocity: 100, seconds: 2 }
-  - { part: guitar, tone: clean, preset: 26, name: Jazz Guitar, velocity: 100, seconds: 2 }
-  - { part: guitar, tone: acoustic, preset: 25, name: Steel String Guitar, velocity: 100, seconds: 2 }
-  - { part: keys, tone: piano, preset: 0, name: Grand Piano, velocity: 95, seconds: 2.4 }
-  - { part: keys, tone: organ, preset: 16, name: Drawbar Organ, velocity: 100, seconds: 3 }
-  - { part: lead, tone: harp, preset: 22, name: Harmonica, velocity: 105, seconds: 2 }
-  - { part: lead, tone: sax, preset: 66, name: Tenor Sax, velocity: 100, seconds: 2 }
+# Downloaded into .cache/libraries/<id>/archive.zip and unpacked beside it.
+libraries:
+  virtuosity:
+    name: Virtuosity Drums v0.925
+    by: Versilian Studios and Karoryfer Samples
+    license: CC0 1.0
+    url: https://github.com/sfzinstruments/virtuosity_drums/releases/download/v0.925/Virtuosity_Drums_v0.925.zip
+    sha256: c6c5d0fe11a394e94be3146a950c3377ec102cb57d189d5a23cec26183d1963a
+    root: .
+  swirly:
+    name: Swirly Drums v1.104
+    by: Karoryfer Samples
+    license: CC0 1.0
+    url: https://github.com/sfzinstruments/karoryfer.swirly-drums/releases/download/v1.104/Swirly.Drums_1104.zip
+    sha256: dbeb1ad04052da1bada490ced8cc7d9fdd3b21ea90f7c6020269968b70f836c3
+    root: .
+  meatbass:
+    name: Meatbass v1.001
+    by: Karoryfer Samples
+    license: CC0 1.0
+    url: https://github.com/sfzinstruments/karoryfer.meatbass/releases/download/v1.001/Karoryfer.Meatbass.v1.001.zip
+    sha256: bc053061d4f39fb76ba56bc1f323efa228d1f63757c331738812479bcf04fe96
+    root: Meatbass
+  growlybass:
+    name: Growlybass v1.002
+    by: Karoryfer Samples
+    license: CC0 1.0
+    url: https://github.com/sfzinstruments/karoryfer.growlybass/releases/download/v1.002/Karoryfer.Growlybass.v1.002.zip
+    sha256: b92dca75494fa39d6e8d8b8addaabfe70c5aaa59b5f9a0f624be6de51a2374bc
+    root: Growlybass
+  shinyguitar:
+    name: Shinyguitar v1.002
+    by: Karoryfer Samples
+    license: CC0 1.0
+    url: https://github.com/sfzinstruments/karoryfer.shinyguitar/releases/download/v1.002/Karoryfer.Shinyguitar.v1.002.zip
+    sha256: 23cf4030cbf9ce9e2c84d7cbb1c022fbca124bfff0ad118a14eda7cf6c921d7b
+    root: Shinyguitar
+  salamander:
+    name: Salamander Grand Piano V3 (SFZ by kinwie)
+    by: Alexander Holm
+    license: CC BY 3.0
+    url: https://github.com/sfzinstruments/SalamanderGrandPiano/archive/refs/heads/master.zip
+    sha256: 74d11c1ea0fcfe77eb80d6a48e960cbfc42716bdfd74a621eca5799f1680cb5c
+    root: SalamanderGrandPiano-master
+  mtgsax:
+    name: MTG Solo Sax (SFZ by kinwie)
+    by: Music Technology Group, Universitat Pompeu Fabra
+    license: CC BY 4.0
+    url: https://github.com/sfzinstruments/MTG.SoloSax/archive/refs/heads/master.zip
+    sha256: 7f9dda479efb6c137c30617e804153e6b0c4ec1964fd95811c1d3321373b03b1
+    root: MTG.SoloSax-master
 
-# Drum hits: one per piece per kit. GM drum notes: 36 kick, 37 side stick,
-# 38 snare (brush tap on the Brush kit), 39 brush slap, 40 brush swirl,
-# 42 closed hi-hat, 49 crash, 51 ride.
+# Pitched tones: each note held this many seconds, then let go.
+tones:
+  # Meatbass: a 1958 Otto Rubner double bass, plucked. Four loudness layers and four takes in the library.
+  - { part: bass, tone: upright, name: Meatbass pizzicato, from: meatbass, sfz: Programs/04_pizz.sfz, layers: [50, 85, 115], takes: 2, seconds: 1.4 }
+  # Growlybass: a Squier Jazz Bass, recorded direct. Mapped an octave above where it sounds.
+  - { part: bass, tone: electric, name: Growlybass, from: growlybass, sfz: growlybass_clean.sfz, transpose: 12, layers: [55, 90, 118], takes: 2, seconds: 1.4 }
+  # Shinyguitar: an archtop. Its pickup, clean (and through our crunch amp), and its microphone for the acoustic sound.
+  - { part: guitar, tone: crunch, name: Shinyguitar pickup through a crunch amp, from: shinyguitar, sfz: Programs/main.sfz, cc: { '100': 0, '106': 0, '107': 0 }, amp: crunch, layers: [60, 105], takes: 2, seconds: 2 }
+  - { part: guitar, tone: clean, name: Shinyguitar pickup, from: shinyguitar, sfz: Programs/main.sfz, cc: { '100': 0, '106': 0, '107': 0 }, layers: [55, 100], takes: 2, seconds: 2 }
+  - { part: guitar, tone: acoustic, name: Shinyguitar microphone, from: shinyguitar, sfz: Programs/main.sfz, cc: { '100': 127, '106': 0, '107': 0 }, layers: [55, 100], takes: 2, seconds: 2 }
+  # Salamander: a Yamaha C5 grand, 16 loudness layers in the library.
+  - { part: keys, tone: piano, name: Salamander Grand Piano, from: salamander, sfz: Salamander Grand Piano V3.sfz, layers: [45, 80, 112], seconds: 2.4 }
+  # No freely licensed drawbar organ or blues harmonica beats the soundfont's.
+  - { part: keys, tone: organ, name: Drawbar Organ, from: soundfont, preset: 16, layers: [100], octaves: any, seconds: 3 }
+  - { part: lead, tone: harp, name: Harmonica, from: soundfont, preset: 22, layers: [105], seconds: 2 }
+  # MTG tenor sax: a sample every semitone, soft and loud. The non-looped program, since a browser ignores loop points.
+  - { part: lead, tone: sax, name: MTG Tenor Sax, from: mtgsax, sfz: MTG Solo Saxophones/MTG Tenor Sax (NL).sfz, layers: [85, 115], seconds: 2 }
+
+# Drum hits: each kit's pieces, by MIDI key in the library's program.
 drums:
-  - { id: sticks-kick, tone: sticks, kit: 32, key: 36, velocity: 110 }
-  - { id: sticks-snare, tone: sticks, kit: 32, key: 38, velocity: 105 }
-  - { id: sticks-hat, tone: sticks, kit: 32, key: 42, velocity: 95 }
-  - { id: sticks-ride, tone: sticks, kit: 32, key: 51, velocity: 95 }
-  - { id: sticks-crash, tone: sticks, kit: 32, key: 49, velocity: 100 }
-  - { id: sticks-rim, tone: sticks, kit: 32, key: 37, velocity: 100 }
-  - { id: brushes-kick, tone: brushes, kit: 40, key: 36, velocity: 100 }
-  - { id: brushes-snare, tone: brushes, kit: 40, key: 39, velocity: 105 }
-  - { id: brushes-sweep, tone: brushes, kit: 40, key: 40, velocity: 100 }
-  - { id: brushes-ride, tone: brushes, kit: 40, key: 51, velocity: 90 }
-  - { id: brushes-crash, tone: brushes, kit: 40, key: 49, velocity: 90 }
-  - { id: brushes-rim, tone: brushes, kit: 40, key: 37, velocity: 95 }
+  # Virtuosity: a jazz kit played with sticks, close mics and overheads. The basic program; the cross-stick is only in the full one.
+  - { tone: sticks, piece: kick, from: virtuosity, sfz: Programs/01-basic-kit.sfz, key: 36, layers: [55, 90, 120], takes: 3 }
+  - { tone: sticks, piece: snare, from: virtuosity, sfz: Programs/01-basic-kit.sfz, key: 38, layers: [45, 80, 115], takes: 3 }
+  - { tone: sticks, piece: hat, from: virtuosity, sfz: Programs/01-basic-kit.sfz, key: 42, layers: [45, 80, 110], takes: 4 }
+  - { tone: sticks, piece: ride, from: virtuosity, sfz: Programs/01-basic-kit.sfz, key: 51, layers: [55, 90, 115], takes: 3 }
+  - { tone: sticks, piece: crash, from: virtuosity, sfz: Programs/01-basic-kit.sfz, key: 49, layers: [85, 115], takes: 2 }
+  - { tone: sticks, piece: rim, from: virtuosity, sfz: Programs/02-full-kit.sfz, cc: { '4': 127 }, key: 88, layers: [70, 105], takes: 2 }
+  # Swirly: a kit played with brushes throughout. It has no cross-stick, so a soft hit on the snare's edge stands in.
+  - { tone: brushes, piece: kick, from: swirly, sfz: Programs/Basic_kit.sfz, key: 36, layers: [50, 85, 115], takes: 3 }
+  - { tone: brushes, piece: snare, from: swirly, sfz: Programs/Basic_kit.sfz, key: 38, layers: [45, 80, 110], takes: 3 }
+  - { tone: brushes, piece: hat, from: swirly, sfz: Programs/Basic_kit.sfz, key: 42, layers: [40, 75, 105], takes: 4 }
+  - { tone: brushes, piece: ride, from: swirly, sfz: Programs/Basic_kit.sfz, key: 51, layers: [50, 85, 110], takes: 3 }
+  - { tone: brushes, piece: crash, from: swirly, sfz: Programs/Basic_kit.sfz, key: 49, layers: [80, 110], takes: 2 }
+  - { tone: brushes, piece: rim, from: swirly, sfz: Programs/Basic_kit.sfz, key: 40, layers: [55, 90], takes: 2 }
 
 # Generated with ElevenLabs (needs ELEVENLABS_API_KEY to regenerate; spends credits).
 generated:

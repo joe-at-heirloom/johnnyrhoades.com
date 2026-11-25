@@ -46,7 +46,7 @@ export const STYLES: readonly Style[] = [
     blurb: 'Acoustic guitar, upright bass, brushes and a harp, on an old record.',
     song: song({ key: 'E', feel: 'shuffle', bpm: 84, parts: { drums: 'brushes', bass: 'upright', guitar: 'acoustic', keys: null, lead: 'harp', room: 'vinyl' } }),
     mix: mixWith((m) => {
-      m.strips.drums = { ...m.strips.drums, db: -7 };
+      m.strips.drums = { ...m.strips.drums, db: -12 };
       m.strips.guitar = { ...m.strips.guitar, db: -3, pan: -0.15 };
       m.master.room = 0.15;
       m.master.drive = 0.05;
@@ -68,7 +68,7 @@ export const STYLES: readonly Style[] = [
     blurb: 'B flat, slow, brushes and organ, a breathy sax, and the record crackling.',
     song: song({ key: 'Bb', feel: 'slow', bpm: 52, parts: { drums: 'brushes', bass: 'upright', guitar: 'clean', keys: 'organ', lead: 'sax', room: 'vinyl' } }),
     mix: mixWith((m) => {
-      m.strips.drums = { ...m.strips.drums, db: -6 };
+      m.strips.drums = { ...m.strips.drums, db: -11 };
       m.strips.lead = { ...m.strips.lead, send: 0.4 };
       m.master.room = 0.75;
       m.master.drive = 0;

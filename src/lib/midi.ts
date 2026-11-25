@@ -21,7 +21,10 @@ export type Notes = {
   program: number;
   /** MIDI notes (or drums on channel 9), played one after another. */
   notes: readonly number[];
-  velocity: number;
+  /** One velocity for every note, or one per note. */
+  velocity: number | readonly number[];
+  /** Controllers to set before the first note, as { number: value }: a library's switches. */
+  cc?: Readonly<Record<string, number>>;
   /** How long each key is held. */
   seconds: number;
   /** Silence after each note is let go, so its release is rendered too, before the next starts. */
@@ -37,7 +40,7 @@ export const slotStart = (i: number, seconds: number, tail: number) => i * (seco
  * Rendering once per instrument, not once per note, saves FluidSynth loading
  * and decompressing the soundfont over and over.
  */
-export function notesMidi({ channel, program, notes, velocity, seconds, tail }: Notes): Uint8Array {
+export function notesMidi({ channel, program, notes, velocity, seconds, tail, cc = {} }: Notes): Uint8Array {
   const ch = channel & 0x0f;
   const hold = Math.round(seconds * TICKS_PER_SECOND);
   const rest = Math.round(tail * TICKS_PER_SECOND);
@@ -45,9 +48,11 @@ export function notesMidi({ channel, program, notes, velocity, seconds, tail }: 
     0x00, 0xff, 0x51, 0x03, 0x07, 0xa1, 0x20, // tempo: 500,000 µs a beat (120 bpm)
     0x00, 0xb0 | ch, 0x00, 0x00, // bank select 0 (FluidSynth plays channel 10 from the drum bank by itself)
     0x00, 0xc0 | ch, program & 0x7f, // program change
+    ...Object.entries(cc).flatMap(([n, v]) => [0x00, 0xb0 | ch, Number(n) & 0x7f, v & 0x7f]), // controllers
   ];
   notes.forEach((note, i) => {
-    events.push(...varLen(i === 0 ? 0 : rest), 0x90 | ch, note & 0x7f, velocity & 0x7f); // note on, after the last one's tail
+    const v = typeof velocity === 'number' ? velocity : (velocity[i] ?? 100);
+    events.push(...varLen(i === 0 ? 0 : rest), 0x90 | ch, note & 0x7f, Math.max(1, v) & 0x7f); // note on, after the last one's tail
     events.push(...varLen(hold), 0x80 | ch, note & 0x7f, 0x40); // note off
   });
   // A harmless controller change at the end of the last tail keeps the player (and so the render) going until then.

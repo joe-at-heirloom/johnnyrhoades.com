@@ -6,7 +6,7 @@
     session in → tone (low shelf + high shelf, tilted) → pan → fader → meter → master
                                                               └→ reverb send → reverb
   and the master:
-    sum (dry + reverb return) → drive (WaveShaper) → bus compressor → master fader → meter → out
+    sum (dry + reverb return) → drive (WaveShaper) → bus compressor → master fader → safety limiter → meter → out
 
   Notes you play yourself (sitting in) go straight into a strip's head, so
   they work whether or not the band is playing. A MediaStream tap on the
@@ -73,9 +73,17 @@ export function createDesk(ctx: AudioContext, mix: Mix): Desk {
   glue.attack.value = 0.012;
   glue.release.value = 0.25;
   const masterFader = ctx.createGain();
+  // A safety limiter last of all, just under full scale: a crash on top of the kick and snare with the
+  // faders up can't clip the output. It does nothing until then.
+  const limiter = ctx.createDynamicsCompressor();
+  limiter.threshold.value = -2;
+  limiter.knee.value = 0;
+  limiter.ratio.value = 20;
+  limiter.attack.value = 0.001;
+  limiter.release.value = 0.1;
   const masterMeter = ctx.createAnalyser();
   masterMeter.fftSize = 512;
-  sum.connect(drive).connect(glue).connect(masterFader).connect(masterMeter).connect(ctx.destination);
+  sum.connect(drive).connect(glue).connect(masterFader).connect(limiter).connect(masterMeter).connect(ctx.destination);
   let recordTap: MediaStreamAudioDestinationNode | null = null;
 
   const reverb = ctx.createConvolver();

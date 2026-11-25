@@ -4,6 +4,21 @@ A running log for the portfolio write-up (PLAN.md section 16): numbers, screensh
 
 ---
 
+## 2026-11-24: Deeply sampled instruments, layers, takes and strums
+
+**What changed.** Drums, basses, guitars, piano and sax now come from free, deeply sampled libraries (Virtuosity and Swirly drums, Meatbass, Growlybass, Shinyguitar, Salamander, MTG Solo Sax), recorded at several loudnesses and in several takes, and the guitar strums (ADR 0032).
+
+**Numbers**
+- Samples: 92 → 354 (2 or 3 loudness layers, up to 4 takes a hit), library 2.3 → 6.1 MB at 64 kbps, a default band at most 2.3 MB.
+- Pitch: every note within 25 cents but two, which the browser retunes from their measurement.
+
+**Worth telling**
+- *The renderer silently truncated notes.* sfizz streams samples, and an offline render outran the stream, cutting notes to 0.2 s, but only for some notes. A loudness envelope of the render found it; one SFZ opcode (`hint_ram_based`) fixed it.
+- *Leveling had flipped the dynamics.* Normalizing every sample to the same loudness under a peak ceiling made the hardest-played layers the quietest, since their attacks hit the ceiling first. Leveling 6 dB lower fixed it, and a test now fails if a harder layer is quieter than a softer one.
+- *An octave check that knows about basses.* A pitch tracker can't tell a bass's weak low E from a sample an octave up. Measuring whether the note's own frequency is there at all can, and it caught a library mapped an octave off.
+
+---
+
 ## 2026-11-24: Real instruments instead of generated ones
 
 **What changed.** The blues maker's instruments and drums are now real recorded samples from the MuseScore General soundfont (MIT), rendered note by note with FluidSynth, in place of ElevenLabs one-shots that had to be retuned (ADR 0031).

@@ -146,3 +146,42 @@ export function levelTo(x: Float32Array, targetDb: number, window: number, ceili
   const gain = Math.min(Math.pow(10, (targetDb - now) / 20), Math.pow(10, ceilingDb / 20) / p);
   return x.map((v) => v * gain);
 }
+
+/** The power of one frequency in a stretch of sound (a Hann-windowed single DFT bin), in dB. */
+export function bandPower(x: Float32Array, sampleRate: number, hz: number): number {
+  let re = 0;
+  let im = 0;
+  const n = x.length;
+  for (let i = 0; i < n; i++) {
+    const w = 0.5 - 0.5 * Math.cos((2 * Math.PI * i) / n);
+    const phase = (2 * Math.PI * hz * i) / sampleRate;
+    re += x[i]! * w * Math.cos(phase);
+    im += x[i]! * w * Math.sin(phase);
+  }
+  return 10 * Math.log10(re * re + im * im + 1e-20);
+}
+
+/**
+ * Whether a recording sounds the note it's meant to, and how far out of tune.
+ * The pitch search can mistake a low note with a weak fundamental (a bass's
+ * low E) for its octave, and a sample really an octave up looks the same to
+ * it; the difference is whether the note's own frequency is there at all.
+ * So when the search reads an octave or more high, the note still counts if
+ * its fundamental is within 20 dB of the octave above it. An organ's
+ * drawbars repeat only octaves under the key, so `anyOctave` accepts a
+ * reading octaves low.
+ */
+export function checkPitch(x: Float32Array, sampleRate: number, midi: number, { anyOctave = false } = {}): { cents: number } | { error: string } {
+  const hz = 440 * Math.pow(2, (midi - 69) / 12);
+  const start = onsetIndex(x, sampleRate) + Math.round(0.05 * sampleRate);
+  const body = x.subarray(start, Math.min(x.length, start + sampleRate));
+  const wide = notePitch(x, sampleRate, { minHz: 25, maxHz: 2000 });
+  const near = notePitch(x, sampleRate, { minHz: hz / 1.25, maxHz: hz * 1.25 });
+  if (!wide && !near) return { error: 'no clear pitch' };
+  const off = hzToMidi((wide ?? near)!.hz) - midi;
+  const octaves = Math.round(off / 12);
+  const cents = (off - 12 * octaves) * 100;
+  if (octaves > 0 && bandPower(body, sampleRate, hz) < bandPower(body, sampleRate, 2 * hz) - 20) return { error: `sounds ${octaves} octave${octaves > 1 ? 's' : ''} up` };
+  if (octaves < 0 && !anyOctave) return { error: `sounds ${-octaves} octave${octaves < -1 ? 's' : ''} down` };
+  return { cents };
+}

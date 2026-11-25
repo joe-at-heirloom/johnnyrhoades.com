@@ -70,7 +70,25 @@ export const PART_LABELS: Record<Part, string> = {
 };
 
 /** What the generator measured (src/data/jam-sounds.json). `midi` is fractional: the real pitch. `db`: loudness, RMS dBFS. */
-export type MeasuredSound = { id: string; part: Part; tone: string; file: string; midi?: number; seconds: number; db?: number; loop?: boolean };
+export type MeasuredSound = {
+  id: string;
+  part: Part;
+  tone: string;
+  file: string;
+  /** The note it was recorded as. */
+  key?: number;
+  /** The pitch it measured, which the browser tunes from (a real recording can be a few cents out). */
+  midi?: number;
+  /** For a drum: the piece it is (src/lib/jam-manifest.ts). */
+  piece?: DrumPiece | 'sweep';
+  /** Which loudness it was played at, 0 the softest, where an instrument was recorded at more than one. */
+  layer?: number;
+  /** Which of several recordings of the same note at the same loudness, played in turn so repeats differ. */
+  take?: number;
+  seconds: number;
+  db?: number;
+  loop?: boolean;
+};
 
 /* ---------- The song ---------- */
 
@@ -213,6 +231,8 @@ export type JamEvent = {
   beats: number;
   /** A scoop: the note starts this many semitones flat and slides up to pitch, the way a harp or sax player leans into it. */
   bend?: number;
+  /** Seconds after `at`, for a note of a strummed or rolled chord (`strum`). */
+  delay?: number;
 };
 
 /** Everything a player needs to know about the bar they're in. */
@@ -536,13 +556,44 @@ export function barEvents(song: Song, bar: number, section: Section = 'head'): J
     nextPc: (keyPc + prog[(inForm + 1) % 12]!) % 12,
   };
   const p = song.parts;
-  return legato([
+  return strum(legato([
     ...(p.drums ? drums(b) : []),
     ...(p.bass ? bass(b) : []),
     ...(p.guitar ? guitar(b) : []),
     ...(p.keys ? keys(b, p.keys) : []),
     ...(p.lead ? lead(b, p.lead, p.guitar !== null) : []),
-  ]);
+  ]));
+}
+
+/** How far apart a strummed chord's strings sound: a downstroke is a little slower than an upstroke. */
+export const STRUM_S = { down: 0.009, up: 0.006, roll: 0.003 } as const;
+
+/**
+ * Strum the guitar's chords and roll the piano's: notes struck together in a
+ * chord don't land at once. A guitar downstroke (on the beat) sweeps low to
+ * high, an upstroke (off it) high to low and a touch lighter on the strings
+ * it reaches last; a piano chord spreads a few milliseconds. The delay is in
+ * seconds, so it's the same at any tempo.
+ */
+export function strum(events: JamEvent[]): JamEvent[] {
+  const chords = new Map<string, JamEvent[]>();
+  for (const e of events)
+    if ((e.part === 'guitar' || (e.part === 'keys' && e.midi !== undefined)) && e.midi !== undefined) {
+      const k = `${e.part}@${e.at.toFixed(4)}`;
+      chords.set(k, [...(chords.get(k) ?? []), e]);
+    }
+  const out = new Map<JamEvent, JamEvent>();
+  for (const notes of chords.values()) {
+    if (notes.length < 2) continue;
+    const guitar = notes[0]!.part === 'guitar';
+    const down = Number.isInteger(Math.round(notes[0]!.at * 1000) / 1000);
+    const order = [...notes].sort((a, b) => (guitar && !down ? b.midi! - a.midi! : a.midi! - b.midi!));
+    order.forEach((e, i) => {
+      const step = guitar ? (down ? STRUM_S.down : STRUM_S.up) : STRUM_S.roll;
+      out.set(e, { ...e, delay: i * step, ...(guitar && !down && i > 0 ? { gain: e.gain * 0.92 } : {}) });
+    });
+  }
+  return events.map((e) => out.get(e) ?? e);
 }
 
 /** The parts a player connects: each note held until the next one starts. */
@@ -579,6 +630,12 @@ export function degreeName(song: Song, bar: number): 'I' | 'IV' | 'V' {
   return ({ 0: 'I', 5: 'IV', 7: 'V' } as const)[progression(song.quick)[bar % 12] as 0 | 5 | 7];
 }
 
+/**
+ * The samples are leveled 6 dB under where they'd sit, to leave room for a hard-played attack
+ * (scripts/make-jam-sounds.ts); every note the player plays is brought back up by this much.
+ */
+export const SAMPLE_GAIN = 2;
+
 export const secondsPerBeat = (bpm: number) => 60 / bpm;
 
 /** A small, repeatable number in [0, 1) for a bar and an event: the same song always plays the same way. */
@@ -604,18 +661,55 @@ export const COUNT_IN: readonly number[] = [-4, -3, -2, -1];
 /* ---------- Choosing a sample ---------- */
 
 /**
- * The tuned sample nearest `midi`, and the playback rate that takes it the rest of
- * the way. A rate also changes length and timbre a little, which is why the
- * samples are close together.
+ * Which loudness layer a note played at `gain` (0–1) uses, of `layers`: the
+ * range split evenly, so a soft note gets the softly played recording, not
+ * just a quieter copy of a hard one.
  */
-export function pickSample(samples: readonly MeasuredSound[], midi: number): { sound: MeasuredSound; rate: number } | null {
-  let best: MeasuredSound | null = null;
+export const layerFor = (gain: number, layers: number) => Math.max(0, Math.min(layers - 1, Math.floor(gain * layers)));
+
+/** Of several samples recorded the same way, the `take`th in turn, so repeated notes differ. */
+function choose(group: readonly MeasuredSound[], gain: number, take: number): MeasuredSound {
+  const layers = [...new Set(group.map((s) => s.layer ?? 0))].sort((a, b) => a - b);
+  const layer = layers[layerFor(gain, layers.length)]!;
+  const takes = group.filter((s) => (s.layer ?? 0) === layer).sort((a, b) => (a.take ?? 0) - (b.take ?? 0));
+  return takes[((take % takes.length) + takes.length) % takes.length]!;
+}
+
+/**
+ * The recorded note nearest `midi`, at the loudness layer for `gain` and the
+ * take in turn, and the playback rate that takes it the rest of the way. A
+ * rate also changes length and timbre a little, which is why the samples are
+ * close together.
+ */
+export function pickSample(
+  samples: readonly MeasuredSound[],
+  midi: number,
+  { gain = 0.75, take = 0 }: { gain?: number; take?: number } = {},
+): { sound: MeasuredSound; rate: number } | null {
+  // The note recorded nearest, by the note it was recorded as; then every recording of it (its layers and takes).
+  const noteOf = (s: MeasuredSound) => s.key ?? (s.midi === undefined ? undefined : Math.round(s.midi));
+  let best: number | null = null;
   for (const s of samples) {
-    if (s.midi === undefined) continue;
-    if (!best || Math.abs(s.midi - midi) < Math.abs(best.midi! - midi)) best = s;
+    const n = noteOf(s);
+    if (n !== undefined && (best === null || Math.abs(n - midi) < Math.abs(best - midi))) best = n;
   }
-  if (!best) return null;
-  return { sound: best, rate: Math.pow(2, (midi - best.midi!) / 12) };
+  if (best === null) return null;
+  const group = samples.filter((s) => noteOf(s) === best && s.midi !== undefined);
+  const sound = choose(group, gain, take);
+  return { sound, rate: Math.pow(2, (midi - sound.midi!) / 12) };
+}
+
+/** Which drum a sample is: its `piece`, or the word after the kit in its id ("sticks-snare"). */
+export const pieceOf = (s: MeasuredSound) => s.piece ?? s.id.split('-')[1];
+
+/**
+ * The drum sample for a piece in a kit, at the layer for `gain` and the take in turn. A kit with no
+ * hi-hat (the soundfont's brush kit had none) keeps time on a brush sweep instead.
+ */
+export function pickDrum(samples: readonly MeasuredSound[], kit: string, piece: DrumPiece, { gain = 0.75, take = 0 } = {}): MeasuredSound | null {
+  const of = (p: string) => samples.filter((s) => s.part === 'drums' && s.tone === kit && pieceOf(s) === p);
+  const group = of(piece).length || piece !== 'hat' ? of(piece) : of('sweep');
+  return group.length ? choose(group, gain, take) : null;
 }
 
 /** How far above its lowest root a part reaches: the highest root (11) plus its highest note above the root. */
@@ -637,8 +731,3 @@ export function sampleNotes(part: Part, tone: string): number[] {
   return notes;
 }
 
-/** The drum sample for a piece in a kit. Brushes have no hi-hat; the sweep stands in. */
-export function drumSampleId(kit: string, piece: DrumPiece): string {
-  if (kit === 'brushes' && piece === 'hat') return 'brushes-sweep';
-  return `${kit}-${piece}`;
-}

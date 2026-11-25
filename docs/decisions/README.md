@@ -33,4 +33,5 @@ Short notes on choices that shape the code, so the reasoning survives. One file 
 | [0028](0028-inline-the-stylesheet.md) | Inline the stylesheet, allowed by its hash | Accepted |
 | [0029](0029-prefetch-on-intent.md) | Prefetch the next page on intent, with Speculation Rules | Accepted |
 | [0030](0030-blues-maker.md) | The blues maker, with sounds from ElevenLabs | Accepted (instrument sounds superseded by 0031) |
-| [0031](0031-real-instrument-samples.md) | Real instrument samples from MuseScore General | Accepted |
+| [0031](0031-real-instrument-samples.md) | Real instrument samples from MuseScore General | Accepted (most instruments moved on by 0032) |
+| [0032](0032-deeply-sampled-instruments.md) | Deeply sampled instruments, loudness layers, takes and strums | Accepted |

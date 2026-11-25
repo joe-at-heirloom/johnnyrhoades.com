@@ -215,3 +215,5 @@
 .jam-credits summary:focus-visible { outline: 2px solid var(--red-hi); outline-offset: 2px; }
 .jam-credits p { margin-top: 10px; }
 .jam-license { margin-top: 14px; padding: 14px; max-height: 320px; overflow: auto; border: 1px solid var(--line-strong); border-radius: var(--radius); background: var(--ink-2); color: var(--bone-2); font-size: .8rem; line-height: 1.5; white-space: pre-wrap; }
+.jam-credits ul { margin: 10px 0 0 1.2em; }
+.jam-credits li { margin-top: 6px; }
