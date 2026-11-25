@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { FEEL_INFO, KEYS, parseSong, pickSample, SAMPLE_STEP, songToParams, type MeasuredSound } from '../../src/lib/jam';
 import { mixToParam, parseMix } from '../../src/lib/mixer';
-import { BLUES_SCALE, SIT_IN, SIT_IN_INSTRUMENTS, bendFromDrag, noteName, padForKey, pads, spoken } from '../../src/lib/sit-in';
+import { BLUES_SCALE, SIT_IN, SIT_IN_INSTRUMENTS, bendFromDrag, noteName, padFor, padForKey, pads, spoken } from '../../src/lib/sit-in';
 import { STYLES } from '../../src/lib/styles';
 
 describe('sitting in', () => {
@@ -41,6 +41,17 @@ describe('sitting in', () => {
     expect(bendFromDrag(30)).toBe(1);
     expect(bendFromDrag(200)).toBe(2);
     expect(bendFromDrag(-50)).toBe(0);
+  });
+
+  it('finds the pad for a note of the band’s call, in the nearest octave', () => {
+    const e = pads('E', 'harp');
+    // A note a pad plays is that pad, even the octave up.
+    e.forEach((p, i) => expect(padFor(p.midi, 'E', 'harp')).toBe(i));
+    // An octave below the pads, the 1 is still the first pad; a note off the scale shows on the nearest one.
+    expect(padFor(e[0]!.midi - 12, 'E', 'harp')).toBe(0);
+    expect(padFor(e[0]!.midi + 1, 'E', 'harp')).toBe(0); // F, by E
+    expect(padFor(e[0]!.midi + 2, 'E', 'harp')).toBe(1); // F#, by G
+    expect(padFor(e[0]!.midi + 9, 'E', 'harp')).toBe(5); // C#, by D
   });
 });
 

@@ -88,6 +88,8 @@ export type MeasuredSound = {
   seconds: number;
   db?: number;
   loop?: boolean;
+  /** A crowd reaction for the game. */
+  crowd?: boolean;
 };
 
 /* ---------- The song ---------- */
@@ -193,8 +195,10 @@ const LEAD_FLOOR: Record<string, number> = { harp: 59, sax: 46 };
  *   lays out, while the soloist plays into the gaps.
  * - ending: "take it home": the tune, then the ending line in bar 11 and the
  *   last chord (a half step above, sliding into home) in bar 12.
+ * - call: the game's chorus (src/lib/game.ts): the fills play a call in the
+ *   first two bars of each line and leave the last two for the player to answer.
  */
-export const SECTIONS = ['head', 'solo', 'quiet', 'stop', 'ending'] as const;
+export const SECTIONS = ['head', 'solo', 'quiet', 'stop', 'ending', 'call'] as const;
 export type Section = (typeof SECTIONS)[number];
 
 export const SECTION_LABELS: Record<Section, string> = {
@@ -203,6 +207,7 @@ export const SECTION_LABELS: Record<Section, string> = {
   quiet: 'Break it down',
   stop: 'Stop time',
   ending: 'Take it home',
+  call: 'Call and response',
 };
 
 /** What the band plays by itself, chorus by chorus, when nobody calls anything: the tune twice, then around the other kinds. */
@@ -235,8 +240,25 @@ export type JamEvent = {
   delay?: number;
 };
 
+/**
+ * What the band does in a bar on top of the arrangement, when you're sitting in with it in the
+ * game (src/lib/game.ts), where you lead the band by tapping its players:
+ * - caller: who plays the call in a `call` chorus: the guitar, the keys or the fills;
+ * - fill: the drummer kicks into the next line with a fill on beat 4;
+ * - drop: the band drops out under your answer, stop-time style: a hit on one, and space;
+ * - hot: the band digs in, as under a solo: the ride, the bass's pickups;
+ * - shout: the band answers a great answer back: a crash and a kick on the downbeat;
+ * - level: how hard the band plays, for the crowd's mood (1 as written);
+ * - sittingIn: you're playing the fills' instrument, so the band's own fills stay out.
+ */
+export type BandMoves = { caller?: Caller; fill?: boolean; drop?: boolean; hot?: boolean; shout?: boolean; level?: number; sittingIn?: boolean };
+/** Who can play the call in the game. */
+export const CALLERS = ['guitar', 'keys', 'lead'] as const;
+export type Caller = (typeof CALLERS)[number];
+
 /** Everything a player needs to know about the bar they're in. */
 type Bar = {
+  moves: BandMoves;
   song: Song;
   feel: Feel;
   bar: number;
@@ -253,8 +275,14 @@ type Bar = {
 const eighth = (b: number, off: boolean, swing: number) => b + (off ? swing : 0);
 /** The three triplets of beat `b`. */
 const triplets = (b: number) => [b, b + 1 / 3, b + 2 / 3];
-/** The first line of a stop-time chorus, where the band only hits one. */
-const stopHit = (b: Bar) => b.section === 'stop' && b.inForm < 4;
+/** The first line of a stop-time chorus, or your answer when the band drops out: the band only hits one. */
+const stopHit = (b: Bar) => (b.section === 'stop' && b.inForm < 4) || (!!b.moves.drop && b.section === 'call' && b.inForm % 4 >= 2);
+/** Whether the band digs in: under a solo, or when it's hot in the game. */
+const digsIn = (b: Bar) => b.section === 'solo' || (!!b.moves.hot && b.section === 'call');
+/** Who plays the call in a `call` chorus. */
+const callerOf = (b: Bar): Caller => b.moves.caller ?? 'lead';
+/** The bars of a `call` chorus where the caller plays: the first two of each line. */
+const calling = (b: Bar, part: Caller) => b.section === 'call' && b.inForm % 4 < 2 && callerOf(b) === part;
 /** The ending's last two bars. */
 const endingLine = (b: Bar) => b.section === 'ending' && b.inForm === 10;
 const lastChord = (b: Bar) => b.section === 'ending' && b.inForm === 11;
@@ -276,6 +304,7 @@ function drums(b: Bar): JamEvent[] {
     if (inForm === 0) hit(0, 'crash', 0.6, 3);
     hit(1, 'hat', 0.3);
     hit(3, 'hat', 0.3);
+    if (b.moves.fill && inForm % 4 === 3) triplets(3).forEach((t, i) => hit(t, 'snare', [0.45, 0.55, 0.7][i]!));
     return ev;
   }
   if (endingLine(b)) {
@@ -296,9 +325,10 @@ function drums(b: Bar): JamEvent[] {
   }
 
   const quiet = section === 'quiet';
-  const solo = section === 'solo';
-  // Fills: the big one into the top of the form, and now and then a short one at the end of a line.
-  const bigFill = inForm === 11;
+  const solo = digsIn(b);
+  // Fills: the big one into the top of the form (or wherever you call for one), and now and then a
+  // short one at the end of a line.
+  const bigFill = inForm === 11 || (!!b.moves.fill && inForm % 4 === 3);
   const smallFill = (inForm === 3 || inForm === 7) && hash(b.chorus, inForm) > 0.55;
   for (let beat = 0; beat < 4; beat++) {
     if (beat === 3 && bigFill) {
@@ -321,7 +351,7 @@ function drums(b: Bar): JamEvent[] {
       hit(eighth(beat, true, swing), time, 0.33);
     }
   }
-  if (inForm === 0 && !quiet) hit(0, 'crash', 0.5, 3); // the top of the form
+  if ((inForm === 0 && !quiet) || b.moves.shout) hit(0, 'crash', b.moves.shout ? 0.75 : 0.5, 3); // the top of the form, or the band shouting back
   if (feel === 'straight' && !quiet) hit(2 + swing, 'kick', 0.6); // the push into beat 4
   // A ghost note on the snare just before 4: barely there, but it's what makes a shuffle shuffle.
   if (feel !== 'slow' && !quiet && !bigFill && !smallFill) hit(2 + swing, 'snare', 0.22, 0.5);
@@ -373,7 +403,7 @@ function bass(b: Bar): JamEvent[] {
       const ev = walk.map((iv, beat) => n(beat, root + iv, beat === 0 ? 0.9 : 0.82));
       if (nextRoot !== root) ev[3] = n(3, approach(nextRoot), 0.8);
       // Under a solo the bass digs in: a swung pickup into each beat 3.
-      if (section === 'solo') ev.push(n(1 + swing, root + (walk[2] ?? P5) - 1, 0.55, 0.3));
+      if (digsIn(b)) ev.push(n(1 + swing, root + (walk[2] ?? P5) - 1, 0.55, 0.3));
       return ev;
     }
   }
@@ -382,7 +412,7 @@ function bass(b: Bar): JamEvent[] {
 function guitar(b: Bar): JamEvent[] {
   const { feel, swing, section, inForm } = b;
   const root = noteAtOrAbove(b.chordPc, FLOOR.guitar);
-  const dyn = dynamics(b) * (section === 'solo' ? 0.8 : 1); // under a solo, the comp makes room
+  const dyn = dynamics(b) * (digsIn(b) ? 0.8 : 1); // under a solo, the comp makes room
   const ev: JamEvent[] = [];
   const note = (at: number, midi: number, gain: number, beats: number) => ev.push({ at, part: 'guitar', midi, gain: gain * dyn, beats });
   const dyad = (at: number, top: number, gain: number, beats: number, base = root) => {
@@ -394,6 +424,7 @@ function guitar(b: Bar): JamEvent[] {
     for (const iv of [R, P5, b7, OCT]) if (fits('guitar', base + iv)) note(at, base + iv, iv === R ? gain : gain * 0.85, beats);
   };
 
+  if (calling(b, 'guitar')) return callPhrase(b, 'guitar', noteAtOrAbove(b.keyPc, FLOOR.guitar));
   if (stopHit(b)) {
     chord(0, root, 0.8, 0.9);
     return ev;
@@ -450,11 +481,12 @@ function guitar(b: Bar): JamEvent[] {
 
 function keys(b: Bar, tone: string): JamEvent[] {
   const { feel, swing, section } = b;
-  const dyn = dynamics(b) * (section === 'solo' ? 0.85 : 1);
+  const dyn = dynamics(b) * (digsIn(b) ? 0.85 : 1);
   // Rootless voicing (third, fifth, seventh, plus the root on top) in the middle of the keyboard.
   const voice = (pc: number) => [M3, P5, b7, OCT].map((iv) => noteAtOrAbove((pc + iv) % 12, FLOOR.keys));
   const chord = (at: number, gain: number, beats: number, pc = b.chordPc) => voice(pc).map((midi): JamEvent => ({ at, part: 'keys', midi, gain: gain * dyn, beats }));
 
+  if (calling(b, 'keys')) return callPhrase(b, 'keys', noteAtOrAbove(b.keyPc, FLOOR.keys));
   if (stopHit(b)) return chord(0, 0.6, 0.9);
   if (lastChord(b)) return [...chord(0, 0.45, 0.4, (b.keyPc + 1) % 12), ...chord(swing, 0.6, 3.4, b.keyPc)];
   if (endingLine(b)) return chord(0, 0.45, 3.5, b.keyPc);
@@ -462,7 +494,7 @@ function keys(b: Bar, tone: string): JamEvent[] {
   if (section === 'quiet') return [...chord(0, 0.35, 0.9), ...chord(2, 0.3, 0.9)];
   if (feel === 'slow') return [0, 1, 2, 3].flatMap((beat) => triplets(beat).flatMap((t, i) => chord(t, i === 0 ? 0.45 : 0.3, 0.3)));
   // Comp on the offbeats of 2 and 4, and under a solo on every offbeat.
-  const beats = section === 'solo' ? [0, 1, 2, 3] : [1, 3];
+  const beats = digsIn(b) ? [0, 1, 2, 3] : [1, 3];
   return beats.flatMap((beat) => chord(eighth(beat, true, swing), beat % 2 ? 0.45 : 0.32, 0.4));
 }
 
@@ -500,22 +532,43 @@ export const BREATHS: readonly Lick[] = [
 /** The solo's last bar lands on the fifth, which leads back to the top. */
 const SOLO_TURN: Lick = [[0, 7, 0.3], [0.33, 10, 0.3], [0.67, 7, 0.3], [1, 6, 0.3], [1.33, 5, 0.3], [1.67, 3, 0.3, -1], [2, 7, 1.6]];
 
-function lead(b: Bar, tone: string, guitarPlaying: boolean): JamEvent[] {
-  const { inForm, section, chorus, swing } = b;
-  const tonic = noteAtOrAbove(b.keyPc, LEAD_FLOOR[tone] ?? 62);
-  // A triplet-feel phrase, straightened for a straight feel.
+/** A phrase on a part, from `tonic`: its triplet feel straightened for a straight feel. A guitar's or keys' phrase has no scoops. */
+function phrase(b: Bar, part: Part, tonic: number, lick: Lick, gain: number, from = 0, until = 4): JamEvent[] {
   const swingIt = (t: number) => {
     const whole = Math.floor(t);
     const f = t - whole;
-    return f === 0 ? t : whole + (Math.abs(f - 2 / 3) < 0.01 ? swing : f);
+    return f === 0 ? t : whole + (Math.abs(f - 2 / 3) < 0.01 ? b.swing : f);
   };
-  const play = (lick: Lick, gain: number, from = 0, until = 4) =>
-    lick
-      .filter(([at]) => at >= from && at < until)
-      .map(([at, iv, beats, bend]): JamEvent => ({ at: swingIt(at), part: 'lead', midi: tonic + iv, gain, beats, ...(bend ? { bend } : {}) }));
-  const pick = <T>(list: readonly T[], salt: number) => list[Math.floor(hash(chorus * 31 + salt, inForm) * list.length)]!;
+  return lick
+    .filter(([at]) => at >= from && at < until)
+    .map(([at, iv, beats, bend]): JamEvent => ({ at: swingIt(at), part, midi: tonic + iv, gain, beats, ...(bend && part === 'lead' ? { bend } : {}) }));
+}
+const pickFor = <T>(b: Bar, list: readonly T[], salt: number) => list[Math.floor(hash(b.chorus * 31 + salt, b.inForm) * list.length)]!;
 
-  if (endingLine(b)) return []; // the band plays the ending line together
+/**
+ * The game's call (a `call` chorus, src/lib/game.ts), on whichever part plays it: a phrase in the
+ * first bar of each line, a short tag in the second. The last two bars are the player's.
+ */
+function callPhrase(b: Bar, part: Caller, tonic: number): JamEvent[] {
+  const gain = part === 'lead' ? 0.68 : 0.72;
+  const notes =
+    b.inForm % 4 === 0
+      ? phrase(b, part, tonic, LICKS[(Math.floor(b.inForm / 4) + b.chorus * 3) % LICKS.length]!, gain)
+      : phrase(b, part, tonic, pickFor(b, BREATHS, 5), gain * 0.9, 0, 2.5);
+  if (part === 'lead') return notes;
+  // A guitar's or keys' phrase stays inside its samples: a note past the top drops an octave.
+  const top = FLOOR[part] + SPAN[part] + 1;
+  return notes.map((e) => (e.midi! > top ? { ...e, midi: e.midi! - OCT } : e));
+}
+
+function lead(b: Bar, tone: string, guitarPlaying: boolean): JamEvent[] {
+  const { inForm, section, chorus, swing } = b;
+  const tonic = noteAtOrAbove(b.keyPc, LEAD_FLOOR[tone] ?? 62);
+  const play = (lick: Lick, gain: number, from = 0, until = 4) => phrase(b, 'lead', tonic, lick, gain, from, until);
+  const pick = <T>(list: readonly T[], salt: number) => pickFor(b, list, salt);
+
+  if (endingLine(b) || b.moves.sittingIn) return []; // the band plays the ending line together; you're on the fills
+  if (section === 'call') return calling(b, 'lead') ? callPhrase(b, 'lead', tonic) : []; // the rest is the player's
   if (lastChord(b)) return [{ at: swing, part: 'lead', midi: tonic + OCT, gain: 0.6, beats: 3.4, bend: -1 }];
   if (stopHit(b)) return play(pick(SOLO, 1), 0.65, 1); // into the gap after the band's hit
   if (section === 'solo') {
@@ -539,11 +592,12 @@ function lead(b: Bar, tone: string, guitarPlaying: boolean): JamEvent[] {
  * (bar 12 is the top of the second time through), in a chorus of the given kind.
  * The form repeats every 12 bars; the fills, the walks and the drum fills don't.
  */
-export function barEvents(song: Song, bar: number, section: Section = 'head'): JamEvent[] {
+export function barEvents(song: Song, bar: number, section: Section = 'head', moves: BandMoves = {}): JamEvent[] {
   const inForm = ((bar % 12) + 12) % 12;
   const keyPc = KEY_PC[song.key];
   const prog = progression(song.quick);
   const b: Bar = {
+    moves,
     song,
     feel: song.feel,
     bar,

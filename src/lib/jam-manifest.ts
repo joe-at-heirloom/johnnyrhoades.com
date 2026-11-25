@@ -65,6 +65,8 @@ const Generated = z.object({
   prompt: z.string().min(10),
   seconds: z.number().min(0.5).max(30),
   loop: z.boolean().optional(),
+  /** A crowd reaction for the game (src/lib/game.ts), played through the room strip, not a tone you can pick. */
+  crowd: z.boolean().optional(),
 });
 const Manifest = z.object({
   soundfont: z.object({ file: z.string(), url: z.url(), sha256 }),
@@ -115,7 +117,7 @@ export function parseJamManifest(data: unknown): JamManifest {
   for (const g of m.generated) {
     if (ids.has(g.id)) throw new Error(`jam.yaml: duplicate id ${g.id}`);
     ids.add(g.id);
-    if (!known(g.part, g.tone)) throw new Error(`jam.yaml: ${g.id} has unknown tone ${g.tone} for ${g.part}`);
+    if (!g.crowd && !known(g.part, g.tone)) throw new Error(`jam.yaml: ${g.id} has unknown tone ${g.tone} for ${g.part}`);
   }
   return m;
 }

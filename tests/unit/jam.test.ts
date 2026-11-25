@@ -22,6 +22,7 @@ import {
   SECTIONS,
   type Section,
   type JamEvent,
+  CALLERS,
   chordName,
   degreeName,
   noteAtOrAbove,
@@ -118,7 +119,9 @@ describe('the manifest and the measured sounds', () => {
     for (const part of ['bass', 'guitar', 'keys', 'lead'] as const)
       for (const t of TONES[part]) expect(manifest.tones.filter((x) => x.part === part && x.tone === t), `${part}/${t}`).toHaveLength(1);
     for (const kit of TONES.drums) expect(manifest.drums.filter((d) => d.tone === kit).map((d) => d.piece).sort(), kit).toEqual([...DRUM_PIECES].sort());
-    expect(manifest.generated.map((g) => g.tone).sort()).toEqual([...TONES.room].sort());
+    expect(manifest.generated.filter((g) => !g.crowd).map((g) => g.tone).sort()).toEqual([...TONES.room].sort());
+    // The game's crowd reactions (src/lib/game.ts): one-shots through the room strip, not tones you can pick.
+    expect(manifest.generated.filter((g) => g.crowd).map((g) => g.id).sort()).toEqual(['crowd-cheer', 'crowd-clap', 'crowd-ovation']);
     expect(manifest.soundfont.url).toMatch(/^https:\/\/ftp\.osuosl\.org\/pub\/musescore\//);
     // Libraries only from their makers' own releases, each pinned by checksum, and only licenses that let the samples be served.
     for (const [id, lib] of Object.entries(manifest.libraries)) {
@@ -169,11 +172,13 @@ describe('the manifest and the measured sounds', () => {
     expect(sampleId('sticks-crash', 1, 2, 0, 1)).toBe('sticks-crash-l1');
   });
 
-  it('levels every note of a tone to within 3.5 dB, and the room loops to the same level', () => {
+  it('levels every note of a tone to within 3.5 dB, the room loops to the same level, and the crowd near it', () => {
     const byTone = new Map<string, number[]>();
     for (const s of measured.sounds) if (s.part !== 'drums' && s.part !== 'room') byTone.set(s.tone, [...(byTone.get(s.tone) ?? []), s.db!]);
     for (const [tone, dbs] of byTone) expect(Math.max(...dbs) - Math.min(...dbs), tone).toBeLessThanOrEqual(3.5);
-    for (const s of measured.sounds.filter((s) => s.part === 'room')) expect(Math.abs(s.db! + 26), s.id).toBeLessThanOrEqual(1);
+    for (const s of measured.sounds.filter((s) => s.part === 'room' && !s.crowd)) expect(Math.abs(s.db! + 26), s.id).toBeLessThanOrEqual(1);
+    // A cheer is all peaks, so it levels a little under the loops; the ceiling holds it there.
+    for (const s of measured.sounds.filter((s) => s.crowd)) expect(Math.abs(s.db! + 26), s.id).toBeLessThanOrEqual(2.5);
   });
 
   it('never makes a harder-played layer quieter than a softer one of the same note', () => {
@@ -571,5 +576,77 @@ describe('loudness layers, takes and strums', () => {
     for (let b = 0; b < 24; b++) for (const e of barEvents(DEFAULT_SONG, b, 'solo')) expect(e.delay ?? 0).toBeLessThan(0.04);
     // Single notes and drums aren't strummed.
     expect(bar.filter((e) => e.part === 'drums' || e.part === 'bass').every((e) => e.delay === undefined)).toBe(true);
+  });
+});
+
+describe('call and response, for the game', () => {
+  it('has the fills call in the first two bars of each line and leave the last two to the player', () => {
+    const lead = Array.from({ length: 12 }, (_, i) => barEvents(DEFAULT_SONG, 12 + i, 'call').some((e) => e.part === 'lead'));
+    expect(lead).toEqual([true, true, false, false, true, true, false, false, true, true, false, false]);
+    // The rest of the band plays the tune.
+    for (let i = 0; i < 12; i++) {
+      const rest = (s: Section) => barEvents(DEFAULT_SONG, 12 + i, s).filter((e) => e.part !== 'lead');
+      expect(rest('call')).toEqual(rest('head'));
+    }
+    // The tag in the second bar of a call leaves a beat before the turn.
+    for (const bar of [13, 17, 21]) expect(Math.max(...barEvents(DEFAULT_SONG, bar, 'call').filter((e) => e.part === 'lead').map((e) => e.at))).toBeLessThan(3);
+  });
+});
+
+describe('leading the band, in the game', () => {
+  const band: Song = { ...DEFAULT_SONG, parts: { ...DEFAULT_SONG.parts, guitar: 'clean', keys: 'piano', lead: 'harp' } };
+  const at = (bar: number, moves = {}) => barEvents(band, bar, 'call', moves);
+  const of = (events: JamEvent[], part: string) => events.filter((e) => e.part === part);
+
+  it('lets the guitar or the keys play the call, the same phrase, inside their samples, in every key', () => {
+    for (const caller of ['guitar', 'keys'] as const) {
+      const call = of(at(12, { caller }), caller);
+      // The caller plays single notes, the phrase the fills would have played, and the fills stay out.
+      expect(call.map((e) => e.at)).toEqual(of(at(12), 'lead').map((e) => e.at));
+      expect(of(at(12, { caller }), 'lead')).toEqual([]);
+      // In the last two bars of the line it's back to comping.
+      expect(of(at(14, { caller }), caller)).toEqual(of(at(14), caller));
+      for (const key of KEYS) {
+        const notes = [12, 13, 16, 17, 20, 21].flatMap((bar) => of(barEvents({ ...band, key }, bar, 'call', { caller }), caller).map((e) => e.midi!));
+        const have = sampleNotes(caller, caller === 'guitar' ? 'clean' : 'piano');
+        expect(Math.min(...notes), `${caller} in ${key}`).toBeGreaterThanOrEqual(have[0]! - 1);
+        expect(Math.max(...notes), `${caller} in ${key}`).toBeLessThanOrEqual(have.at(-1)! + 1);
+      }
+    }
+    expect(CALLERS).toEqual(['guitar', 'keys', 'lead']);
+  });
+
+  it('keeps the band’s fills out when you’re on them', () => {
+    for (let bar = 12; bar < 24; bar++) expect(of(barEvents(band, bar, 'call', { sittingIn: true }), 'lead')).toEqual([]);
+    expect(of(barEvents(band, 23, 'ending', { sittingIn: true }), 'lead')).toEqual([]);
+  });
+
+  it('throws a fill on beat 4 when the drummer’s cued, at the end of a line', () => {
+    // A line's last bar where the drummer would have just kept time on beat 4.
+    const bar = [15, 27, 39, 51, 63].find((n) => of(at(n), 'drums').some((e) => e.at >= 3 && (e.drum === 'ride' || e.drum === 'hat')))!;
+    const on4 = of(at(bar, { fill: true }), 'drums').filter((e) => e.at >= 3);
+    expect(on4.filter((e) => e.drum === 'snare').map((e) => e.at)).toEqual([3, 3 + 1 / 3, 3 + 2 / 3]);
+    expect(on4.some((e) => e.drum === 'ride' || e.drum === 'hat')).toBe(false);
+  });
+
+  it('drops out under your answer: a hit on one, the hi-hat, and nothing else', () => {
+    const turn = at(14, { drop: true });
+    expect(turn.filter((e) => e.part !== 'drums' && e.at > 0)).toEqual([]);
+    expect(of(turn, 'drums').filter((e) => e.drum !== 'hat').every((e) => e.at === 0)).toBe(true);
+    // The call itself still has the whole band.
+    expect(at(12, { drop: true })).toEqual(at(12));
+  });
+
+  it('digs in when it’s hot, and shouts a great answer back', () => {
+    const ride = (moves = {}) => of(at(13, moves), 'drums').filter((e) => e.drum === 'ride').length;
+    const shuffleOnHat: Song = { ...band, feel: 'boogie' };
+    expect(of(barEvents(shuffleOnHat, 13, 'call', { hot: true }), 'drums').some((e) => e.drum === 'ride')).toBe(true);
+    expect(of(barEvents(shuffleOnHat, 13, 'call'), 'drums').some((e) => e.drum === 'ride')).toBe(false);
+    expect(ride({ hot: true })).toBeGreaterThan(0);
+    // The bass's pickups.
+    expect(of(at(13, { hot: true }), 'bass').length).toBeGreaterThan(of(at(13), 'bass').length);
+    const crash = (moves = {}) => of(at(16, moves), 'drums').some((e) => e.drum === 'crash' && e.at === 0);
+    expect(crash()).toBe(false);
+    expect(crash({ shout: true })).toBe(true);
   });
 });

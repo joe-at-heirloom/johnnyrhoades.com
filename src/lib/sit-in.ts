@@ -45,3 +45,22 @@ export const padForKey = (key: string) => (PAD_KEYS as readonly string[]).indexO
 
 /** A pad dragged upward bends its note, up to a whole step at `fullPx` of drag, B.B. King style. */
 export const bendFromDrag = (dragUpPx: number, fullPx = 60) => 2 * Math.min(1, Math.max(0, dragUpPx / fullPx));
+
+/**
+ * The pad nearest a note, for showing the band's call on the pads (the game, ADR 0033): the pad
+ * that plays it, or the one whose scale note is nearest, in the octave closest to it.
+ */
+export function padFor(midi: number, key: Key, instrument: SitInInstrument): number {
+  const ps = pads(key, instrument);
+  let best = 0;
+  let cost = Infinity;
+  ps.forEach((p, i) => {
+    const pc = Math.abs((((midi - p.midi) % 12) + 18) % 12 - 6); // distance between pitch classes, 0–6
+    const c = pc * 100 + Math.abs(midi - p.midi);
+    if (c < cost) {
+      cost = c;
+      best = i;
+    }
+  });
+  return best;
+}

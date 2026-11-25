@@ -119,11 +119,16 @@ export function initSitIn(root: HTMLElement, deps: SitInDeps): SitIn {
     });
     el.addEventListener('pointermove', (e) => {
       if (!el.dataset.hold) return;
-      bend(el.dataset.hold, bendFromDrag(Number(el.dataset.startY) - e.clientY));
+      const semitones = bendFromDrag(Number(el.dataset.startY) - e.clientY);
+      bend(el.dataset.hold, semitones);
+      // Show the bend on the pad: a bar up its edge, full at a whole step.
+      el.style.setProperty('--bend', (semitones / 2).toFixed(3));
+      el.toggleAttribute('data-bend', semitones > 0.05);
     });
     const up = () => {
       if (el.dataset.hold) release(el.dataset.hold, i);
       delete el.dataset.hold;
+      el.removeAttribute('data-bend');
     };
     el.addEventListener('pointerup', up);
     el.addEventListener('pointercancel', up);

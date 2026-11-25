@@ -113,3 +113,7 @@ drums:
 generated:
   - { id: room-bar, part: room, tone: bar, seconds: 20, loop: true, prompt: "Ambience of a small neighborhood bar on a weeknight, quiet murmur of conversation, glasses clinking, no music" }
   - { id: room-vinyl, part: room, tone: vinyl, seconds: 12, loop: true, prompt: "Vinyl record surface noise, soft crackle and hiss of an old 78, no music" }
+  # The game's crowd (src/lib/game.ts): one-shots, played through the room strip when an answer lands.
+  - { id: crowd-clap, part: room, tone: crowd, crowd: true, seconds: 3, prompt: "A small audience in a blues bar clapping warmly for a few seconds after a musician's solo, no music, no talking" }
+  - { id: crowd-cheer, part: room, tone: crowd, crowd: true, seconds: 3.5, prompt: "A small crowd in a blues club cheering, clapping and whistling after a great solo, a couple of shouts of yeah, no music" }
+  - { id: crowd-ovation, part: room, tone: crowd, crowd: true, seconds: 6, prompt: "A packed small club giving a band a big ovation at the end of a song, loud applause, whistles and cheering, no music" }

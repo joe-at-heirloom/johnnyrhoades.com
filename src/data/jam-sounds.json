@@ -4087,6 +4087,33 @@
       "seconds": 12,
       "db": -26.5,
       "loop": true
+    },
+    {
+      "id": "crowd-clap",
+      "part": "room",
+      "tone": "crowd",
+      "file": "crowd-clap.mp3",
+      "seconds": 2.931,
+      "db": -25.6,
+      "crowd": true
+    },
+    {
+      "id": "crowd-cheer",
+      "part": "room",
+      "tone": "crowd",
+      "file": "crowd-cheer.mp3",
+      "seconds": 3.102,
+      "db": -24.4,
+      "crowd": true
+    },
+    {
+      "id": "crowd-ovation",
+      "part": "room",
+      "tone": "crowd",
+      "file": "crowd-ovation.mp3",
+      "seconds": 6,
+      "db": -25.6,
+      "crowd": true
     }
   ]
 }

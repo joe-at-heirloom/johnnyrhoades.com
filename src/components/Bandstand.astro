@@ -11,7 +11,13 @@
   The instruments that would float (guitars, the electric bass, the keys,
   the harmonica, the sax) are on stands.
 
-  It's also where the band is picked: each part has a switch by its name
+  In the game (ADR 0033) the band is who you play with, and each player
+  does something when you tap them (src/scripts/game.ts): before a gig you
+  hear them; during one the guitar or the keys take the calls, the drummer
+  throws a fill, the bass drops the band out under your answer, and the
+  fills' spot is you, where a tap switches your horn.
+
+  With the advanced controls it's where the band is picked: each part has a switch by its name
   (clicking the drawing flips it too) and its tones in a segmented control
   under it (src/scripts/jam.ts). Those
   are the form's own radios, so the page still works, and a song is still a
@@ -44,6 +50,8 @@ const lead = (tone: string) => {
   return { 'data-lo': n[0], 'data-hi': n.at(-1) };
 };
 const parts: Part[] = ['drums', 'bass', 'guitar', 'keys', 'lead'];
+// In the game the fills' spot is yours.
+const GAME_NAMES: Partial<Record<Part, string>> = { lead: 'You' };
 const song = DEFAULT_SONG;
 ---
 
@@ -62,7 +70,7 @@ const song = DEFAULT_SONG;
     parts.map((part) => (
       <div class="band-piece" role="group" aria-labelledby={`band-${part}`} data-jam-light={part} data-band={part}>
         <div class="band-head">
-          <span class="band-name" id={`band-${part}`}>{PART_LABELS[part]}<span class="band-spot" aria-hidden="true">Solo</span></span>
+          <span class="band-name" id={`band-${part}`}><span data-advanced-only>{PART_LABELS[part]}</span><span data-game-only>{GAME_NAMES[part] ?? PART_LABELS[part]}</span><span class="band-spot" aria-hidden="true">Solo</span></span>
           <button class="switch" type="button" role="switch" aria-checked={song.parts[part] ? 'true' : 'false'} aria-label={PART_LABELS[part]} data-band-toggle={part}>
             <span class="switch-knob"></span>
           </button>
@@ -209,6 +217,10 @@ const song = DEFAULT_SONG;
           )}
         </svg>
         </div>
+        {/* In the game, the whole drawing is a button, its chip saying what a tap does now. */}
+        <button class="band-act" type="button" aria-label={`Hear the ${PART_LABELS[part].toLowerCase()}`} data-band-act={part} data-game-only>
+          <span class="band-chip" data-band-chip>Hear</span>
+        </button>
         <Segmented name={part} options={TONES[part].map((t) => ({ value: t, label: TONE_SHORT[t]!, full: TONE_LABELS[t]! }))} value={song.parts[part] ?? 'off'} />
         {/* "Off" is the switch's job; this keeps it in the form, so a song is still a link */}
         <input type="radio" name={part} value="off" checked={song.parts[part] === null} hidden />

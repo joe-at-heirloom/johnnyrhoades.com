@@ -4,6 +4,42 @@ A running log for the portfolio write-up (PLAN.md section 16): numbers, screensh
 
 ---
 
+## 2026-11-24: The blues maker becomes a game, and two blind playtests make it one
+
+**What changed.** The blues maker opens as a game (ADR 0033): pick a gig, the band's harp plays a two-bar call, you answer on the pads, and the crowd decides. The controls from before are an advanced mode behind a switch.
+
+**The playtest.** Two agents who hadn't seen the code played it cold: one as a casual phone visitor, one as a guitarist on a laptop with no sound. They rated it 4/10 and 5/10, and the reasons were specific:
+
+- the prompt and the pads were 1,200 to 1,500 px apart;
+- without sound, the call was invisible;
+- the scoring barely told playing from not playing. Random taps averaged 60 an answer and careful playing 79; eight of the same note scored "Nice, +78";
+- the crowd meter was full by the fourth answer and couldn't fall;
+- the first turn on the easy gig came 21 seconds in, and the last line couldn't be answered.
+
+**The fixes, measured.**
+
+| | Before | After |
+|---|---|---|
+| Random taps, per answer | 60 (playtest) | 63 (400 simulated); one star, not two, and the crowd cools |
+| Mashing, per answer | 47 (playtest) | 49 (simulated); the crowd walks out in three turns |
+| One note eight times | 78 | at most 60 |
+| Same answer as last time | no penalty | variety drops to 30% |
+| First turn, easy gig | 21 s | 9 s |
+| Answers in a two-chorus gig | 5 | 6 (the band tags the ending after your last one) |
+| Panel and pads on a 375×667 phone | two screens apart | one screen, pads end at 628 px |
+
+Random tapping still averages about the same: half the time, timing and the last note are luck. What changed is what it earns and what it's told. A clean answer scores 100, and anything less loses points for the specific thing it got wrong. Scoring is five named parts (timing 35, ending 20, space 15, echo 15, variety 15). Echo compares the answer's rhythm with the call's, slot by slot, allowing a beat's nudge, so the same number of notes somewhere else scores nothing. Each answer shows its breakdown, and the weakest part comes with a tip. Good answers in a row build a streak. Below 70 the crowd cools, so coasting drains it, and three missed turns empty the room. Stars moved to 70% and 85%, so tapping at random earns one star, not two.
+
+**Things worth telling**
+
+- *The call has to be visible.* The pads light as the band plays its call, the line draws it note by note, and on your turn the call's rhythm shows as ticks under where you answer. A player with the sound off can still play.
+- *"Unclear you're supposed to match the notes on the right."* Joe's first go found what the agents hadn't: the drawing needed words. The halves now read "The band calls" and "You answer", a line under the prompt says what to do, and on your turn the 1 and 5 pads light up as the places to land.
+- *"The band needs to be interactive."* Joe's next note: the stage had become scenery in the game. Now the band stands between the panel and the pads, and each player does something when tapped. You choose who you trade with, cue the drummer's fill, drop the band out under your answer, or switch your horn. The band also plays to the room: softer to a cool crowd, digging in when it's hot, and a crash on the downbeat after a great answer. That last one needed a trick. The band schedules each bar about 0.3 s ahead, so it can't wait for the score. It judges the answer so far as it reaches the next line instead. Fitting the band onto a 375×667 phone with everything else took the form out of the layout (`display: contents`), so the stage could move up beside the gig.
+- *Audio latency is part of timing.* A note is stamped with the audio clock when it's pressed, but the player is pressing to what they heard, which comes out of the speakers `outputLatency` later. The game subtracts it. On Bluetooth headphones that's well over the 35 ms pocket.
+- *The iPhone ringer switch mutes Web Audio.* Setting `navigator.audioSession.type = 'playback'` (Safari 17 and later) lets the band play anyway, as a music app would. The gig page also says to check the switch.
+
+---
+
 ## 2026-11-24: Deeply sampled instruments, layers, takes and strums
 
 **What changed.** Drums, basses, guitars, piano and sax now come from free, deeply sampled libraries (Virtuosity and Swirly drums, Meatbass, Growlybass, Shinyguitar, Salamander, MTG Solo Sax), recorded at several loudnesses and in several takes, and the guitar strums (ADR 0032).

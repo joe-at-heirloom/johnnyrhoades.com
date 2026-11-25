@@ -198,7 +198,7 @@
 .sit-in-pick [role="group"] { flex: 1 1 320px; max-width: 520px; }
 .pads { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 8px; }
 @media (max-width: 640px) { .pads { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
-.pad { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; min-height: 92px; padding: 10px 4px; border: 1.5px solid var(--line-strong); border-radius: var(--radius); background: var(--ink-2); color: var(--bone); cursor: pointer; touch-action: none; user-select: none; -webkit-user-select: none; }
+.pad { -webkit-tap-highlight-color: transparent; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; min-height: 92px; padding: 10px 4px; border: 1.5px solid var(--line-strong); border-radius: var(--radius); background: var(--ink-2); color: var(--bone); cursor: pointer; touch-action: none; user-select: none; -webkit-user-select: none; }
 .pad:hover { border-color: var(--bone); }
 .pad:focus-visible { outline: 2px solid var(--red-hi); outline-offset: 2px; }
 .pad[data-down] { border-color: var(--red); background: var(--red); }
@@ -207,7 +207,10 @@
 .pad[data-down] .pad-degree { color: var(--bone); }
 .pad-key { position: absolute; top: 6px; right: 7px; color: var(--muted); font-family: var(--font); font-size: .7rem; }
 .pad[data-down] .pad-key { color: var(--bone); }
-@media (hover: none) { .pad-key { display: none; } }
+@media (hover: none) { .pad-key, .hint-keys { display: none; } }
+/* A bend shows as a bar rising up the pad's left edge, a whole step at the top. */
+.pad::before { content: ""; position: absolute; left: 5px; bottom: 6px; width: 4px; height: calc(var(--bend, 0) * (100% - 12px)); border-radius: 2px; background: var(--bone); }
+.pad:not([data-bend])::before { display: none; }
 
 /* ---------- Sound credits ---------- */
 .jam-credits { max-width: 46rem; margin-top: 20px; color: var(--bone-2); }
@@ -217,3 +220,145 @@
 .jam-license { margin-top: 14px; padding: 14px; max-height: 320px; overflow: auto; border: 1px solid var(--line-strong); border-radius: var(--radius); background: var(--ink-2); color: var(--bone-2); font-size: .8rem; line-height: 1.5; white-space: pre-wrap; }
 .jam-credits ul { margin: 10px 0 0 1.2em; }
 .jam-credits li { margin-top: 6px; }
+
+/* ---------- Game mode and advanced mode (ADR 0033) ---------- */
+.jam[data-mode="game"] [data-advanced-only],
+.jam[data-mode="game"] .band-piece .switch,
+.jam[data-mode="game"] .band-piece .seg,
+.jam[data-mode="advanced"] [data-game-only] { display: none; }
+.jam[data-mode="game"] .band-art { cursor: default; }
+/* In a game: the gig, the band on stage, your pads, then the chart. The form steps out of the
+   layout (its fields are the advanced controls), so the stage inside it can come up by the gig. */
+.jam[data-mode="game"] > .wrap { display: flex; flex-direction: column; }
+.jam[data-mode="game"] .jam-form { display: contents; }
+.jam[data-mode="game"] > .wrap > *,
+.jam[data-mode="game"] .jam-form > * { order: 5; }
+.jam[data-mode="game"] > .wrap > .jam-head,
+.jam[data-mode="game"] > .wrap > .jam-mode { order: 0; }
+.jam[data-mode="game"] > .wrap > .gig { order: 1; }
+.jam[data-mode="game"] .jam-form > .stage { order: 2; margin-bottom: 14px; }
+.jam[data-mode="game"] > .wrap > .sit-in { order: 3; margin: 0 0 clamp(36px, 5vw, 56px); }
+.jam[data-mode="game"] .jam-form > :is(.jam-legend, .jam-chart, .jam-about) { order: 4; }
+.jam[data-mode="game"] > .wrap > .jam-note { margin-top: 0; }
+
+/* The band in the game: each player is a button, its chip saying what a tap does now. */
+.jam[data-mode="game"] .band-spot { display: none; }
+.band-piece { position: relative; }
+/* the chip sits under the drawing, the button over the whole player */
+.jam[data-mode="game"] .band-piece { padding-bottom: 30px; }
+.band-act { position: absolute; inset: 0; display: flex; align-items: flex-end; justify-content: center; padding: 0 0 2px; border: 0; background: none; cursor: pointer; }
+.band-act:focus-visible { outline: 2px solid var(--red-hi); outline-offset: -2px; }
+.band-chip { padding: 3px 9px; border: 1.5px solid var(--line-strong); border-radius: 999px; background: var(--ink-2); color: var(--bone); font-size: .75rem; font-weight: 700; font-stretch: var(--stretch-label); text-transform: uppercase; letter-spacing: .08em; white-space: nowrap; }
+.band-act:hover .band-chip { border-color: var(--bone); }
+.band-piece:has(.band-act:hover) .band-svg { stroke: var(--bone); }
+.band-act[aria-pressed="true"] .band-chip { border-color: var(--red); background: var(--red); }
+
+/* In the game the band stands in one row, sized so that while a gig plays the panel, the band and
+   the pads are all in view. On a phone the chips name the players' moves; the drawings name them. */
+.jam[data-mode="game"] .bandstand { grid-template-columns: repeat(5, minmax(0, 1fr)); max-width: 680px; margin: 0 auto; gap: 0; }
+.jam[data-live] .stage-valance { display: none; }
+.jam[data-live] .bandstand { max-width: 560px; }
+@media (max-width: 640px) {
+  .jam[data-mode="game"] .band-head { display: none; }
+  .jam[data-mode="game"] .band-piece { padding: 0 2px; }
+  .jam[data-mode="game"] .band-piece { padding-bottom: 22px; }
+  .jam[data-mode="game"] .band-chip { padding: 2px 5px; font-size: .62rem; letter-spacing: .04em; }
+  /* the panel tightens: the part names keep their bars, the values go to the screen reader's label */
+  .jam[data-live] .gig-part-value { display: none; }
+  .jam[data-live] .pad { min-height: 54px; padding: 6px 4px; }
+  .jam[data-live] .pad-name { font-size: 1.3rem; }
+  .jam[data-live] .jam-form > .stage { margin-bottom: 8px; }
+}
+/* On stage: while a gig plays, the page's introduction steps aside and the pads sit tight under the
+   panel, without theirs, so the two fill one screen from the top, on a phone too. */
+.jam[data-live] .jam-head,
+.jam[data-live] .jam-mode { display: none; }
+.jam[data-live] .gig { margin-bottom: 10px; }
+.jam[data-live].page { padding-top: calc(var(--header-h) + 12px); }
+
+.jam[data-live] .sit-in > .jam-legend,
+.jam[data-live] .sit-in-about { display: none; }
+/* The band's call lights its pads; on your turn they all light up. */
+.sit-in[data-phase="turn"] .pad:not([data-down]) { border-color: var(--red-hi); background: var(--ink-3); }
+.sit-in[data-phase="turn"] .pad[data-home]:not([data-down]) .pad-degree { color: var(--red-hi); font-weight: 800; }
+.pad[data-call]:not([data-down]) { border-color: var(--bone); background: var(--ink-3); box-shadow: inset 0 0 0 2px var(--bone); }
+.jam[data-mode="game"] .band-art:hover .band-svg { stroke: var(--bone-2); }
+.jam-mode { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; margin: -8px 0 clamp(28px, 4vw, 40px); }
+.jam-mode-label { font-stretch: var(--stretch-label); font-weight: 800; text-transform: uppercase; letter-spacing: .16em; font-size: .85rem; color: var(--bone); }
+.jam-mode-about { flex: 1 1 260px; color: var(--muted); font-size: .9rem; }
+
+/* ---------- The game ---------- */
+.gig { margin-bottom: clamp(28px, 4vw, 40px); }
+.gig-about { max-width: 46rem; margin: 10px 0 16px; color: var(--bone-2); }
+.gig-list { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+@media (max-width: 760px) { .gig-list { grid-template-columns: 1fr; } }
+.gig-card { display: flex; flex-direction: column; gap: 4px; padding: 14px 16px; border: 1.5px solid var(--line-strong); border-radius: var(--radius); background: none; color: var(--bone); text-align: left; cursor: pointer; }
+.gig-card:hover { border-color: var(--bone); }
+.gig-card:focus-visible { outline: 2px solid var(--red-hi); outline-offset: 2px; }
+.gig-level { color: var(--red-hi); font-stretch: var(--stretch-label); font-weight: 800; text-transform: uppercase; letter-spacing: .14em; font-size: .75rem; }
+.gig-name { font-stretch: var(--stretch-display); font-weight: 900; text-transform: uppercase; font-size: 1.5rem; line-height: 1; }
+.gig-blurb { color: var(--bone-2); font-size: .9rem; }
+.gig-best { color: var(--muted); font-size: .85rem; }
+.gig-best:empty { display: none; }
+
+/* While it plays, the panel sits right above the pads (game mode puts them together), and a gig
+   scrolls the two into view: prompt, line, score and pads on one screen, on a phone too. */
+.gig-live { scroll-margin-top: calc(var(--header-h) + 8px); padding: 12px 14px 14px; border: 1.5px solid var(--line-strong); border-radius: var(--radius); background: var(--ink-2); }
+.gig-live:focus { outline: none; }
+.gig-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.gig-title { min-width: 0; overflow: hidden; color: var(--bone-2); font-size: .85rem; line-height: 1.3; white-space: nowrap; text-overflow: ellipsis; }
+.gig-top .btn { flex: none; padding: 7px 12px; font-size: .75rem; }
+.gig-line { color: var(--muted); }
+.gig-status { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 16px; margin-top: 6px; }
+.gig-prompt { font-stretch: var(--stretch-display); font-weight: 900; text-transform: uppercase; font-size: clamp(1.6rem, 5vw, 2.4rem); line-height: 1; color: var(--bone-2); }
+.gig-live[data-turn] .gig-prompt { color: var(--red-hi); }
+.gig-score { display: flex; align-items: baseline; gap: 12px; color: var(--bone-2); }
+.gig-score strong { color: var(--bone); font-size: 1.2rem; font-variant-numeric: tabular-nums; }
+.gig-streak { color: var(--red-hi); font-weight: 800; }
+.gig-hint { margin-top: 6px; color: var(--bone-2); font-size: .9rem; line-height: 1.4; }
+.gig-live[data-turn] .gig-hint { color: var(--bone); }
+
+/* The line: sixteen beats, the call's eight then yours. Each note sits at its beat, as high as its pad.
+   The beat sounding now is shaded; nothing slides. */
+.gig-roll { display: grid; grid-template-columns: 1fr 1fr; margin-top: 10px; }
+.gig-half { color: var(--muted); font-size: .75rem; font-weight: 800; font-stretch: var(--stretch-label); text-transform: uppercase; letter-spacing: .14em; }
+.gig-half[data-on] { color: var(--bone); }
+.gig-half + .gig-half { padding-left: 8px; }
+.gig-live[data-turn] .gig-half[data-on] { color: var(--red-hi); }
+.gig-lane { position: relative; grid-column: 1 / -1; height: 52px; margin-top: 4px; border: 1px solid var(--line-strong); border-radius: 2px; background: var(--ink); }
+.gig-beats { list-style: none; position: absolute; inset: 0; display: grid; grid-template-columns: repeat(16, 1fr); }
+.gig-beats li + li { border-left: 1px solid var(--line); }
+.gig-beats li:nth-child(4n + 1) { border-left-color: var(--line-strong); }
+.gig-beats li:nth-child(9) { border-left: 2px solid var(--bone-2); }
+.gig-beats li[data-now] { background: var(--ink-3); }
+.gig-notes { position: absolute; inset: 6px 0; }
+.gig-note { position: absolute; left: calc(var(--x) * 100% + 2px); bottom: calc(var(--y) * (100% - 8px)); width: 8px; height: 8px; border-radius: 50%; background: var(--bone-2); }
+.gig-note[data-kind="you"] { background: var(--red-hi); }
+.gig-note[data-hit="off"] { background: none; border: 2px solid var(--red-hi); }
+/* The call's rhythm, shown where you answer: a tick on the floor of the line for each of its notes */
+.gig-note[data-kind="echo"] { bottom: -6px; width: 2px; height: 10px; margin-left: 3px; border-radius: 0; background: var(--bone-2); }
+
+.gig-crowd { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
+.gig-crowd-label { color: var(--bone-2); font-size: .9rem; }
+.gig-meter { position: relative; flex: 1; height: 10px; border: 1px solid var(--line-strong); border-radius: 2px; overflow: hidden; }
+.gig-meter span { position: absolute; inset: 0; background: var(--red); transform-origin: left; transform: scaleX(var(--crowd, .4)); }
+
+/* Your last answer: what it scored, why, and each part's share */
+.gig-feedback { min-height: 2.9em; margin-top: 8px; color: var(--bone); font-size: .9rem; line-height: 1.45; }
+.gig-parts { list-style: none; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; margin-top: 6px; }
+.gig-part { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.gig-part-name { overflow: hidden; color: var(--bone-2); font-size: .75rem; white-space: nowrap; text-overflow: ellipsis; }
+.gig-part[data-weak] .gig-part-name { color: var(--red-hi); font-weight: 700; }
+.gig-part-bar { position: relative; height: 4px; overflow: hidden; border-radius: 2px; background: var(--line-strong); }
+.gig-part-bar span { position: absolute; inset: 0; background: var(--bone); transform-origin: left; transform: scaleX(var(--part, 0)); }
+.gig-part[data-weak] .gig-part-bar span { background: var(--red-hi); }
+.gig-part-value { color: var(--bone-2); font-size: .75rem; font-variant-numeric: tabular-nums; }
+
+.gig-summary { padding: 18px; border: 1.5px solid var(--line-strong); border-radius: var(--radius); }
+/* The stars are drawn SVGs: they need a size, or each fills the width (the playtest found them 1,160 px tall). */
+.gig-stars { display: flex; gap: 8px; margin-top: 10px; color: var(--red-hi); }
+.gig-star { display: block; width: 40px; height: 40px; }
+.gig-total, .gig-best-answer, .gig-work-on { margin-top: 8px; color: var(--bone-2); }
+.gig-work-on:empty, .gig-best-answer:empty { display: none; }
+.gig-sound { max-width: 46rem; margin: -6px 0 16px; color: var(--muted); font-size: .9rem; }
+.gig-actions { display: flex; flex-wrap: wrap; gap: 10px 14px; margin-top: 16px; }

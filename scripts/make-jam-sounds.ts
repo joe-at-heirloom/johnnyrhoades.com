@@ -287,9 +287,10 @@ function kit(hits: DrumSpec[]): MeasuredSound[] {
 /** A generated loop, from its kept original. */
 function loop(g: GeneratedSpec): MeasuredSound {
   const raw = decode(join(SOURCE, `${g.id}.mp3`));
-  const y = level(g.loop ? raw : trim(raw), g.loop);
+  // A crowd reaction plays out whole, faded only at its end.
+  const y = level(g.loop ? raw : trim(raw), g.loop || g.crowd);
   encode(y, join(OUT, `${g.id}.mp3`));
-  return { id: g.id, part: g.part, tone: g.tone, file: `${g.id}.mp3`, seconds: seconds(y), db: db(y, g.loop), ...(g.loop ? { loop: true } : {}) };
+  return { id: g.id, part: g.part, tone: g.tone, file: `${g.id}.mp3`, seconds: seconds(y), db: db(y, g.loop), ...(g.loop ? { loop: true } : {}), ...(g.crowd ? { crowd: true } : {}) };
 }
 
 /* ---------- Build ---------- */

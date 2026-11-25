@@ -19,6 +19,7 @@ import Bandstand from '../components/Bandstand.astro';
 import Segmented from '../components/Segmented.astro';
 import Mixer from '../components/Mixer.astro';
 import SitIn from '../components/SitIn.astro';
+import Gig from '../components/Gig.astro';
 import SoundCredits from '../components/SoundCredits.astro';
 import { DEFAULT_SONG, FEELS, FEEL_INFO, KEYS, SECTION_LABELS, TONES, TONE_LABELS, TONE_SHORT, chordName, degreeName, type MeasuredSound, type Section } from '../lib/jam';
 import { STYLES } from '../lib/styles';
@@ -48,16 +49,26 @@ const description = 'Make a 12-bar blues and lead the band: pick a style or buil
 >
   <a class="skip-link" href="#main">Skip to content</a>
   <Header solid />
-  <main id="main" class="page jam" data-jam>
+  <main id="main" class="page jam" data-jam data-mode="game">
     <div class="wrap">
       <header class="jam-head">
         <p class="epk-kicker">Blues maker</p>
         <h1 class="display">Make a <span class="jam-nowrap">12-bar</span> <em>blues</em></h1>
-        <p class="lede">Pick a style or build the band, press Play, and lead it: call a solo, break it down, take it home. Sit in on the pads, mix it, and record your take.</p>
+        <p class="lede">Play a gig with the band: it calls, you answer on the pads, and the crowd decides. Or switch on the advanced controls to build your own band, lead it, mix it and record it.</p>
       </header>
 
+      <div class="jam-mode">
+        <span class="jam-mode-label" id="jam-mode-label">Advanced controls</span>
+        <button class="switch" type="button" role="switch" aria-checked="false" aria-labelledby="jam-mode-label" aria-describedby="jam-mode-about" data-mode-switch>
+          <span class="switch-knob"></span>
+        </button>
+        <span class="jam-mode-about" id="jam-mode-about">Styles, the bandleader’s cues, every tone, key, feel and tempo, the mixer and recording.</span>
+      </div>
+
+      <Gig />
+
       <form class="jam-form" method="get" action="/jam/" data-jam-form>
-        <section class="jam-styles" aria-labelledby="jam-styles-title">
+        <section class="jam-styles" aria-labelledby="jam-styles-title" data-advanced-only>
           <h2 class="jam-legend" id="jam-styles-title">Start from a style</h2>
           <div class="style-list">
             {
@@ -71,7 +82,7 @@ const description = 'Make a 12-bar blues and lead the band: pick a style or buil
           </div>
         </section>
 
-        <div class="jam-transport">
+        <div class="jam-transport" data-advanced-only>
           <button class="btn btn-red jam-play" type="submit" aria-pressed="false" data-jam-play>Play</button>
           <button class="btn btn-ghost jam-record" type="button" aria-pressed="false" data-record>Record a take</button>
           <span class="jam-record-time" data-record-time aria-hidden="true"></span>
@@ -79,7 +90,7 @@ const description = 'Make a 12-bar blues and lead the band: pick a style or buil
           <p class="jam-status" role="status" data-jam-status></p>
         </div>
 
-        <section class="leader" aria-labelledby="leader-title" data-leader>
+        <section class="leader" aria-labelledby="leader-title" data-leader data-advanced-only>
           <div class="leader-head">
             <h2 class="jam-legend" id="leader-title">Lead the band</h2>
             <p class="leader-now" data-leader-now>Press Play, then call the next chorus, or let the band choose.</p>
@@ -114,7 +125,7 @@ const description = 'Make a 12-bar blues and lead the band: pick a style or buil
 
         <Bandstand />
 
-        <div class="jam-grid">
+        <div class="jam-grid" data-advanced-only>
           <fieldset class="jam-field">
             <legend>Key</legend>
             <Segmented name="key" options={KEYS.map((k) => ({ value: k, label: k }))} value={song.key} />

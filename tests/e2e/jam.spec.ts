@@ -18,7 +18,7 @@ test('it plays the 12 bars, loading only the sounds the song uses, and stops', a
   page.on('request', (r) => {
     if (r.url().endsWith('.mp3')) mp3s.push(r.url().split('/').pop()!.replace(/\.[^.]+\.mp3$/, ''));
   });
-  await page.goto('/jam/?feel=boogie&bpm=176&guitar=off&keys=off&lead=off&intro=none');
+  await page.goto('/jam/?mode=advanced&feel=boogie&bpm=176&guitar=off&keys=off&lead=off&intro=none');
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Make a 12-bar blues');
   await expect(page.locator('[data-jam-chord]')).toHaveText(['E7', 'E7', 'E7', 'E7', 'A7', 'A7', 'E7', 'E7', 'B7', 'A7', 'E7', 'B7']);
   expect(mp3s).toEqual([]); // nothing loads before Play
@@ -50,7 +50,7 @@ test('it plays the 12 bars, loading only the sounds the song uses, and stops', a
 });
 
 test('a song is a link: the form reads the address bar and writes it back', async ({ page }) => {
-  await page.goto('/jam/?key=A&feel=slow&bpm=60&change=quick&drums=brushes&room=vinyl');
+  await page.goto('/jam/?mode=advanced&key=A&feel=slow&bpm=60&change=quick&drums=brushes&room=vinyl');
   await expect(page.getByRole('radio', { name: 'A', exact: true })).toBeChecked();
   await expect(page.getByRole('radio', { name: 'Slow blues' })).toBeChecked();
   await expect(page.getByRole('checkbox', { name: /Quick change/ })).toBeChecked();
@@ -69,14 +69,14 @@ test('a song is a link: the form reads the address bar and writes it back', asyn
 });
 
 test('it has no serious accessibility problems', async ({ page }) => {
-  await page.goto('/jam/');
+  await page.goto('/jam/?mode=advanced');
   const results = await new AxeBuilder({ page }).analyze();
   const serious = results.violations.filter((v) => v.impact === 'serious' || v.impact === 'critical');
   expect(serious.map((v) => `${v.id}: ${v.help}`)).toEqual([]);
 });
 
 test('every control can be reached and used from the keyboard', async ({ page }) => {
-  await page.goto('/jam/');
+  await page.goto('/jam/?mode=advanced');
   await page.getByRole('button', { name: 'Play' }).focus();
   // Play, then Record; the bandleader's cues wait (disabled) until the band plays; then the band:
   // the drum kit is a switch, then its tones.
@@ -102,7 +102,7 @@ test('every control can be reached and used from the keyboard', async ({ page })
 });
 
 test('an instrument’s switch (or its drawing) sits it out, and brings it back with the tone it had', async ({ page }) => {
-  await page.goto('/jam/?guitar=acoustic');
+  await page.goto('/jam/?mode=advanced&guitar=acoustic');
   const guitar = page.getByRole('switch', { name: 'Guitar' });
   await expect(guitar).toHaveAttribute('aria-checked', 'true');
   await guitar.click();
@@ -122,13 +122,13 @@ test('an instrument’s switch (or its drawing) sits it out, and brings it back 
   await expect(guitar).toHaveAttribute('aria-checked', 'true');
   await expect(page).toHaveURL(/guitar=clean/);
   // A part that starts off comes in on its first tone.
-  await page.goto('/jam/?keys=off');
+  await page.goto('/jam/?mode=advanced&keys=off');
   await page.getByRole('switch', { name: 'Keys' }).click();
   await expect(page.getByRole('group', { name: 'Keys' }).getByRole('radio', { name: 'Upright piano' })).toBeChecked();
 });
 
 test('the drawings follow the tones, and the keys and harmonica play the notes', async ({ page }) => {
-  await page.goto('/jam/?bass=electric&guitar=off&keys=piano&lead=harp&feel=slow&bpm=76&intro=none');
+  await page.goto('/jam/?mode=advanced&bass=electric&guitar=off&keys=piano&lead=harp&feel=slow&bpm=76&intro=none');
   await expect(page.locator('[data-band="bass"] [data-tone="electric"]')).toBeVisible();
   await expect(page.locator('[data-band="bass"] [data-tone="upright"]')).toBeHidden();
   await expect(page.getByRole('group', { name: 'Bass' }).getByRole('radio', { name: 'Electric' })).toBeChecked();
@@ -148,7 +148,7 @@ test('the drawings follow the tones, and the keys and harmonica play the notes',
 
 test('with reduced motion nothing moves, and the playing parts hold steady', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
-  await page.goto('/jam/?guitar=off&room=vinyl');
+  await page.goto('/jam/?mode=advanced&guitar=off&room=vinyl');
   await page.getByRole('button', { name: 'Play' }).click();
   await expect(page.locator('[data-jam-status]')).toHaveText(/Playing/);
   const on = () => page.locator('[data-jam-light][data-on]').evaluateAll((els) => els.map((el) => (el as HTMLElement).dataset.jamLight).sort());
@@ -182,7 +182,7 @@ test.describe('the mixer', () => {
 
   test('the meters read the band, and mute and solo silence the right strips', async ({ page }) => {
     const errors = collectConsoleErrors(page);
-    await page.goto('/jam/?feel=boogie&bpm=176&lead=off');
+    await page.goto('/jam/?mode=advanced&feel=boogie&bpm=176&lead=off');
     await page.getByRole('button', { name: 'Play' }).click();
     await expect.poll(() => meter(page, 'bass'), { timeout: 5000 }).toBeGreaterThan(0.3);
     await expect.poll(() => meter(page, 'master'), { timeout: 5000 }).toBeGreaterThan(0.3);
@@ -206,7 +206,7 @@ test.describe('the mixer', () => {
   });
 
   test('faders and knobs move the mix, read out in dB, go into the link, and reset', async ({ page }) => {
-    await page.goto('/jam/');
+    await page.goto('/jam/?mode=advanced');
     const fader = page.getByRole('slider', { name: 'Guitar level' });
     await fader.focus();
     for (let i = 0; i < 4; i++) await page.keyboard.press('ArrowUp');
@@ -228,7 +228,7 @@ test.describe('the mixer', () => {
   });
 
   test('a part the song leaves out has a dimmed strip', async ({ page }) => {
-    await page.goto('/jam/?keys=off');
+    await page.goto('/jam/?mode=advanced&keys=off');
     await expect(page.locator('[data-strip="keys"]')).toHaveAttribute('data-off', '');
     await page.getByRole('switch', { name: 'Keys' }).click();
     await expect(page.locator('[data-strip="keys"]')).not.toHaveAttribute('data-off');
@@ -239,7 +239,7 @@ test.describe('leading the band', () => {
   test('the cues wait for the band, then call the next chorus; taking it home plays the ending and stops', async ({ page }) => {
     test.setTimeout(60_000);
     const errors = collectConsoleErrors(page);
-    await page.goto('/jam/?feel=boogie&bpm=176');
+    await page.goto('/jam/?mode=advanced&feel=boogie&bpm=176');
     const solo = page.getByRole('button', { name: 'A solo' });
     const home = page.getByRole('button', { name: 'Take it home' });
     await expect(solo).toBeDisabled();
@@ -265,7 +265,7 @@ test.describe('leading the band', () => {
 
   test('the band arranges itself: the tune, then the spotlight moves to the fills for a solo', async ({ page }) => {
     test.setTimeout(60_000);
-    await page.goto('/jam/?feel=boogie&bpm=176&intro=none');
+    await page.goto('/jam/?mode=advanced&feel=boogie&bpm=176&intro=none');
     await page.getByRole('button', { name: 'Play' }).click();
     await expect(page.locator('[data-leader-now]')).toContainText('Chorus 1: the tune.', { timeout: 5000 });
     // Call the solo for chorus 2 and wait for it.
@@ -283,7 +283,7 @@ test.describe('sitting in', () => {
 
   test('the pads play the blues scale in the song’s key, from the keyboard too, through the instrument’s strip', async ({ page }) => {
     const errors = collectConsoleErrors(page);
-    await page.goto('/jam/?key=A');
+    await page.goto('/jam/?mode=advanced&key=A');
     const pads = page.locator('[data-pad-name]');
     await expect(pads).toHaveText(['A', 'C', 'D', 'Eb', 'E', 'G', 'A', 'C']);
     await expect(page.locator('[data-pad]').nth(3)).toHaveAttribute('aria-label', 'E flat, the flat 5 (key F)');
@@ -312,7 +312,7 @@ test.describe('sitting in', () => {
 
 test.describe('styles and takes', () => {
   test('a style sets the whole band and mix, as a link, and stays marked until something changes', async ({ page }) => {
-    await page.goto('/jam/');
+    await page.goto('/jam/?mode=advanced');
     const jump = page.getByRole('button', { name: /Jump boogie/ });
     await jump.click();
     await expect(jump).toHaveAttribute('aria-pressed', 'true');
@@ -328,17 +328,169 @@ test.describe('styles and takes', () => {
     await expect(page.getByRole('button', { name: /Jump boogie/ })).toHaveAttribute('aria-pressed', 'false');
   });
 
-  test('recording a take hands over a file named after the song', async ({ page }) => {
-    await page.goto('/jam/?feel=boogie&bpm=176&intro=none');
+  test('recording a take starts the band, hands over a file named after the song, and ends with the band', async ({ page }) => {
+    await page.goto('/jam/?mode=advanced&feel=boogie&bpm=176&intro=none');
     await page.getByRole('button', { name: 'Record a take' }).click();
     await expect(page.getByRole('button', { name: 'Stop recording' })).toHaveAttribute('aria-pressed', 'true');
-    await page.getByRole('button', { name: 'Play' }).click();
+    // Record starts the band.
+    await expect(page.getByRole('button', { name: 'Stop', exact: true })).toBeVisible({ timeout: 10_000 });
     await page.waitForTimeout(2000);
     await page.getByRole('button', { name: 'Stop recording' }).click();
-    const take = page.getByRole('link', { name: /Download your take \(0:0[1-3]\)/ });
+    const take = page.getByRole('link', { name: /Download your take \(0:0[1-4]\)/ });
     await expect(take).toBeVisible();
     const [download] = await Promise.all([page.waitForEvent('download'), take.click()]);
     expect(download.suggestedFilename()).toMatch(/^blues-in-e-boogie-176-bpm\.(webm|ogg|m4a)$/);
     expect((await download.path()) && (await import('node:fs')).statSync((await download.path())!).size).toBeGreaterThan(1000);
+
+    // A take that's still recording when the band stops ends a moment later, not in silence.
+    await page.getByRole('button', { name: 'Record a take' }).click();
+    await expect(page.getByRole('button', { name: 'Stop recording' })).toBeVisible();
+    await page.getByRole('button', { name: 'Stop', exact: true }).click();
+    await expect(page.getByRole('button', { name: 'Record a take' })).toBeVisible({ timeout: 5_000 });
+    await expect(take).toBeVisible();
+  });
+});
+
+test.describe('the game', () => {
+  test('opens as a game: gigs, the stage and the pads, with the advanced controls a switch away', async ({ page }) => {
+    await page.goto('/jam/');
+    await expect(page.getByRole('heading', { name: 'Play a gig' })).toBeVisible();
+    await expect(page.getByRole('button', { name: /Open mic/ })).toBeVisible();
+    await expect(page.locator('[data-pad]').first()).toBeVisible();
+    await expect(page.locator('[data-band="drums"] svg')).toBeVisible();
+    for (const hidden of ['The mixer', 'Lead the band', 'Start from a style']) await expect(page.getByRole('heading', { name: hidden })).toBeHidden();
+    await expect(page.getByRole('button', { name: 'Play', exact: true })).toBeHidden();
+
+    const advanced = page.getByRole('switch', { name: 'Advanced controls' });
+    await advanced.click();
+    await expect(advanced).toHaveAttribute('aria-checked', 'true');
+    await expect(page.getByRole('heading', { name: 'The mixer' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Play a gig' })).toBeHidden();
+    await expect(page).toHaveURL(/mode=advanced/);
+    // A link made with the advanced controls opens with them.
+    await page.reload();
+    await expect(page.getByRole('heading', { name: 'The mixer' })).toBeVisible();
+    await page.getByRole('switch', { name: 'Advanced controls' }).click();
+    await expect(page).not.toHaveURL(/mode=/);
+  });
+
+  test('a gig: the band calls on the pads, you answer on the keys, each answer is scored, and the crowd decides', async ({ page }) => {
+    test.setTimeout(90_000);
+    const errors = collectConsoleErrors(page);
+    await page.goto('/jam/?choruses=1');
+    await page.getByRole('button', { name: /Saturday, late/ }).click();
+    const prompt = page.locator('[data-gig-prompt]');
+    const live = page.locator('[data-gig-live]');
+    await expect(live).toBeVisible();
+    // The pads switched to the gig's instrument.
+    await expect(page.locator('input[name="sit-in"][value="sax"]')).toBeChecked();
+    await expect(page.locator('[data-gig-name]')).toHaveText('Saturday, late:');
+    await expect(page.locator('[data-gig-line]')).toHaveText('line 1 of 3', { timeout: 10_000 });
+
+    // Straight in: no intro, the first call comes right after the count-in.
+    await expect(prompt).toHaveText('Listen…', { timeout: 10_000 });
+    // The panel and the pads under it are on one screen.
+    const viewport = page.viewportSize()!;
+    const lastPad = (await page.locator('[data-pad]').last().boundingBox())!;
+    expect((await live.boundingBox())!.y).toBeGreaterThanOrEqual(0);
+    expect(lastPad.y + lastPad.height).toBeLessThanOrEqual(viewport.height);
+
+    // The band's on stage, and you lead it: the piano calls on Saturday; tap the guitar to trade with
+    // it instead, and the drummer for a fill.
+    const act = (part: string) => page.locator(`[data-band-act="${part}"]`);
+    await expect(act('keys')).toHaveAttribute('aria-pressed', 'true');
+    await expect(act('lead')).toHaveAccessibleName(/^You: sax\. Switch to harmonica$/);
+    await act('guitar').click();
+    await expect(act('guitar')).toHaveAttribute('aria-pressed', 'true');
+    await expect(act('keys')).toHaveAttribute('aria-pressed', 'false');
+    await act('drums').click();
+    await expect(act('drums')).toHaveAttribute('aria-pressed', 'true');
+
+    // Three turns in a one-chorus gig, the last line too. Answer each with four notes, ending on the 1.
+    for (let turn = 0; turn < 3; turn++) {
+      await expect(prompt).toHaveText('Listen…', { timeout: 15_000 });
+      // The call shows on the pads and on the line as it plays.
+      await expect(page.locator('[data-pad][data-call]').first()).toBeAttached({ timeout: 6_000 });
+      await expect(page.locator('.gig-note[data-kind="call"]').first()).toBeAttached();
+      await expect(prompt).toHaveText('Your turn!', { timeout: 10_000 });
+      await expect(live).toHaveAttribute('data-turn', '');
+      await expect(page.locator('[data-sit-in]')).toHaveAttribute('data-phase', 'turn');
+      for (const key of ['h', 'g', 'd', 'a']) {
+        await page.keyboard.down(key);
+        await page.waitForTimeout(150);
+        await page.keyboard.up(key);
+        await page.waitForTimeout(250);
+      }
+      // Each note is on the line, marked on time or not.
+      await expect(page.locator('.gig-note[data-kind="you"]')).toHaveCount(4);
+      await expect(page.locator('.gig-note[data-kind="you"][data-hit]')).toHaveCount(4);
+      // Scored the moment the turn ends, with the breakdown.
+      await expect(page.locator('[data-gig-feedback]')).toHaveText(/^\+\d+/, { timeout: 10_000 });
+      await expect(page.locator('[data-part="timing"] [data-part-value]')).toHaveText(/^\d+\/35$/);
+      // The drummer's fill played at the end of the first line, and the chip let go.
+      if (turn === 0) await expect(act('drums')).toHaveAttribute('aria-pressed', 'false');
+    }
+    expect(Number(await page.locator('[data-gig-score]').textContent())).toBeGreaterThan(0);
+
+    // The band takes it home, then the summary: stars, the total, the best answer, what to work on.
+    const summary = page.locator('[data-gig-summary]');
+    await expect(summary).toBeVisible({ timeout: 30_000 });
+    await expect(page.locator('[data-gig-summary-title]')).toHaveText('That’s the gig');
+    await expect(page.locator('[data-gig-stars]')).toHaveAttribute('aria-label', /^[0-3] of 3 stars$/);
+    await expect(page.locator('[data-gig-total]')).toContainText('of 300 points');
+    await expect(page.locator('[data-gig-best-answer]')).toHaveText(/^Your best answer scored \d+\.$/);
+    await expect(page.locator('[data-gig-work-on]')).not.toBeEmpty();
+    await expect(page.locator('[data-gig-summary-title]')).toBeFocused();
+    // The best is remembered on the gig's card.
+    await page.getByRole('button', { name: 'Choose a gig' }).click();
+    await expect(page.locator('[data-gig-best="saturday"]')).toContainText('Your best:');
+    expect(errors).toEqual([]);
+  });
+
+  test('before a gig, tapping a player on stage plays a little of what they do', async ({ page }) => {
+    await page.goto('/jam/');
+    const guitar = page.locator('[data-band-act="guitar"]');
+    await expect(guitar).toHaveAccessibleName('Hear the guitar');
+    await guitar.click();
+    // The drawing plays along: a string lights as it sounds.
+    await expect(page.locator('[data-band="guitar"] [data-hot]').first()).toBeAttached({ timeout: 10_000 });
+    // In advanced mode the drawings are the switches again.
+    await page.getByRole('switch', { name: 'Advanced controls' }).click();
+    await expect(guitar).toBeHidden();
+  });
+
+  test('miss three turns and the crowd walks out', async ({ page }) => {
+    test.setTimeout(60_000);
+    await page.goto('/jam/?choruses=2');
+    await page.getByRole('button', { name: /Saturday, late/ }).click();
+    await expect(page.locator('[data-gig-feedback]')).toHaveText(/missed your turn/, { timeout: 15_000 });
+    await expect(page.locator('[data-gig-summary-title]')).toHaveText('They walked out', { timeout: 30_000 });
+    await expect(page.locator('[data-gig-total]')).toContainText('walked out after 3 of 6 answers');
+    await expect(page.locator('[data-gig-stars]')).toHaveAttribute('aria-label', '0 of 3 stars');
+  });
+
+  test('on a phone: the gig, then the pads, then the chart, and a gig fits the panel and the pads on one screen', async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 667 });
+    await page.goto('/jam/');
+    const y = async (sel: string) => (await page.locator(sel).first().boundingBox())!.y;
+    expect(await y('[data-gig]')).toBeLessThan(await y('[data-pad]'));
+    expect(await y('[data-pad]')).toBeLessThan(await y('.jam-chart'));
+    await page.getByRole('button', { name: /Open mic/ }).click();
+    await expect(page.locator('[data-gig-live]')).toBeVisible();
+    // The panel and every pad fit on the screen together.
+    const lastPad = (await page.locator('[data-pad]').last().boundingBox())!;
+    expect((await page.locator('[data-gig-live]').boundingBox())!.y).toBeGreaterThanOrEqual(0);
+    expect(lastPad.y + lastPad.height).toBeLessThanOrEqual(667);
+    await page.getByRole('button', { name: 'Leave the stage' }).click();
+  });
+
+  test('leaving the stage stops the band and goes back to the gigs', async ({ page }) => {
+    await page.goto('/jam/?choruses=1');
+    await page.getByRole('button', { name: /Open mic/ }).click();
+    await expect(page.locator('[data-gig-live]')).toBeVisible();
+    await page.getByRole('button', { name: 'Leave the stage' }).click();
+    await expect(page.locator('[data-gig-live]')).toBeHidden();
+    await expect(page.getByRole('button', { name: /Open mic/ })).toBeVisible();
+    await expect(page.locator('[data-gig-summary]')).toBeHidden();
   });
 });

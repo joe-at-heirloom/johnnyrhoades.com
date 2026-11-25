@@ -29,11 +29,14 @@ import {
   pickDrum,
   pieceOf,
   FEEL_INFO,
+  KEY_PC,
   parseSong,
   pickSample,
   secondsPerBeat,
   songToParams,
   startBar,
+  type BandMoves,
+  type Caller,
   type JamEvent,
   type MeasuredSound,
   type Part,
@@ -43,10 +46,12 @@ import {
 import { cloneMix, parseMix, mixToParam, type Mix } from '../lib/mixer';
 import type { Style } from '../lib/styles';
 import { initBandstand } from './bandstand';
+import { initGame, type Game } from './game';
 import { createDesk, type Desk } from './console';
 import { initMixerUI } from './mixer-ui';
 import { initRecorder } from './recorder';
 import { initSitIn } from './sit-in';
+import { SIT_IN } from '../lib/sit-in';
 import { prefersReducedMotion } from './dom';
 import { track } from './track';
 
@@ -100,8 +105,21 @@ export function initJam(root: HTMLElement): void {
     if (p) params.set('mix', p);
     return params.toString();
   };
+  /* ---------- Game mode, or every control ---------- */
+
+  // The page opens as a game (ADR 0033); a link made with the advanced controls opens with them.
+  let advanced = new URLSearchParams(location.search).get('mode') === 'advanced';
+  const modeSwitch = root.querySelector<HTMLButtonElement>('[data-mode-switch]');
+  const showMode = () => {
+    root.dataset.mode = advanced ? 'advanced' : 'game';
+    modeSwitch?.setAttribute('aria-checked', String(advanced));
+  };
+  showMode();
+
+  // In game mode the gig picks the band, so the address bar stays plain.
   const writeUrl = () => {
-    history.replaceState(null, '', `?${link(song, mix)}`);
+    if (!advanced) return;
+    history.replaceState(null, '', `?mode=advanced&${link(song, mix)}`);
     // A style stays marked only while the song and mix are still exactly it.
     const here = link(song, mix);
     for (const b of styleButtons) {
@@ -217,6 +235,9 @@ export function initJam(root: HTMLElement): void {
     if (ctx) return ctx;
     const AC = window.AudioContext ?? (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
     if (!AC) return null;
+    // Play like a music app: on an iPhone, the ringer switch would otherwise silence the band.
+    const session = (navigator as Navigator & { audioSession?: { type: string } }).audioSession;
+    if (session) session.type = 'playback';
     ctx = new AC();
     desk = createDesk(ctx, mix);
     return ctx;
@@ -299,14 +320,15 @@ export function initJam(root: HTMLElement): void {
   };
 
   /** Play one event at audio time `when`. */
-  function voice(e: JamEvent, at: number, spb: number, gainScale = 1, forced?: { id: string; rate: number }) {
+  /** Play a note. `through` sends it straight to a channel strip, outside a Play (a player heard on their own). */
+  function voice(e: JamEvent, at: number, spb: number, gainScale = 1, forced?: { id: string; rate: number }, through?: { out: AudioNode; song: Song }) {
     if (!ctx) return;
     const when = at + (e.delay ?? 0); // a strummed or rolled chord's later notes
-    const sample = forced ?? sampleFor(e, song, nextTake(`${e.part}:${e.drum ?? Math.round(e.midi ?? 0)}`));
+    const sample = forced ?? sampleFor(e, through?.song ?? song, nextTake(`${e.part}:${e.drum ?? Math.round(e.midi ?? 0)}`));
     if (!sample) return;
     const { id, rate } = sample;
     const got = ready.get(id); // never wait on a fetch mid-song: a tone still loading just sits out
-    const out = desk?.input(e.part);
+    const out = through?.out ?? desk?.input(e.part);
     if (!got || !out) return;
     const src = ctx.createBufferSource();
     src.buffer = got.buffer;
@@ -345,15 +367,115 @@ export function initJam(root: HTMLElement): void {
     key: () => song.key,
     show: (e, at, end) => {
       band.note(e, at, end);
+      // You hear the band a moment after the clock schedules it, and play to what you hear.
+      const heard = ctx ? (ctx.outputLatency || ctx.baseLatency || 0) : 0;
+      if (game.active() && e.midi !== undefined) game.played(e.midi, at - heard);
       if (!playing) requestAnimationFrame(sitInFrame);
     },
   });
-  initRecorder(root, {
+  const recording = initRecorder(root, {
     stream: async () => ((await ensureAudio()) && desk ? desk.recordStream() : null),
     name: () => `blues-in-${song.key.toLowerCase()}-${song.feel}-${song.bpm}-bpm`,
+    playing: () => playing,
+    play: () => start(),
   });
   writeForm(song);
   writeUrl();
+
+  const crowdSounds = ['crowd-clap', 'crowd-cheer', 'crowd-ovation'] as const;
+  const game: Game = initGame(root, {
+    async play(gig) {
+      if (playing) stop();
+      song = { ...gig.song, parts: { ...gig.song.parts } };
+      mix = cloneMix(gig.mix);
+      mixer.setMix(mix);
+      desk?.apply(mix);
+      desk?.setRoom(mix.master.room);
+      writeForm(song);
+      // The gig's instrument on the pads.
+      const pick = root.querySelector<HTMLInputElement>(`input[name="sit-in"][value="${gig.instrument}"]`);
+      if (pick && !pick.checked) {
+        pick.checked = true;
+        pick.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+      // The gig's choruses of call and response. You answer the last line too, then the band tags
+      // it with the ending.
+      const first = Math.ceil(startBar(song) / 12);
+      const plan = new Map(Array.from({ length: gig.choruses }, (_, i) => [first + i, 'call' as Section]));
+      await start({ calls: plan, home: first + gig.choruses, tag: true, extra: [...crowdSounds] });
+    },
+    stop: () => {
+      // Leaving while the band is still loading cancels the start, too.
+      starts++;
+      if (playing) stop('You left the stage.');
+      else game.ended(false);
+    },
+    crowd(id) {
+      const got = ready.get(id);
+      const out = desk?.liveInput('room');
+      if (!ctx || !got || !out) return;
+      const src = ctx.createBufferSource();
+      src.buffer = got.buffer;
+      const g = ctx.createGain();
+      g.gain.value = SAMPLE_GAIN * 0.9;
+      src.connect(g).connect(out);
+      src.start();
+    },
+    now: () => ctx?.currentTime ?? 0,
+    parts: () => song.parts,
+    async preview(part) {
+      // A player on their own, for a bar: the drummer's fill into the top, the bass's walk, a call from the rest.
+      if (playing || part === 'room') return;
+      const audio = await ensureAudio();
+      if (!audio || !desk) return;
+      const s: Song = { ...song, parts: { ...song.parts, [part]: song.parts[part] ?? TONES[part][0] } };
+      await load(s);
+      if (playing) return;
+      const spb = secondsPerBeat(s.bpm);
+      const t0 = audio.currentTime + 0.05;
+      const events = part === 'drums' ? barEvents(s, 11, 'head') : part === 'bass' ? barEvents(s, 0, 'head') : barEvents(s, 0, 'call', { caller: part as Caller });
+      const out = desk.liveInput(part);
+      for (const e of events) if (e.part === part) voice(e, t0 + e.at * spb, spb, 1, undefined, { out, song: s });
+      previewUntil = t0 + 4 * spb;
+      requestAnimationFrame(previewFrame);
+    },
+    bringIn(part) {
+      if (song.parts[part]) return;
+      const before = song;
+      song = { ...song, parts: { ...song.parts, [part]: lastTone.get(part) ?? TONES[part][0] } };
+      songChanged(before);
+    },
+    setInstrument(instrument) {
+      const radio = root.querySelector<HTMLInputElement>(`input[name="sit-in"][value="${instrument}"]`);
+      if (radio && !radio.checked) {
+        radio.checked = true;
+        radio.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+      // The fills' spot on stage is you: it shows your horn.
+      const tone = SIT_IN[instrument].tone;
+      if (SIT_IN[instrument].part === 'lead' && song.parts.lead !== tone) {
+        const before = song;
+        song = { ...song, parts: { ...song.parts, lead: tone } };
+        songChanged(before);
+      }
+    },
+  });
+  // Hearing a player on their own: the drawing plays along until they're done.
+  let previewUntil = 0;
+  function previewFrame() {
+    if (!ctx || playing) return;
+    band.frame(ctx.currentTime);
+    if (ctx.currentTime < previewUntil + 0.6) requestAnimationFrame(previewFrame);
+  }
+
+  modeSwitch?.addEventListener('click', () => {
+    advanced = !advanced;
+    // Whatever was playing belongs to the other mode.
+    if (playing) stop();
+    showMode();
+    if (advanced) writeUrl();
+    else history.replaceState(null, '', location.pathname);
+  });
 
   /* ---------- The meters ---------- */
 
@@ -494,21 +616,37 @@ export function initJam(root: HTMLElement): void {
       const chorus = Math.floor(bar / 12);
       const inForm = bar % 12;
       const section = sectionOf(chorus, inForm);
-      // The fills lay out while you're sitting in.
-      const youre = ctx.currentTime - sitIn.lastPlayed() < LAY_OUT_BARS * 4 * spb || sitIn.playingPart() !== null;
+      // The fills lay out while you're sitting in (in the game they keep calling: that's the game).
+      const youre = !game.active() && (ctx.currentTime - sitIn.lastPlayed() < LAY_OUT_BARS * 4 * spb || sitIn.playingPart() !== null);
       const b = bar;
-      barEvents(song, b, section)
+      // In a gig, the band plays what you lead it to, and to the crowd.
+      const moves: BandMoves = game.active() ? game.moves({ inForm, section, time: nextBarAt }) : {};
+      const events = barEvents(song, b, section, moves);
+      events
         .filter((e) => !(youre && e.part === 'lead'))
         .forEach((e, i) => {
           const feel = humanize(b, i, e.part);
-          voice(e, nextBarAt + e.at * spb + feel.seconds, spb, feel.gain);
+          voice(e, nextBarAt + e.at * spb + feel.seconds, spb, feel.gain * (moves.level ?? 1));
+        });
+      if (game.active())
+        game.scheduled({
+          chorus,
+          inForm,
+          section,
+          at: nextBarAt,
+          spb,
+          swing: FEEL_INFO[song.feel].swing,
+          keyPc: KEY_PC[song.key],
+          lead: events.filter((e) => e.part === (moves.caller ?? 'lead') && e.midi !== undefined).map((e) => ({ beat: e.at, midi: e.midi!, beats: e.beats })),
         });
       marks.push(window.setTimeout(onBar, Math.max(0, (nextBarAt - ctx.currentTime) * 1000), chorus, inForm, section));
       nextBarAt += 4 * spb;
       bar++;
+      // A tagged ending: after the last chorus, straight to the ending's two bars.
+      if (tagAt !== null && bar === tagAt) bar = tagAt + 10;
       if (section === 'ending' && inForm === 11) {
         done = true;
-        marks.push(window.setTimeout(() => stop('That’s the end. Press Play to go again.'), (nextBarAt - 4 * spb - ctx.currentTime + LAST_CHORD_RING_S) * 1000));
+        marks.push(window.setTimeout(() => stop('That’s the end. Press Play to go again.', true), (nextBarAt - 4 * spb - ctx.currentTime + LAST_CHORD_RING_S) * 1000));
       }
     }
   }
@@ -516,6 +654,7 @@ export function initJam(root: HTMLElement): void {
   /** As each bar starts: mark it on the chart, and at the top of a chorus, say what it is. */
   function onBar(chorus: number, inForm: number, section: Section) {
     highlight(inForm);
+    game.sounding({ chorus, inForm, section });
     soloing = section === 'solo' || section === 'stop';
     if (chorus !== soundingChorus || inForm === 0) {
       soundingChorus = chorus;
@@ -532,6 +671,18 @@ export function initJam(root: HTMLElement): void {
 
   async function toggle() {
     if (playing) return stop();
+    await start();
+  }
+
+  /**
+   * Count the band in and play. A plan (the game's) calls the choruses ahead of time and says which one
+   * takes it home; with `tag`, that chorus is only its ending, played right after the one before, so
+   * the whole of the last chorus is still yours. `extra` sounds load with the song (the crowd's reactions).
+   */
+  let starts = 0; // a start still loading is cancelled if another start (or leaving the stage) comes first
+  let tagAt: number | null = null; // the bar where a tagged ending jumps to its last two bars
+  async function start(plan?: { calls: Map<number, Section>; home: number; tag?: boolean; extra?: string[] }) {
+    const mine = ++starts;
     const audio = await ensureAudio();
     if (!audio || !desk) {
       if (status) status.textContent = 'This browser can’t play sound.';
@@ -539,12 +690,20 @@ export function initJam(root: HTMLElement): void {
     }
     play!.disabled = true;
     if (status) status.textContent = 'Getting the band together…';
-    await load(song);
+    await Promise.all([load(song), ...(plan?.extra ?? []).map(loadSound)]);
     play!.disabled = false;
+    if (mine !== starts) return;
     playing = true;
+    recording.bandStarted();
     done = false;
     calls.clear();
     homeChorus = null;
+    tagAt = null;
+    if (plan) {
+      for (const [c, kind] of plan.calls) calls.set(c, kind);
+      homeChorus = plan.home;
+      if (plan.tag) tagAt = plan.home * 12;
+    }
     desk.openSession();
     metersUntil = Infinity;
     play!.textContent = 'Stop';
@@ -569,9 +728,11 @@ export function initJam(root: HTMLElement): void {
     track('jam_play', { feel: song.feel, key: song.key });
   }
 
-  function stop(message = 'Stopped.') {
+  function stop(message = 'Stopped.', finished = false) {
     if (!playing) return;
     playing = false;
+    recording.bandStopped();
+    if (game.active()) game.ended(finished);
     window.clearInterval(timer);
     marks.splice(0).forEach((t) => window.clearTimeout(t));
     desk?.closeSession();

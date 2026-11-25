@@ -15,9 +15,9 @@ const first = pads(DEFAULT_SONG.key, 'harp');
 <section class="sit-in" aria-labelledby="sit-in-title" data-sit-in>
   <h2 class="jam-legend" id="sit-in-title">Sit in</h2>
   <p class="sit-in-about">
-    Play along on the pads, or on the keys A to K. They’re the blues scale in the song’s key, so there’s no wrong note. Hold a pad to hold the note, and drag it up to bend. The fills lay out while you play.
+    Play along on the pads<span class="hint-keys">, or on the keys A to K</span>. They’re the blues scale in the song’s key, so there’s no wrong note. Hold a pad to hold the note, and drag it up to bend.<span data-advanced-only> The fills lay out while you play.</span>
   </p>
-  <div class="sit-in-pick" data-sit-in-instrument>
+  <div class="sit-in-pick" data-sit-in-instrument data-advanced-only>
     <span class="jam-legend" id="sit-in-on">On</span>
     <div role="group" aria-labelledby="sit-in-on">
       <Segmented name="sit-in" options={SIT_IN_INSTRUMENTS.map((i) => ({ value: i, label: SIT_IN[i].label, full: SIT_IN[i].full }))} value="harp" />
@@ -26,7 +26,7 @@ const first = pads(DEFAULT_SONG.key, 'harp');
   <div class="pads">
     {
       first.map((p) => (
-        <button class="pad" type="button" data-pad aria-label={`${spoken(p)} (key ${p.key.toUpperCase()})`}>
+        <button class="pad" type="button" data-pad data-home={p.degree === '1' || p.degree === '5' ? '' : undefined} aria-label={`${spoken(p)} (key ${p.key.toUpperCase()})`}>
           <span class="pad-name" data-pad-name>{p.name}</span>
           <span class="pad-degree" data-pad-degree>{p.degree}</span>
           <kbd class="pad-key" aria-hidden="true">{p.key.toUpperCase()}</kbd>

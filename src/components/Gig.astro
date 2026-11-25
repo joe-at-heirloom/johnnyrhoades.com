@@ -1,0 +1,92 @@
+---
+/*
+  The game (ADR 0033): play a gig. Pick one, and the band plays; in each
+  line its guitar (or piano) plays a call for two bars and you answer on the
+  pads in the next two, leading the band on stage as you go. Each answer is scored (src/lib/game.ts) and the crowd
+  reacts. While it plays, this panel sits right above the pads, so the
+  prompt, the line drawn as it goes and the score are in view while you
+  play. Run by src/scripts/game.ts.
+*/
+import { GIGS, PART_NAMES, TURN_BEATS, WEIGHTS, type Part } from '../lib/game';
+
+const parts = Object.keys(WEIGHTS) as Part[];
+---
+
+<section class="gig" aria-labelledby="gig-title" data-gig data-game-only>
+  <div class="gig-pick" data-gig-pick>
+    <h2 class="jam-legend" id="gig-title">Play a gig</h2>
+    <p class="gig-about">
+      Sit in with the band on stage. In each line one of them plays a call for two bars, and you answer in the next two on the pads<span class="hint-keys"> or the keys A to K</span>. Stay with the drums, end on the 1 or the 5, leave some space, borrow the call’s rhythm, and win the crowd. Lose them and they walk out. Tap the players to lead them as you go: choose who you trade with, cue the drummer’s fill, or drop the band out under you. Before a gig, tap one to hear them.
+    </p>
+    <p class="gig-sound">Turn your sound up. On an iPhone, check the ringer switch, too.</p>
+    <div class="gig-list">
+      {
+        GIGS.map((g) => (
+          <button class="gig-card" type="button" data-gig-start={g.id}>
+            <span class="gig-level">{g.level}</span>
+            <span class="gig-name">{g.label}</span>
+            <span class="gig-blurb">{g.blurb}</span>
+            <span class="gig-best" data-gig-best={g.id}></span>
+          </button>
+        ))
+      }
+    </div>
+  </div>
+
+  <div class="gig-live" data-gig-live tabindex="-1" hidden>
+    <div class="gig-top">
+      <p class="gig-title"><span data-gig-name></span> <span class="gig-line" data-gig-line></span></p>
+      <button class="btn btn-ghost btn-sm" type="button" data-gig-stop>Leave the stage</button>
+    </div>
+    <div class="gig-status">
+      <p class="gig-prompt" data-gig-prompt aria-live="assertive">Count it in…</p>
+      <p class="gig-score">
+        <span>Score <strong data-gig-score>0</strong></span>
+        <span class="gig-streak" data-gig-streak></span>
+      </p>
+    </div>
+    <p class="gig-hint" data-gig-hint>The band plays a call, then it’s your turn to answer.</p>
+    {/* The line as it goes: the call on the left, your answer on the right, each note at its beat and pad. */}
+    <div class="gig-roll" aria-hidden="true">
+      <span class="gig-half">The band calls</span>
+      <span class="gig-half">You answer</span>
+      <div class="gig-lane">
+        <ol class="gig-beats" data-gig-beats>
+          {Array.from({ length: TURN_BEATS * 2 }, () => <li></li>)}
+        </ol>
+        <div class="gig-notes" data-gig-notes></div>
+      </div>
+    </div>
+    <div class="gig-crowd">
+      <span class="gig-crowd-label" id="gig-crowd-label">Crowd</span>
+      <span class="gig-meter" role="meter" aria-labelledby="gig-crowd-label" aria-valuemin="0" aria-valuemax="100" aria-valuenow="40" data-gig-crowd><span></span></span>
+    </div>
+    <div class="gig-result" data-gig-result>
+      <p class="gig-feedback" data-gig-feedback aria-live="polite"></p>
+      <ul class="gig-parts" data-gig-parts aria-label="Your last answer">
+        {
+          parts.map((p) => (
+            <li class="gig-part" data-part={p}>
+              <span class="gig-part-name">{PART_NAMES[p]}</span>
+              <span class="gig-part-bar" aria-hidden="true"><span></span></span>
+              <span class="gig-part-value" data-part-value>–</span>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </div>
+
+  <div class="gig-summary" data-gig-summary hidden>
+    <h2 class="jam-legend" data-gig-summary-title tabindex="-1">That’s the gig</h2>
+    <p class="gig-stars" data-gig-stars></p>
+    <p class="gig-total" data-gig-total></p>
+    <p class="gig-best-answer" data-gig-best-answer></p>
+    <p class="gig-work-on" data-gig-work-on></p>
+    <div class="gig-actions">
+      <button class="btn btn-red" type="button" data-gig-again>Play it again</button>
+      <button class="btn btn-ghost" type="button" data-gig-next>Next gig</button>
+      <button class="btn btn-ghost" type="button" data-gig-choose>Choose a gig</button>
+    </div>
+  </div>
+</section>
