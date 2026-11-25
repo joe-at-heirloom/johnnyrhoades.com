@@ -1,0 +1,33 @@
+---
+/*
+  A rotary knob for the mixer (ADR 0030): a drawn knob over a real range
+  input, so it works with a mouse (drag sideways), touch and the arrow keys,
+  and screen readers hear a slider. The pointer turns through 270 degrees;
+  src/scripts/mixer-ui.ts sets --turn from the value (a style attribute
+  here would break the CSP). Double-click resets it.
+*/
+interface Props {
+  control: string;
+  label: string;
+  /** What screen readers hear, e.g. "Drums pan". */
+  name: string;
+  min: number;
+  max: number;
+  step: number;
+  value: number;
+  /** A tick at the top for controls whose middle is "nothing" (pan, tone). */
+  centered?: boolean;
+}
+const { control, label, name, min, max, step, value, centered = false } = Astro.props;
+---
+
+<label class="knob">
+  <svg class="knob-face" viewBox="0 0 40 40" aria-hidden="true">
+    <path class="knob-track" d="M10.1 29.9 A14 14 0 1 1 29.9 29.9" />
+    {centered && <path class="knob-tick" d="M20 3 V6" />}
+    <circle class="knob-body" cx="20" cy="20" r="10" />
+    <g class="knob-pointer"><path d="M20 20 V11" /></g>
+  </svg>
+  <input type="range" data-mix={control} min={min} max={max} step={step} value={value} aria-label={name} />
+  <span class="knob-label">{label}</span>
+</label>

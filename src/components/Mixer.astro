@@ -1,0 +1,62 @@
+---
+/*
+  The mixing console (ADR 0030): a channel strip per part and a master
+  strip. Each strip has tone, pan and a reverb send on knobs, mute and solo,
+  and a fader with a meter beside it. The audio is src/scripts/console.ts,
+  the controls src/scripts/mixer-ui.ts, the numbers src/lib/mixer.ts.
+
+  The inputs have no `name`, so they stay out of the song form; the mix goes
+  into the link as its own `mix` parameter.
+*/
+import Knob from './Knob.astro';
+import { PARTS, PART_LABELS } from '../lib/jam';
+import { DEFAULT_MIX, FADER, faderText } from '../lib/mixer';
+
+const mix = DEFAULT_MIX;
+---
+
+<section class="mixer" aria-labelledby="mixer-title" data-mixer>
+  <div class="mixer-top">
+    <h2 class="jam-legend" id="mixer-title">The mixer</h2>
+    <button class="btn btn-ghost btn-sm" type="button" data-mix-reset>Reset the mix</button>
+  </div>
+  <p class="mixer-about">Ride the faders while it plays. Tone tilts a part darker or brighter, pan places it left or right, and reverb sends it into the room. Solo a part to hear it alone. Double-click (or double-tap) any control to put it back.</p>
+
+  <p class="mixer-swipe">Swipe the desk sideways for every strip.</p>
+  <div class="desk">
+    {
+      PARTS.map((part) => {
+        const s = mix.strips[part];
+        const f = { id: `fader-${part}`, name: `${PART_LABELS[part]} level`, db: s.db };
+        return (
+          <div class="strip" role="group" aria-labelledby={`strip-${part}`} data-strip={part}>
+            <span class="strip-name" id={`strip-${part}`}>{PART_LABELS[part]}</span>
+            <Knob control="tone" label="Tone" name={`${PART_LABELS[part]} tone`} min={-1} max={1} step={0.05} value={s.tone} centered />
+            <Knob control="pan" label="Pan" name={`${PART_LABELS[part]} pan`} min={-1} max={1} step={0.05} value={s.pan} centered />
+            <Knob control="send" label="Reverb" name={`${PART_LABELS[part]} reverb`} min={0} max={1} step={0.01} value={s.send} />
+            <div class="strip-buttons">
+              <button class="strip-btn" type="button" aria-pressed="false" aria-label={`Mute ${PART_LABELS[part]}`} data-mix="mute">M</button>
+              <button class="strip-btn strip-btn--solo" type="button" aria-pressed="false" aria-label={`Solo ${PART_LABELS[part]}`} data-mix="solo">S</button>
+            </div>
+            <div class="strip-fader">
+              <span class="meter" aria-hidden="true"><span class="meter-fill" data-meter></span><span class="meter-peak" data-meter-peak></span></span>
+              <span class="fader-slot"><input class="fader" aria-orientation="vertical" id={f.id} type="range" data-mix="db" min={FADER.min} max={FADER.max} step={FADER.step} value={f.db} aria-label={f.name} aria-valuetext={faderText(f.db)} /></span>
+            </div>
+            <output class="strip-db" for={f.id} data-mix-out>{faderText(f.db)}</output>
+          </div>
+        );
+      })
+    }
+    <div class="strip strip--master" role="group" aria-labelledby="strip-master" data-strip="master">
+      <span class="strip-name" id="strip-master">Master</span>
+      <Knob control="room" label="Room size" name="Room size" min={0} max={1} step={0.01} value={mix.master.room} />
+      <Knob control="drive" label="Drive" name="Drive" min={0} max={1} step={0.01} value={mix.master.drive} />
+      <div class="strip-spacer"></div>
+      <div class="strip-fader">
+        <span class="meter" aria-hidden="true"><span class="meter-fill" data-meter></span><span class="meter-peak" data-meter-peak></span></span>
+        <span class="fader-slot"><input class="fader" aria-orientation="vertical" id="fader-master" type="range" data-mix="db" min={FADER.min} max={FADER.max} step={FADER.step} value={mix.master.db} aria-label="Master level" aria-valuetext={faderText(mix.master.db)} /></span>
+      </div>
+      <output class="strip-db" for="fader-master" data-mix-out>{faderText(mix.master.db)}</output>
+    </div>
+  </div>
+</section>

@@ -7,25 +7,21 @@
 .jam-status { color: var(--bone-2); min-height: 1.5em; }
 
 /* The 12 bars, four to a line, the way a chart is written */
-.jam-chart { list-style: none; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-top: 1px solid var(--line-strong); border-left: 1px solid var(--line-strong); margin-bottom: clamp(36px, 5vw, 56px); }
+.jam-chart { list-style: none; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-top: 1px solid var(--line-strong); border-left: 1px solid var(--line-strong); margin-bottom: 16px; }
 .jam-bar { position: relative; padding: 14px 14px 12px; border-right: 1px solid var(--line-strong); border-bottom: 1px solid var(--line-strong); }
 .jam-bar-n { display: block; color: var(--muted); font-size: .75rem; }
 .jam-chord { font-stretch: var(--stretch-display); font-weight: 900; font-size: clamp(1.5rem, 4vw, 2.4rem); line-height: 1; }
+.jam-degree { float: right; margin-top: -1.2em; color: var(--muted); font-size: .8rem; font-weight: 700; letter-spacing: .08em; }
+.jam-bar[aria-current] .jam-degree { color: var(--bone); }
+.jam-about { max-width: 46rem; margin-bottom: clamp(36px, 5vw, 56px); color: var(--bone-2); }
 .jam-bar[aria-current] { background: var(--red); }
 .jam-bar[aria-current] .jam-bar-n { color: var(--bone); }
 
 .jam-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 28px 40px; }
-.jam-field { border: 0; min-width: 0; }
+.jam-field { margin: 0; padding: 0; border: 0; min-width: 0; }
 .jam-field legend,
 .jam-legend { display: block; margin-bottom: 12px; font-stretch: var(--stretch-label); font-weight: 800; text-transform: uppercase; letter-spacing: .2em; font-size: .85rem; color: var(--bone-2); }
 
-.jam-options { display: flex; flex-wrap: wrap; gap: 8px; }
-.jam-option { position: relative; }
-.jam-option input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
-.jam-option span { display: inline-flex; align-items: center; min-height: 44px; padding: 0 14px; border: 2px solid var(--line-strong); border-radius: var(--radius); color: var(--bone); }
-.jam-option input:checked + span { background: var(--bone); border-color: var(--bone); color: var(--ink); }
-.jam-option input:hover + span { border-color: var(--bone); }
-.jam-option input:focus-visible + span { outline: 2px solid var(--red-hi); outline-offset: 2px; }
 
 .jam-tempo { display: flex; align-items: center; gap: 14px; min-height: 44px; }
 .jam-tempo input { flex: 1; accent-color: var(--red); }
@@ -35,3 +31,187 @@
 
 .jam-note { margin-top: clamp(40px, 6vw, 64px); max-width: 40rem; color: var(--muted); }
 .jam-nowrap { white-space: nowrap; }
+
+/* The bandstand: the band drawn in the strum neck's lines, playing along (ADR 0030).
+   Red is what's sounding. Nothing here transitions: the script moves it on the audio clock. */
+/* The stage: a red valance over the band, and a floor (drawn in each instrument's SVG) that joins across a row */
+.stage { margin-bottom: clamp(40px, 6vw, 64px); overflow: hidden; }
+.stage-valance { display: block; margin-bottom: 18px; }
+.stage-valance path { fill: var(--red); stroke: var(--red-deep); stroke-width: 1; }
+.stage-valance line { stroke: var(--red-deep); stroke-width: 2; }
+.bandstand { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr)); gap: 28px 0; }
+.band-piece { min-width: 0; padding: 0 clamp(8px, 1.5vw, 14px); }
+/* Dim the instrument, not the stage under it */
+.band-piece[data-off] .band-svg > g { opacity: .3; }
+.band-floor { fill: var(--ink-3); stroke: var(--bone-2); }
+.band-name { margin-bottom: 8px; font-stretch: var(--stretch-label); font-weight: 800; text-transform: uppercase; letter-spacing: .2em; font-size: .85rem; color: var(--bone-2); }
+.band-piece[data-on] .band-name { color: var(--bone); }
+.band-svg { display: block; width: 100%; height: auto; overflow: visible; fill: none; stroke: var(--bone-2); stroke-width: 1.5; stroke-linejoin: round; stroke-linecap: round; }
+.band-svg [hidden] { display: none; }
+.band-faint { stroke: var(--line-strong); }
+.band-string { stroke: #d6cfbf; stroke-width: 1; }
+.band-svg [data-hot],
+.band-svg [data-hot] * { stroke: var(--red-hi); }
+.band-key { fill: var(--bone); stroke: var(--ink); stroke-width: 1; }
+.band-key--black { fill: var(--ink); stroke: var(--bone-2); }
+.band-key[data-down] { fill: var(--red-hi); }
+.band-hole[data-hot] { fill: var(--red-hi); }
+
+/* The blues maker's two controls, used for every choice so they all match.
+   A segmented control: equal segments in one bar, the chosen one filled in bone. */
+.seg { display: flex; border: 1.5px solid var(--line-strong); border-radius: var(--radius); }
+.seg-item { position: relative; flex: 1 1 0; min-width: 0; }
+.seg-item + .seg-item { border-left: 1.5px solid var(--line-strong); }
+.seg-item input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
+.seg-item span { display: flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 6px; overflow: hidden; color: var(--bone-2); font-size: .9rem; font-weight: 600; font-stretch: var(--stretch-label); white-space: nowrap; text-overflow: ellipsis; }
+.seg-item input:hover + span { color: var(--bone); }
+.seg-item input:checked + span { background: var(--bone); color: var(--ink); }
+.seg-item input:focus-visible + span { outline: 2px solid var(--red-hi); outline-offset: -5px; }
+
+/* A switch, like the strum's sound switch: red with the knob over when it's on. */
+.switch { position: relative; flex: none; width: 44px; height: 26px; padding: 0; border: 1.5px solid var(--line-strong); border-radius: 13px; background: var(--ink-3); cursor: pointer; }
+.switch-knob { position: absolute; top: 3px; left: 3px; width: 17px; height: 17px; border-radius: 50%; background: var(--bone-2); transition: transform .2s var(--ease); }
+.switch[aria-checked="true"] { border-color: var(--red); background: var(--red); }
+.switch[aria-checked="true"] .switch-knob { transform: translateX(18px); background: var(--bone); }
+.switch:focus-visible { outline: 2px solid var(--red-hi); outline-offset: 2px; }
+
+/* An instrument's card: name and switch, the drawing on the stage, its tones */
+.band-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 4px; }
+.band-head .band-name { margin: 0; }
+.band-art { cursor: pointer; }
+.band-art:hover .band-svg { stroke: var(--bone); }
+.band-piece .seg { margin-top: 10px; }
+
+/* ---------- The mixer: a channel strip per part and a master (ADR 0030) ---------- */
+.mixer { margin-top: clamp(48px, 7vw, 80px); }
+.mixer-top { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.mixer-top .jam-legend { margin: 0; }
+.mixer-about { max-width: 46rem; margin: 12px 0 20px; color: var(--bone-2); }
+.mixer-swipe { display: none; margin-bottom: 10px; color: var(--muted); font-size: .9rem; }
+@media (max-width: 700px) { .mixer-swipe { display: block; } }
+/* On a phone the desk scrolls sideways inside itself; the page never does. */
+.desk { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(84px, 1fr); overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x proximity; border: 1.5px solid var(--line-strong); border-radius: var(--radius); background: var(--ink-2); }
+.strip { display: flex; flex-direction: column; align-items: center; gap: 10px; min-width: 84px; padding: 14px 6px 12px; border-left: 1px solid var(--line); scroll-snap-align: start; }
+.strip:first-child { border-left: 0; }
+.strip--master { border-left: 1.5px solid var(--line-strong); background: var(--ink-3); }
+.strip-name { font-stretch: var(--stretch-label); font-weight: 800; text-transform: uppercase; letter-spacing: .14em; font-size: .75rem; color: var(--bone); }
+/* A part the song leaves out: its drawn controls dim, its text stays readable (it can still be mixed) */
+.strip[data-off] :is(.knob-face, .strip-fader, .strip-buttons) { opacity: .4; }
+.strip[data-off] .strip-name { color: var(--muted); }
+.strip-spacer { flex: 1; }
+
+/* Knobs: a drawn knob over a real slider; the pointer turns through 270 degrees */
+.knob { position: relative; display: flex; flex-direction: column; align-items: center; width: 52px; }
+.knob-face { width: 40px; height: 40px; fill: none; stroke-linecap: round; }
+.knob-track { stroke: var(--muted); stroke-width: 2; }
+.knob-tick { stroke: var(--muted); stroke-width: 1.5; }
+.knob-body { fill: var(--ink-3); stroke: var(--bone-2); stroke-width: 1.5; }
+.knob-pointer { stroke: var(--bone); stroke-width: 2; transform-origin: 20px 20px; transform: rotate(calc(var(--turn, .5) * 270deg - 135deg)); }
+.knob input { position: absolute; top: 0; left: 0; width: 100%; height: 40px; margin: 0; opacity: 0; cursor: ew-resize; }
+.knob:hover .knob-body { stroke: var(--bone); }
+.knob:has(input:focus-visible) .knob-body { stroke: var(--red-hi); stroke-width: 2.5; }
+.knob-label { margin-top: 2px; color: var(--muted); font-size: .72rem; white-space: nowrap; }
+
+/* Mute and solo */
+.strip-buttons { display: flex; gap: 6px; }
+.strip-btn { width: 32px; height: 32px; padding: 0; border: 1.5px solid var(--line-strong); border-radius: var(--radius); background: none; color: var(--bone-2); font-weight: 800; font-stretch: var(--stretch-label); cursor: pointer; }
+.strip-btn:hover { border-color: var(--bone); color: var(--bone); }
+.strip-btn[aria-pressed="true"] { border-color: var(--bone); background: var(--bone); color: var(--ink); }
+.strip-btn--solo[aria-pressed="true"] { border-color: var(--red); background: var(--red); color: var(--bone); }
+.strip-btn:focus-visible { outline: 2px solid var(--red-hi); outline-offset: 2px; }
+
+/* The fader, with its meter beside it */
+.strip-fader { display: flex; gap: 8px; height: 156px; }
+.meter { position: relative; width: 6px; overflow: hidden; border: 1px solid var(--line); background: var(--ink); }
+.meter-fill { position: absolute; inset: 0; background: var(--bone-2); transform: scaleY(0); transform-origin: bottom; }
+.strip[data-silenced] .meter-fill { background: var(--muted); }
+.meter-peak { position: absolute; left: 0; right: 0; bottom: 0; height: 2px; background: var(--bone); opacity: 0; }
+.meter-peak[data-on] { opacity: 1; }
+.meter-peak[data-hot] { background: var(--red-hi); }
+.fader-slot { position: relative; width: 30px; height: 156px; }
+/* the 0 dB mark: 48 of the fader's 54 dB up */
+.fader-slot::after { content: ""; position: absolute; left: 3px; right: 3px; bottom: calc(48 / 54 * (100% - 16px) + 8px); height: 1px; background: var(--muted); }
+/* A horizontal slider turned upright, which every browser draws the same */
+.fader { position: absolute; top: calc(50% - 15px); left: calc(50% - 78px); width: 156px; height: 30px; margin: 0; background: transparent; transform: rotate(-90deg); -webkit-appearance: none; appearance: none; cursor: ns-resize; }
+.fader::-webkit-slider-runnable-track { height: 4px; border-radius: 2px; background: var(--line-strong); }
+.fader::-moz-range-track { height: 4px; border-radius: 2px; background: var(--line-strong); }
+.fader::-webkit-slider-thumb { width: 16px; height: 28px; margin-top: -12px; border: 1.5px solid var(--ink); border-radius: 2px; background: var(--bone); -webkit-appearance: none; appearance: none; }
+.fader::-moz-range-thumb { width: 16px; height: 28px; border: 1.5px solid var(--ink); border-radius: 2px; background: var(--bone); }
+.fader:focus-visible { outline: none; }
+.fader:focus-visible::-webkit-slider-thumb { background: var(--red-hi); }
+.fader:focus-visible::-moz-range-thumb { background: var(--red-hi); }
+.strip-db { color: var(--bone-2); font-size: .75rem; font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+/* ---------- Styles: a band and a mix in one click ---------- */
+.jam-styles { margin-bottom: clamp(28px, 4vw, 40px); }
+.jam-styles .jam-legend { margin-bottom: 12px; }
+.style-list { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+@media (max-width: 860px) { .style-list { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 480px) { .style-list { grid-template-columns: 1fr; } }
+.style { display: flex; flex-direction: column; gap: 4px; padding: 12px 14px; border: 1.5px solid var(--line-strong); border-radius: var(--radius); background: none; color: var(--bone); text-align: left; cursor: pointer; }
+.style:hover { border-color: var(--bone); }
+.style:focus-visible { outline: 2px solid var(--red-hi); outline-offset: 2px; }
+.style[aria-pressed="true"] { border-color: var(--bone); background: var(--bone); color: var(--ink); }
+.style-name { font-stretch: var(--stretch-label); font-weight: 800; text-transform: uppercase; letter-spacing: .12em; font-size: .85rem; }
+.style-blurb { color: var(--bone-2); font-size: .9rem; line-height: 1.4; }
+.style[aria-pressed="true"] .style-blurb { color: var(--ink-on-bone-2); }
+
+/* ---------- Recording a take ---------- */
+.jam-record[aria-pressed="true"] { border-color: var(--red); background: var(--red); color: var(--bone); }
+.jam-record-time { min-width: 3em; color: var(--red-hi); font-variant-numeric: tabular-nums; }
+.jam-record-time:empty { display: none; }
+
+/* ---------- Leading the band ---------- */
+.leader { margin-bottom: clamp(28px, 4vw, 40px); padding: 16px; border: 1.5px solid var(--line-strong); border-radius: var(--radius); }
+.leader-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 20px; margin-bottom: 12px; }
+.leader-head .jam-legend { margin: 0; }
+.leader-now { color: var(--bone-2); }
+.leader-cues { display: flex; flex-wrap: wrap; align-items: stretch; gap: 10px; }
+.leader-seg { flex: 1 1 420px; }
+/* the cue buttons share the segmented control's look */
+.seg-btn { flex: 1 1 0; min-width: 0; min-height: 44px; padding: 0 8px; border: 0; background: none; color: var(--bone-2); font-size: .9rem; font-weight: 600; font-stretch: var(--stretch-label); white-space: nowrap; cursor: pointer; }
+.seg-btn + .seg-btn { border-left: 1.5px solid var(--line-strong); }
+.seg-btn:hover:not(:disabled) { color: var(--bone); }
+.seg-btn[aria-pressed="true"] { background: var(--bone); color: var(--ink); }
+.seg-btn:focus-visible { outline: 2px solid var(--red-hi); outline-offset: -5px; }
+.seg-btn:disabled, .leader-end:disabled { cursor: not-allowed; color: var(--muted); }
+.leader-end { min-height: 44px; }
+.leader-end[aria-pressed="true"] { border-color: var(--red); background: var(--red); }
+.leader-end:disabled { border-color: var(--line-strong); background: none; transform: none; }
+@media (max-width: 560px) {
+  .leader-seg { flex-wrap: wrap; }
+  .leader-seg .seg-btn { flex: 1 1 50%; }
+  .leader-seg .seg-btn:nth-child(3) { border-left: 0; }
+  .leader-seg .seg-btn:nth-child(n + 3) { border-top: 1.5px solid var(--line-strong); }
+  .leader-end { flex: 1 1 100%; }
+}
+
+/* The soloist's tag on the stage */
+.band-spot { display: none; margin-left: 8px; padding: 1px 6px; border-radius: var(--radius); background: var(--red); color: var(--bone); font-size: .7rem; letter-spacing: .12em; vertical-align: 1px; }
+.band-piece[data-spotlight] .band-spot { display: inline-block; }
+
+/* ---------- Sitting in ---------- */
+.sit-in { margin-top: clamp(48px, 7vw, 80px); }
+.sit-in-about { max-width: 46rem; margin: 12px 0 18px; color: var(--bone-2); }
+.sit-in-pick { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; margin-bottom: 16px; }
+.sit-in-pick .jam-legend { margin: 0; }
+.sit-in-pick [role="group"] { flex: 1 1 320px; max-width: 520px; }
+.pads { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 8px; }
+@media (max-width: 640px) { .pads { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.pad { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; min-height: 92px; padding: 10px 4px; border: 1.5px solid var(--line-strong); border-radius: var(--radius); background: var(--ink-2); color: var(--bone); cursor: pointer; touch-action: none; user-select: none; -webkit-user-select: none; }
+.pad:hover { border-color: var(--bone); }
+.pad:focus-visible { outline: 2px solid var(--red-hi); outline-offset: 2px; }
+.pad[data-down] { border-color: var(--red); background: var(--red); }
+.pad-name { font-stretch: var(--stretch-display); font-weight: 900; font-size: 1.6rem; line-height: 1; }
+.pad-degree { color: var(--bone-2); font-size: .85rem; }
+.pad[data-down] .pad-degree { color: var(--bone); }
+.pad-key { position: absolute; top: 6px; right: 7px; color: var(--muted); font-family: var(--font); font-size: .7rem; }
+.pad[data-down] .pad-key { color: var(--bone); }
+@media (hover: none) { .pad-key { display: none; } }
+
+/* ---------- Sound credits ---------- */
+.jam-credits { max-width: 46rem; margin-top: 20px; color: var(--bone-2); }
+.jam-credits summary { min-height: 44px; display: flex; align-items: center; cursor: pointer; color: var(--bone); font-weight: 600; }
+.jam-credits summary:focus-visible { outline: 2px solid var(--red-hi); outline-offset: 2px; }
+.jam-credits p { margin-top: 10px; }
+.jam-license { margin-top: 14px; padding: 14px; max-height: 320px; overflow: auto; border: 1px solid var(--line-strong); border-radius: var(--radius); background: var(--ink-2); color: var(--bone-2); font-size: .8rem; line-height: 1.5; white-space: pre-wrap; }

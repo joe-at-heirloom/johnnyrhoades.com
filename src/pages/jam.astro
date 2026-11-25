@@ -1,15 +1,26 @@
 ---
 /*
-  The blues maker (ADR 0030): pick a key, a feel and a band, and it plays a
-  12-bar blues around and around. The sounds are one-shots generated once
-  with ElevenLabs (src/data/jam.yaml, `npm run jam:sounds`) and sequenced in
-  the browser by src/scripts/jam.ts, which only downloads when the page does.
-  The form is a plain GET form, so a song is a link.
+  The blues maker (ADR 0030). Pick a style or build a band, press Play, and
+  lead it: call the next chorus (the tune, a solo, break it down, stop time)
+  or take it home. Sit in on the pads, mix it on the console, record a take.
+
+  The instruments are real recorded samples from the MuseScore General
+  soundfont (MIT), rendered note by note, and the room sounds were generated
+  with ElevenLabs (src/data/jam.yaml, `npm run jam:sounds`, ADR 0031). They're
+  played as a band in the browser by
+  src/scripts/jam.ts, which only downloads with this page. The song is a
+  plain GET form and the mix rides along, so a song is a link.
 */
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Footer from '../components/Footer.astro';
 import Header from '../components/Header.astro';
-import { DEFAULT_SONG, FEELS, FEEL_INFO, KEYS, PARTS, PART_LABELS, TONES, TONE_LABELS, chordName, type MeasuredSound } from '../lib/jam';
+import Bandstand from '../components/Bandstand.astro';
+import Segmented from '../components/Segmented.astro';
+import Mixer from '../components/Mixer.astro';
+import SitIn from '../components/SitIn.astro';
+import SoundCredits from '../components/SoundCredits.astro';
+import { DEFAULT_SONG, FEELS, FEEL_INFO, KEYS, SECTION_LABELS, TONES, TONE_LABELS, TONE_SHORT, chordName, degreeName, type MeasuredSound, type Section } from '../lib/jam';
+import { STYLES } from '../lib/styles';
 import measured from '../data/jam-sounds.json';
 import { absolute } from '../lib/site';
 
@@ -21,9 +32,11 @@ const sounds = (measured.sounds as MeasuredSound[]).map((s) => {
   return { ...s, url };
 });
 const json = JSON.stringify(sounds).replace(/</g, '\\u003c');
+const styles = JSON.stringify(STYLES).replace(/</g, '\\u003c');
 const song = DEFAULT_SONG;
 const info = FEEL_INFO[song.feel];
-const description = 'Make a 12-bar blues: pick the key, the feel, the tempo and the band, and it plays until you stop it.';
+const cues: Section[] = ['head', 'solo', 'quiet', 'stop'];
+const description = 'Make a 12-bar blues and lead the band: pick a style or build the band, call the solos and the breakdowns, sit in, mix it and record a take.';
 ---
 
 <BaseLayout
@@ -39,41 +52,76 @@ const description = 'Make a 12-bar blues: pick the key, the feel, the tempo and 
       <header class="jam-head">
         <p class="epk-kicker">Blues maker</p>
         <h1 class="display">Make a <span class="jam-nowrap">12-bar</span> <em>blues</em></h1>
-        <p class="lede">Pick a key, a feel and a band. It plays the 12 bars around and around until you stop it, and you can change anything while it plays.</p>
+        <p class="lede">Pick a style or build the band, press Play, and lead it: call a solo, break it down, take it home. Sit in on the pads, mix it, and record your take.</p>
       </header>
 
       <form class="jam-form" method="get" action="/jam/" data-jam-form>
+        <section class="jam-styles" aria-labelledby="jam-styles-title">
+          <h2 class="jam-legend" id="jam-styles-title">Start from a style</h2>
+          <div class="style-list">
+            {
+              STYLES.map((s) => (
+                <button class="style" type="button" aria-pressed="false" data-style={s.id}>
+                  <span class="style-name">{s.label}</span>
+                  <span class="style-blurb">{s.blurb}</span>
+                </button>
+              ))
+            }
+          </div>
+        </section>
+
         <div class="jam-transport">
           <button class="btn btn-red jam-play" type="submit" aria-pressed="false" data-jam-play>Play</button>
+          <button class="btn btn-ghost jam-record" type="button" aria-pressed="false" data-record>Record a take</button>
+          <span class="jam-record-time" data-record-time aria-hidden="true"></span>
+          <a class="text-link jam-take" href="#" data-take hidden>Download your take</a>
           <p class="jam-status" role="status" data-jam-status></p>
         </div>
 
-        <ol class="jam-chart" aria-label="The 12 bars">
+        <section class="leader" aria-labelledby="leader-title" data-leader>
+          <div class="leader-head">
+            <h2 class="jam-legend" id="leader-title">Lead the band</h2>
+            <p class="leader-now" data-leader-now>Press Play, then call the next chorus, or let the band choose.</p>
+          </div>
+          <div class="leader-cues">
+            <div class="seg leader-seg" role="group" aria-label="The next chorus">
+              {
+                cues.map((c) => (
+                  <button class="seg-btn" type="button" aria-pressed="false" data-cue={c} disabled>
+                    {SECTION_LABELS[c]}
+                  </button>
+                ))
+              }
+            </div>
+            <button class="btn btn-outline btn-sm leader-end" type="button" aria-pressed="false" data-cue="ending" disabled>Take it home</button>
+          </div>
+        </section>
+
+        <h2 class="jam-legend" id="jam-chart-title">The 12 bars</h2>
+        <ol class="jam-chart" aria-labelledby="jam-chart-title" aria-describedby="jam-chart-about">
           {Array.from({ length: 12 }, (_, i) => (
             <li class="jam-bar" data-jam-bar>
               <span class="jam-bar-n" aria-hidden="true">{i + 1}</span>
               <span class="jam-chord" data-jam-chord>{chordName(song, i)}</span>
+              <span class="jam-degree" data-jam-degree>{degreeName(song, i)}</span>
             </li>
           ))}
         </ol>
+        <p class="jam-about" id="jam-chart-about">
+          A blues goes around in 12 bars of four beats, written here as three lines of four. Each box is one bar, and shows the chord the band plays in it: the I chord is home, the IV and V lead away and back. The singer sings a line over the first, repeats it over the second, and answers it over the third, which turns around to the top. Each time around is a chorus. The red box is the bar playing now.
+        </p>
+
+        <Bandstand />
 
         <div class="jam-grid">
           <fieldset class="jam-field">
             <legend>Key</legend>
-            <div class="jam-options">
-              {KEYS.map((k) => (
-                <label class="jam-option"><input type="radio" name="key" value={k} checked={k === song.key} /><span>{k}</span></label>
-              ))}
-            </div>
+            <Segmented name="key" options={KEYS.map((k) => ({ value: k, label: k }))} value={song.key} />
           </fieldset>
 
           <fieldset class="jam-field">
             <legend>Feel</legend>
-            <div class="jam-options">
-              {FEELS.map((f) => (
-                <label class="jam-option"><input type="radio" name="feel" value={f} checked={f === song.feel} /><span>{FEEL_INFO[f].label}</span></label>
-              ))}
-            </div>
+            <Segmented name="feel" options={FEELS.map((f) => ({ value: f, label: FEEL_INFO[f].short, full: FEEL_INFO[f].label }))} value={song.feel} />
           </fieldset>
 
           <div class="jam-field">
@@ -85,29 +133,44 @@ const description = 'Make a 12-bar blues: pick the key, the feel, the tempo and 
             <label class="jam-check"><input type="checkbox" name="change" value="quick" /><span>Quick change (bar 2 goes to the IV)</span></label>
           </div>
 
-          {PARTS.map((part) => (
-            <fieldset class="jam-field">
-              <legend>{PART_LABELS[part]}</legend>
-              <div class="jam-options">
-                {TONES[part].map((t) => (
-                  <label class="jam-option"><input type="radio" name={part} value={t} checked={song.parts[part] === t} /><span>{TONE_LABELS[t]}</span></label>
-                ))}
-                <label class="jam-option"><input type="radio" name={part} value="off" checked={song.parts[part] === null} /><span>Off</span></label>
-              </div>
-            </fieldset>
-          ))}
+          <fieldset class="jam-field">
+            <legend>Intro</legend>
+            <Segmented
+              name="intro"
+              options={[
+                { value: 'turnaround', label: 'Turnaround', full: 'Start with the turnaround' },
+                { value: 'none', label: 'Straight in', full: 'Start straight in, at bar 1' },
+              ]}
+              value={song.intro ? 'turnaround' : 'none'}
+            />
+          </fieldset>
+
+          <fieldset class="jam-field">
+            <legend>Room</legend>
+            <Segmented
+              name="room"
+              options={[{ value: 'off', label: 'Off', full: 'No room sound' }, ...TONES.room.map((t) => ({ value: t, label: TONE_SHORT[t]!, full: TONE_LABELS[t]! }))]}
+              value={song.parts.room ?? 'off'}
+            />
+          </fieldset>
         </div>
         <noscript><p class="jam-note">The blues maker needs JavaScript to play.</p></noscript>
       </form>
 
+      <SitIn />
+
+      <Mixer />
+
       <p class="jam-note">
-        Every sound here was generated with ElevenLabs’ sound-effects model, one note or drum hit at a time, and the browser plays them as a band. It isn’t Johnny or his band. To hear the real thing, <a class="text-link" href="/#shows">come to a show</a>.
+        The instruments are real recordings, one note or drum hit at a time, from the free MuseScore General soundfont, and the bar and the old record were made with ElevenLabs. Your browser plays them as a band. It isn’t Johnny or his band: to hear the real thing, <a class="text-link" href="/#shows">come to a show</a>.
       </p>
+      <SoundCredits />
     </div>
   </main>
   <Footer />
 
   <script type="application/json" id="jam-sounds" set:html={json} />
+  <script type="application/json" id="jam-styles" set:html={styles} />
   <script>
     import { initJam } from '../scripts/jam';
     const root = document.querySelector<HTMLElement>('[data-jam]');

@@ -1,70 +1,16 @@
 {
-  "generatedWith": "eleven_text_to_sound_v2",
+  "instruments": "MuseScore_General.sf3 (MIT) via FluidSynth",
+  "rooms": "ElevenLabs eleven_text_to_sound_v2",
   "step": 3,
   "sounds": [
-    {
-      "id": "sticks-kick",
-      "part": "drums",
-      "tone": "sticks",
-      "file": "sticks-kick.mp3",
-      "seconds": 1
-    },
-    {
-      "id": "sticks-snare",
-      "part": "drums",
-      "tone": "sticks",
-      "file": "sticks-snare.mp3",
-      "seconds": 1
-    },
-    {
-      "id": "sticks-hat",
-      "part": "drums",
-      "tone": "sticks",
-      "file": "sticks-hat.mp3",
-      "seconds": 0.48
-    },
-    {
-      "id": "sticks-ride",
-      "part": "drums",
-      "tone": "sticks",
-      "file": "sticks-ride.mp3",
-      "seconds": 1.48
-    },
-    {
-      "id": "brushes-kick",
-      "part": "drums",
-      "tone": "brushes",
-      "file": "brushes-kick.mp3",
-      "seconds": 1
-    },
-    {
-      "id": "brushes-snare",
-      "part": "drums",
-      "tone": "brushes",
-      "file": "brushes-snare.mp3",
-      "seconds": 0.8
-    },
-    {
-      "id": "brushes-sweep",
-      "part": "drums",
-      "tone": "brushes",
-      "file": "brushes-sweep.mp3",
-      "seconds": 0.6
-    },
-    {
-      "id": "brushes-ride",
-      "part": "drums",
-      "tone": "brushes",
-      "file": "brushes-ride.mp3",
-      "seconds": 1.48
-    },
     {
       "id": "upright-28",
       "part": "bass",
       "tone": "upright",
       "file": "upright-28.mp3",
-      "midi": 28,
-      "seconds": 1.48
+      "midi": 28.12,
+      "seconds": 1.595,
+      "db": -14
     },
     {
       "id": "upright-31",
@@ -72,63 +18,71 @@
       "tone": "upright",
       "file": "upright-31.mp3",
       "midi": 30.99,
-      "seconds": 1.48
+      "seconds": 1.564,
+      "db": -14
     },
     {
       "id": "upright-34",
       "part": "bass",
       "tone": "upright",
       "file": "upright-34.mp3",
-      "midi": 34,
-      "seconds": 1.48
+      "midi": 33.98,
+      "seconds": 1.573,
+      "db": -14
     },
     {
       "id": "upright-37",
       "part": "bass",
       "tone": "upright",
       "file": "upright-37.mp3",
-      "midi": 36.98,
-      "seconds": 1.48
+      "midi": 37.01,
+      "seconds": 1.568,
+      "db": -14
     },
     {
       "id": "upright-40",
       "part": "bass",
       "tone": "upright",
       "file": "upright-40.mp3",
-      "midi": 39.99,
-      "seconds": 1.48
+      "midi": 40,
+      "seconds": 1.574,
+      "db": -14
     },
     {
       "id": "upright-43",
       "part": "bass",
       "tone": "upright",
       "file": "upright-43.mp3",
-      "midi": 43,
-      "seconds": 1.48
+      "midi": 42.94,
+      "seconds": 1.541,
+      "db": -14
     },
     {
       "id": "upright-46",
       "part": "bass",
       "tone": "upright",
       "file": "upright-46.mp3",
-      "midi": 46.01,
-      "seconds": 1.48
+      "midi": 45.98,
+      "seconds": 1.546,
+      "db": -14
     },
     {
       "id": "upright-49",
       "part": "bass",
       "tone": "upright",
       "file": "upright-49.mp3",
-      "midi": 48.97,
-      "seconds": 1.48
+      "midi": 49.08,
+      "seconds": 1.536,
+      "db": -14
     },
     {
       "id": "electric-28",
       "part": "bass",
       "tone": "electric",
       "file": "electric-28.mp3",
-      "midi": 28.01,
-      "seconds": 1.48
+      "midi": 28.07,
+      "seconds": 1.473,
+      "db": -14
     },
     {
       "id": "electric-31",
@@ -136,31 +90,35 @@
       "tone": "electric",
       "file": "electric-31.mp3",
       "midi": 31,
-      "seconds": 1.48
+      "seconds": 1.465,
+      "db": -14
     },
     {
       "id": "electric-34",
       "part": "bass",
       "tone": "electric",
       "file": "electric-34.mp3",
-      "midi": 34,
-      "seconds": 1.48
+      "midi": 34.05,
+      "seconds": 1.485,
+      "db": -14
     },
     {
       "id": "electric-37",
       "part": "bass",
       "tone": "electric",
       "file": "electric-37.mp3",
-      "midi": 37,
-      "seconds": 1.48
+      "midi": 37.02,
+      "seconds": 1.495,
+      "db": -14
     },
     {
       "id": "electric-40",
       "part": "bass",
       "tone": "electric",
       "file": "electric-40.mp3",
-      "midi": 40,
-      "seconds": 1.48
+      "midi": 39.99,
+      "seconds": 1.493,
+      "db": -14
     },
     {
       "id": "electric-43",
@@ -168,7 +126,8 @@
       "tone": "electric",
       "file": "electric-43.mp3",
       "midi": 43,
-      "seconds": 1.48
+      "seconds": 1.494,
+      "db": -14
     },
     {
       "id": "electric-46",
@@ -176,135 +135,80 @@
       "tone": "electric",
       "file": "electric-46.mp3",
       "midi": 46,
-      "seconds": 1.48
+      "seconds": 1.497,
+      "db": -14
     },
     {
       "id": "electric-49",
       "part": "bass",
       "tone": "electric",
       "file": "electric-49.mp3",
-      "midi": 49.01,
-      "seconds": 1.48
-    },
-    {
-      "id": "clean-40",
-      "part": "guitar",
-      "tone": "clean",
-      "file": "clean-40.mp3",
-      "midi": 39.97,
-      "seconds": 2.48
-    },
-    {
-      "id": "clean-43",
-      "part": "guitar",
-      "tone": "clean",
-      "file": "clean-43.mp3",
-      "midi": 42.98,
-      "seconds": 2.48
-    },
-    {
-      "id": "clean-46",
-      "part": "guitar",
-      "tone": "clean",
-      "file": "clean-46.mp3",
-      "midi": 45.95,
-      "seconds": 2.48
-    },
-    {
-      "id": "clean-49",
-      "part": "guitar",
-      "tone": "clean",
-      "file": "clean-49.mp3",
-      "midi": 49,
-      "seconds": 2.48
-    },
-    {
-      "id": "clean-52",
-      "part": "guitar",
-      "tone": "clean",
-      "file": "clean-52.mp3",
-      "midi": 52,
-      "seconds": 2.48
-    },
-    {
-      "id": "clean-55",
-      "part": "guitar",
-      "tone": "clean",
-      "file": "clean-55.mp3",
-      "midi": 55,
-      "seconds": 2.48
-    },
-    {
-      "id": "clean-58",
-      "part": "guitar",
-      "tone": "clean",
-      "file": "clean-58.mp3",
-      "midi": 58,
-      "seconds": 2.48
-    },
-    {
-      "id": "clean-61",
-      "part": "guitar",
-      "tone": "clean",
-      "file": "clean-61.mp3",
-      "midi": 61,
-      "seconds": 2.48
+      "midi": 48.99,
+      "seconds": 1.497,
+      "db": -14
     },
     {
       "id": "crunch-40",
       "part": "guitar",
       "tone": "crunch",
       "file": "crunch-40.mp3",
-      "midi": 39.96,
-      "seconds": 2.156
+      "midi": 40.09,
+      "seconds": 2.175,
+      "db": -14
     },
     {
       "id": "crunch-43",
       "part": "guitar",
       "tone": "crunch",
       "file": "crunch-43.mp3",
-      "midi": 43.01,
-      "seconds": 2.156
+      "midi": 43.08,
+      "seconds": 2.177,
+      "db": -14
     },
     {
       "id": "crunch-46",
       "part": "guitar",
       "tone": "crunch",
       "file": "crunch-46.mp3",
-      "midi": 46.01,
-      "seconds": 2.48
+      "midi": 46.09,
+      "seconds": 2.175,
+      "db": -14
     },
     {
       "id": "crunch-49",
       "part": "guitar",
       "tone": "crunch",
       "file": "crunch-49.mp3",
-      "midi": 49.01,
-      "seconds": 2.48
+      "midi": 49.04,
+      "seconds": 2.17,
+      "db": -14
     },
     {
       "id": "crunch-52",
       "part": "guitar",
       "tone": "crunch",
       "file": "crunch-52.mp3",
-      "midi": 52.01,
-      "seconds": 2.48
+      "midi": 52.03,
+      "seconds": 2.171,
+      "db": -14
     },
     {
       "id": "crunch-55",
       "part": "guitar",
       "tone": "crunch",
       "file": "crunch-55.mp3",
-      "midi": 55.01,
-      "seconds": 2.48
+      "midi": 55.06,
+      "seconds": 2.166,
+      "db": -14
     },
     {
       "id": "crunch-58",
       "part": "guitar",
       "tone": "crunch",
       "file": "crunch-58.mp3",
-      "midi": 58.01,
-      "seconds": 2.48
+      "midi": 58.04,
+      "seconds": 2.165,
+      "db": -14
     },
     {
       "id": "crunch-61",
@@ -312,95 +216,179 @@
       "tone": "crunch",
       "file": "crunch-61.mp3",
       "midi": 61,
-      "seconds": 2.48
+      "seconds": 2.17,
+      "db": -14
+    },
+    {
+      "id": "clean-40",
+      "part": "guitar",
+      "tone": "clean",
+      "file": "clean-40.mp3",
+      "midi": 40.03,
+      "seconds": 2.039,
+      "db": -17.1
+    },
+    {
+      "id": "clean-43",
+      "part": "guitar",
+      "tone": "clean",
+      "file": "clean-43.mp3",
+      "midi": 43.14,
+      "seconds": 2.039,
+      "db": -14
+    },
+    {
+      "id": "clean-46",
+      "part": "guitar",
+      "tone": "clean",
+      "file": "clean-46.mp3",
+      "midi": 46.13,
+      "seconds": 2.04,
+      "db": -14
+    },
+    {
+      "id": "clean-49",
+      "part": "guitar",
+      "tone": "clean",
+      "file": "clean-49.mp3",
+      "midi": 49.05,
+      "seconds": 2.037,
+      "db": -14.1
+    },
+    {
+      "id": "clean-52",
+      "part": "guitar",
+      "tone": "clean",
+      "file": "clean-52.mp3",
+      "midi": 52.06,
+      "seconds": 2.034,
+      "db": -15.3
+    },
+    {
+      "id": "clean-55",
+      "part": "guitar",
+      "tone": "clean",
+      "file": "clean-55.mp3",
+      "midi": 55.07,
+      "seconds": 2.033,
+      "db": -14.8
+    },
+    {
+      "id": "clean-58",
+      "part": "guitar",
+      "tone": "clean",
+      "file": "clean-58.mp3",
+      "midi": 58.05,
+      "seconds": 2.031,
+      "db": -14
+    },
+    {
+      "id": "clean-61",
+      "part": "guitar",
+      "tone": "clean",
+      "file": "clean-61.mp3",
+      "midi": 61,
+      "seconds": 2.04,
+      "db": -14
     },
     {
       "id": "acoustic-40",
       "part": "guitar",
       "tone": "acoustic",
       "file": "acoustic-40.mp3",
-      "midi": 40.01,
-      "seconds": 2.48
+      "midi": 40.06,
+      "seconds": 2.257,
+      "db": -14
     },
     {
       "id": "acoustic-43",
       "part": "guitar",
       "tone": "acoustic",
       "file": "acoustic-43.mp3",
-      "midi": 43.01,
-      "seconds": 2.48
+      "midi": 43.06,
+      "seconds": 2.254,
+      "db": -14
     },
     {
       "id": "acoustic-46",
       "part": "guitar",
       "tone": "acoustic",
       "file": "acoustic-46.mp3",
-      "midi": 46,
-      "seconds": 2.48
+      "midi": 46.03,
+      "seconds": 2.187,
+      "db": -14
     },
     {
       "id": "acoustic-49",
       "part": "guitar",
       "tone": "acoustic",
       "file": "acoustic-49.mp3",
-      "midi": 49,
-      "seconds": 2.48
+      "midi": 49.04,
+      "seconds": 2.243,
+      "db": -14
     },
     {
       "id": "acoustic-52",
       "part": "guitar",
       "tone": "acoustic",
       "file": "acoustic-52.mp3",
-      "midi": 51.99,
-      "seconds": 2.48
+      "midi": 52.03,
+      "seconds": 2.245,
+      "db": -14
     },
     {
       "id": "acoustic-55",
       "part": "guitar",
       "tone": "acoustic",
       "file": "acoustic-55.mp3",
-      "midi": 54.99,
-      "seconds": 2.48
+      "midi": 55.03,
+      "seconds": 2.196,
+      "db": -14
     },
     {
       "id": "acoustic-58",
       "part": "guitar",
       "tone": "acoustic",
       "file": "acoustic-58.mp3",
-      "midi": 58,
-      "seconds": 2.48
+      "midi": 58.03,
+      "seconds": 2.19,
+      "db": -14
     },
     {
       "id": "acoustic-61",
       "part": "guitar",
       "tone": "acoustic",
       "file": "acoustic-61.mp3",
-      "midi": 61,
-      "seconds": 2.48
+      "midi": 61.05,
+      "seconds": 2.187,
+      "db": -14
     },
     {
       "id": "piano-52",
       "part": "keys",
       "tone": "piano",
       "file": "piano-52.mp3",
-      "midi": 52.03,
-      "seconds": 2.48
+      "midi": 52.04,
+      "seconds": 2.726,
+      "db": -14
     },
     {
       "id": "piano-55",
       "part": "keys",
       "tone": "piano",
       "file": "piano-55.mp3",
-      "midi": 55.03,
-      "seconds": 2.48
+      "midi": 55.02,
+      "seconds": 2.764,
+      "db": -14
     },
     {
       "id": "piano-58",
       "part": "keys",
       "tone": "piano",
       "file": "piano-58.mp3",
-      "midi": 58.04,
-      "seconds": 2.48
+      "midi": 58.07,
+      "seconds": 2.77,
+      "db": -14
     },
     {
       "id": "piano-61",
@@ -408,63 +396,71 @@
       "tone": "piano",
       "file": "piano-61.mp3",
       "midi": 61.02,
-      "seconds": 2.48
+      "seconds": 2.704,
+      "db": -14
     },
     {
       "id": "piano-64",
       "part": "keys",
       "tone": "piano",
       "file": "piano-64.mp3",
-      "midi": 64.05,
-      "seconds": 2.48
+      "midi": 64.02,
+      "seconds": 2.629,
+      "db": -14
     },
     {
       "id": "piano-67",
       "part": "keys",
       "tone": "piano",
       "file": "piano-67.mp3",
-      "midi": 67.05,
-      "seconds": 2.48
+      "midi": 67,
+      "seconds": 2.621,
+      "db": -14
     },
     {
       "id": "piano-70",
       "part": "keys",
       "tone": "piano",
       "file": "piano-70.mp3",
-      "midi": 70,
-      "seconds": 2.48
+      "midi": 70.02,
+      "seconds": 2.631,
+      "db": -14
     },
     {
       "id": "piano-73",
       "part": "keys",
       "tone": "piano",
       "file": "piano-73.mp3",
-      "midi": 73.03,
-      "seconds": 2.48
+      "midi": 73,
+      "seconds": 2.541,
+      "db": -14
     },
     {
       "id": "piano-76",
       "part": "keys",
       "tone": "piano",
       "file": "piano-76.mp3",
-      "midi": 76.03,
-      "seconds": 2.48
+      "midi": 76,
+      "seconds": 2.561,
+      "db": -14
     },
     {
       "id": "organ-52",
       "part": "keys",
       "tone": "organ",
       "file": "organ-52.mp3",
-      "midi": 52,
-      "seconds": 3
+      "midi": 52.01,
+      "seconds": 3.118,
+      "db": -14
     },
     {
       "id": "organ-55",
       "part": "keys",
       "tone": "organ",
       "file": "organ-55.mp3",
-      "midi": 55,
-      "seconds": 3
+      "midi": 55.01,
+      "seconds": 3.114,
+      "db": -14
     },
     {
       "id": "organ-58",
@@ -472,7 +468,8 @@
       "tone": "organ",
       "file": "organ-58.mp3",
       "midi": 58.01,
-      "seconds": 3
+      "seconds": 3.12,
+      "db": -14
     },
     {
       "id": "organ-61",
@@ -480,23 +477,26 @@
       "tone": "organ",
       "file": "organ-61.mp3",
       "midi": 61.01,
-      "seconds": 3
+      "seconds": 3.126,
+      "db": -14
     },
     {
       "id": "organ-64",
       "part": "keys",
       "tone": "organ",
       "file": "organ-64.mp3",
-      "midi": 64,
-      "seconds": 3
+      "midi": 64.01,
+      "seconds": 3.113,
+      "db": -14
     },
     {
       "id": "organ-67",
       "part": "keys",
       "tone": "organ",
       "file": "organ-67.mp3",
-      "midi": 67,
-      "seconds": 3
+      "midi": 67.01,
+      "seconds": 3.123,
+      "db": -14
     },
     {
       "id": "organ-70",
@@ -504,183 +504,302 @@
       "tone": "organ",
       "file": "organ-70.mp3",
       "midi": 70.01,
-      "seconds": 3
+      "seconds": 3.123,
+      "db": -14
     },
     {
       "id": "organ-73",
       "part": "keys",
       "tone": "organ",
       "file": "organ-73.mp3",
-      "midi": 73.01,
-      "seconds": 3
+      "midi": 73.02,
+      "seconds": 3.117,
+      "db": -14
     },
     {
       "id": "organ-76",
       "part": "keys",
       "tone": "organ",
       "file": "organ-76.mp3",
-      "midi": 76.01,
-      "seconds": 3
+      "midi": 76.02,
+      "seconds": 3.115,
+      "db": -14
     },
     {
       "id": "harp-59",
       "part": "lead",
       "tone": "harp",
       "file": "harp-59.mp3",
-      "midi": 59,
-      "seconds": 1.997
+      "midi": 58.99,
+      "seconds": 2.105,
+      "db": -14
     },
     {
       "id": "harp-62",
       "part": "lead",
       "tone": "harp",
       "file": "harp-62.mp3",
-      "midi": 62.01,
-      "seconds": 1.997
+      "midi": 62,
+      "seconds": 2.093,
+      "db": -14
     },
     {
       "id": "harp-65",
       "part": "lead",
       "tone": "harp",
       "file": "harp-65.mp3",
-      "midi": 65.01,
-      "seconds": 1.997
+      "midi": 65,
+      "seconds": 2.093,
+      "db": -14
     },
     {
       "id": "harp-68",
       "part": "lead",
       "tone": "harp",
       "file": "harp-68.mp3",
-      "midi": 68.01,
-      "seconds": 1.997
+      "midi": 68,
+      "seconds": 2.097,
+      "db": -14
     },
     {
       "id": "harp-71",
       "part": "lead",
       "tone": "harp",
       "file": "harp-71.mp3",
-      "midi": 71.01,
-      "seconds": 1.997
+      "midi": 70.99,
+      "seconds": 2.092,
+      "db": -14
     },
     {
       "id": "harp-74",
       "part": "lead",
       "tone": "harp",
       "file": "harp-74.mp3",
-      "midi": 74.02,
-      "seconds": 1.997
+      "midi": 74,
+      "seconds": 2.093,
+      "db": -14
     },
     {
       "id": "harp-77",
       "part": "lead",
       "tone": "harp",
       "file": "harp-77.mp3",
-      "midi": 77.02,
-      "seconds": 1.997
+      "midi": 77,
+      "seconds": 2.095,
+      "db": -14
     },
     {
       "id": "harp-80",
       "part": "lead",
       "tone": "harp",
       "file": "harp-80.mp3",
-      "midi": 80.01,
-      "seconds": 1.997
+      "midi": 80,
+      "seconds": 2.096,
+      "db": -14
     },
     {
       "id": "harp-83",
       "part": "lead",
       "tone": "harp",
       "file": "harp-83.mp3",
-      "midi": 82.99,
-      "seconds": 1.997
+      "midi": 83,
+      "seconds": 2.097,
+      "db": -14
     },
     {
       "id": "harp-86",
       "part": "lead",
       "tone": "harp",
       "file": "harp-86.mp3",
-      "midi": 85.98,
-      "seconds": 1.997
+      "midi": 86,
+      "seconds": 2.096,
+      "db": -14
     },
     {
       "id": "sax-46",
       "part": "lead",
       "tone": "sax",
       "file": "sax-46.mp3",
-      "midi": 45.98,
-      "seconds": 2
+      "midi": 46.06,
+      "seconds": 2.185,
+      "db": -14
     },
     {
       "id": "sax-49",
       "part": "lead",
       "tone": "sax",
       "file": "sax-49.mp3",
-      "midi": 48.98,
-      "seconds": 2
+      "midi": 49.03,
+      "seconds": 2.175,
+      "db": -14.6
     },
     {
       "id": "sax-52",
       "part": "lead",
       "tone": "sax",
       "file": "sax-52.mp3",
-      "midi": 51.98,
-      "seconds": 2
+      "midi": 52.03,
+      "seconds": 2.177,
+      "db": -14
     },
     {
       "id": "sax-55",
       "part": "lead",
       "tone": "sax",
       "file": "sax-55.mp3",
-      "midi": 54.98,
-      "seconds": 2
+      "midi": 55.05,
+      "seconds": 2.175,
+      "db": -14
     },
     {
       "id": "sax-58",
       "part": "lead",
       "tone": "sax",
       "file": "sax-58.mp3",
-      "midi": 57.98,
-      "seconds": 2
+      "midi": 58.04,
+      "seconds": 2.177,
+      "db": -14
     },
     {
       "id": "sax-61",
       "part": "lead",
       "tone": "sax",
       "file": "sax-61.mp3",
-      "midi": 61,
-      "seconds": 2
+      "midi": 60.99,
+      "seconds": 2.182,
+      "db": -14
     },
     {
       "id": "sax-64",
       "part": "lead",
       "tone": "sax",
       "file": "sax-64.mp3",
-      "midi": 64,
-      "seconds": 2
+      "midi": 64.07,
+      "seconds": 2.184,
+      "db": -14
     },
     {
       "id": "sax-67",
       "part": "lead",
       "tone": "sax",
       "file": "sax-67.mp3",
-      "midi": 67.01,
-      "seconds": 2
+      "midi": 67.05,
+      "seconds": 2.157,
+      "db": -14
     },
     {
       "id": "sax-70",
       "part": "lead",
       "tone": "sax",
       "file": "sax-70.mp3",
-      "midi": 70,
-      "seconds": 2
+      "midi": 70.13,
+      "seconds": 2.163,
+      "db": -14
     },
     {
       "id": "sax-73",
       "part": "lead",
       "tone": "sax",
       "file": "sax-73.mp3",
-      "midi": 72.99,
-      "seconds": 2
+      "midi": 73.12,
+      "seconds": 2.175,
+      "db": -14.9
+    },
+    {
+      "id": "sticks-kick",
+      "part": "drums",
+      "tone": "sticks",
+      "file": "sticks-kick.mp3",
+      "seconds": 0.302,
+      "db": -15.6
+    },
+    {
+      "id": "sticks-snare",
+      "part": "drums",
+      "tone": "sticks",
+      "file": "sticks-snare.mp3",
+      "seconds": 0.352,
+      "db": -21
+    },
+    {
+      "id": "sticks-hat",
+      "part": "drums",
+      "tone": "sticks",
+      "file": "sticks-hat.mp3",
+      "seconds": 0.525,
+      "db": -19.3
+    },
+    {
+      "id": "sticks-ride",
+      "part": "drums",
+      "tone": "sticks",
+      "file": "sticks-ride.mp3",
+      "seconds": 1.939,
+      "db": -19.7
+    },
+    {
+      "id": "sticks-crash",
+      "part": "drums",
+      "tone": "sticks",
+      "file": "sticks-crash.mp3",
+      "seconds": 3.3,
+      "db": -14
+    },
+    {
+      "id": "sticks-rim",
+      "part": "drums",
+      "tone": "sticks",
+      "file": "sticks-rim.mp3",
+      "seconds": 1.642,
+      "db": -22.2
+    },
+    {
+      "id": "brushes-kick",
+      "part": "drums",
+      "tone": "brushes",
+      "file": "brushes-kick.mp3",
+      "seconds": 0.302,
+      "db": -15.7
+    },
+    {
+      "id": "brushes-sweep",
+      "part": "drums",
+      "tone": "brushes",
+      "file": "brushes-sweep.mp3",
+      "seconds": 0.586,
+      "db": -19.8
+    },
+    {
+      "id": "brushes-snare",
+      "part": "drums",
+      "tone": "brushes",
+      "file": "brushes-snare.mp3",
+      "seconds": 0.458,
+      "db": -20.6
+    },
+    {
+      "id": "brushes-ride",
+      "part": "drums",
+      "tone": "brushes",
+      "file": "brushes-ride.mp3",
+      "seconds": 1.939,
+      "db": -19.7
+    },
+    {
+      "id": "brushes-crash",
+      "part": "drums",
+      "tone": "brushes",
+      "file": "brushes-crash.mp3",
+      "seconds": 3.3,
+      "db": -14
+    },
+    {
+      "id": "brushes-rim",
+      "part": "drums",
+      "tone": "brushes",
+      "file": "brushes-rim.mp3",
+      "seconds": 0.622,
+      "db": -22.2
     },
     {
       "id": "room-bar",
@@ -688,6 +807,7 @@
       "tone": "bar",
       "file": "room-bar.mp3",
       "seconds": 20,
+      "db": -26,
       "loop": true
     },
     {
@@ -696,6 +816,7 @@
       "tone": "vinyl",
       "file": "room-vinyl.mp3",
       "seconds": 12,
+      "db": -26.5,
       "loop": true
     }
   ]

@@ -4,6 +4,21 @@ A running log for the portfolio write-up (PLAN.md section 16): numbers, screensh
 
 ---
 
+## 2026-11-24: Real instruments instead of generated ones
+
+**What changed.** The blues maker's instruments and drums are now real recorded samples from the MuseScore General soundfont (MIT), rendered note by note with FluidSynth, in place of ElevenLabs one-shots that had to be retuned (ADR 0031).
+
+**Numbers**
+- Pitch: from "two takes per instrument, stretched up to 16 semitones" to every sample rendered at its own note, measured within 14 cents (harmonica within 1).
+- Build: one FluidSynth render per instrument instead of per note took `npm run jam:sounds` from about 4.5 minutes to under 1.5.
+- Size: 92 files, about 2.3 MB, about the same as before.
+
+**Worth telling**
+- *The organ looked out of tune and wasn't.* Its drawbars together only repeat two octaves under the key (an E3 repeats at E1), so a pitch check looking near the note found nothing. Checking for any octave of the right note fixed the check, not the organ.
+- *Licenses decided the source.* The deeper free libraries had no freely licensed drawbar organ or blues harmonica, and a popular prerendered set states its license two different ways. One MIT soundfont covered every instrument, and its notice now ships on the page beside the samples it covers.
+
+---
+
 ## 2026-11-22: The blues maker
 
 **What changed.** `/jam/` makes a 12-bar blues: key, feel, tempo, quick change, and a tone (or nothing) for drums, bass, guitar, keys, fills and the room. The 28 sounds were generated once with ElevenLabs' sound-effects model, and the browser plays them as a band (ADR 0030).
@@ -13,6 +28,11 @@ A running log for the portfolio write-up (PLAN.md section 16): numbers, screensh
 - *Generated once, played forever.* No server, no key on the site, no per-visitor cost. A song only downloads the samples its key and feel use.
 - *The model doesn't take requests, so the notes are tuned afterwards.* Asked for E1, A1, E3, A3 and so on, it mostly returned C, in whatever octave it liked. Writing the frequency into the prompt didn't help, and the harmonica came back on C5 five times running (C is the commonest harp key). So the script measures each original's pitch with YIN, then pitch-shifts it with TD-PSOLA into a tuned sample every three semitones: 78 samples from 18 originals, each measured again and within 15 cents. In the browser no note bends more than a semitone and a half, down from up to 14 with the raw recordings.
 - *The harmonica found a bug in the shifter.* Every harp note failed to tune, even one semitone from the original. Snapping pitch marks to the biggest swing flips between peaks and troughs on a buzzy sound, so the grains landed half a period out of line. Snapping to the positive peak of a smoothed copy fixed it.
+- *Leveled by loudness, not by peak.* With every file normalized to the same peak, one guitar's notes still spread 8 dB and the record crackle sat at −42 dB. Leveling by loudness (RMS over the first 300 ms) brought every tone within 3.5 dB, and a test keeps it there.
+- *The band, drawn.* The instruments are SVG line drawings in the strum neck's style, driven off the Web Audio clock: strings shake on the string a player would use, keys go down, drums dip. Each string stores its own ends, so one wobble function shakes strings drawn at any angle. Under reduced motion only the colors change. End-to-end tests check both.
+- *A console in Web Audio.* Each strip is shelf EQ → stereo panner → fader → analyser, with a post-fader send to a convolution reverb whose impulse is generated noise, darkened as it rings. The master runs through a WaveShaper drive and a compressor. Every control glides with `setTargetAtTime`. End-to-end tests read the real meters to prove mute and solo silence the right strips.
+- *A bandleader, not a loop.* The band plays choruses of different kinds (the tune, a solo, a breakdown, stop time, an ending) and arranges itself unless the visitor calls the next one. A single unit test plays all five kinds in every key, feel and tone (thousands of bars) and checks every note stays within its samples. An end-to-end test calls "Take it home" and waits for the band to finish on its own.
+- *Sitting in.* Eight pads in the blues scale of the song's key, on four instruments, held and bent like the strum's string. The meters in the test prove the note goes through the right channel strip.
 - *Call and response, at last.* ADR 0018 was waiting on Johnny's licks for the guitar to answer the visitor. Here the fills answer in bars 3–4, 7–8 and 11–12, and his real licks can replace them later.
 
 ---

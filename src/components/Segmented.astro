@@ -1,0 +1,25 @@
+---
+/*
+  A segmented control: a row of radios drawn as one bar, the chosen one
+  filled in bone. Used for every choice on the blues maker (ADR 0030), so
+  they all look alike. Segments share the width equally, so the labels are
+  kept short; `full` is the name screen readers hear.
+*/
+interface Props {
+  name: string;
+  options: { value: string; label: string; full?: string }[];
+  value: string;
+}
+const { name, options, value } = Astro.props;
+---
+
+<div class="seg">
+  {
+    options.map((o) => (
+      <label class="seg-item">
+        <input type="radio" name={name} value={o.value} checked={o.value === value} aria-label={o.full && o.full !== o.label ? o.full : undefined} />
+        <span>{o.label}</span>
+      </label>
+    ))
+  }
+</div>

@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { parse } from 'yaml';
 import { describe, expect, it } from 'vitest';
-import { hzToMidi, midiToName, noteToMidi, notePitch, onsetIndex, tailIndex, yin } from '../../src/lib/audio-analysis';
+import { hzToMidi, levelTo, loudness, midiToName, noteToMidi, notePitch, onsetIndex, tailIndex, yin } from '../../src/lib/audio-analysis';
 import {
   DEFAULT_SONG,
   FEELS,
@@ -10,7 +10,16 @@ import {
   PARTS,
   TONES,
   barEvents,
+  COUNT_IN,
+  humanize,
+  legato,
+  autoSection,
+  startBar,
+  SECTIONS,
+  type Section,
+  type JamEvent,
   chordName,
+  degreeName,
   drumSampleId,
   noteAtOrAbove,
   SAMPLE_STEP,
@@ -22,7 +31,7 @@ import {
   type MeasuredSound,
   type Song,
 } from '../../src/lib/jam';
-import { parseJamManifest } from '../../src/lib/jam-manifest';
+import { DRUM_PIECES, parseJamManifest } from '../../src/lib/jam-manifest';
 
 const RATE = 44100;
 const tone = (hz: number, seconds: number, harmonics = [1, 0.5, 0.3]) => {
@@ -62,6 +71,16 @@ describe('audio analysis', () => {
     expect(Math.round(hzToMidi(p!.hz))).toBe(45);
   });
 
+  it('measures and sets loudness, never past the peak ceiling', () => {
+    const quiet = tone(220, 1).map((v) => v * 0.1);
+    expect(loudness(levelTo(quiet, -14, RATE))).toBeCloseTo(-14, 1);
+    const spiky = new Float32Array(RATE);
+    spiky[100] = 0.5;
+    const leveled = levelTo(spiky, -14, RATE);
+    expect(Math.max(...leveled.map(Math.abs))).toBeCloseTo(Math.pow(10, -1 / 20), 3);
+    expect(loudness(new Float32Array(10))).toBe(-Infinity);
+  });
+
   it('finds no pitch in noise', () => {
     let s = 1;
     const noise = Float32Array.from({ length: RATE }, () => ((s = (s * 1664525 + 1013904223) % 4294967296) / 4294967296) * 2 - 1);
@@ -74,29 +93,49 @@ describe('the manifest and the measured sounds', () => {
   const manifest = parseJamManifest(parse(readFileSync('src/data/jam.yaml', 'utf8')));
   const measured: { sounds: MeasuredSound[] } = JSON.parse(readFileSync('src/data/jam-sounds.json', 'utf8'));
 
-  it('has every tone the page offers, with two notes for pitched tones', () => {
-    for (const part of PARTS)
-      for (const t of TONES[part]) {
-        const n = manifest.filter((s) => s.part === part && s.tone === t).length;
-        expect(n, `${part}/${t}`).toBe(part === 'drums' ? 4 : part === 'room' ? 1 : 2);
-      }
+  it('renders every pitched tone the page offers from the soundfont, and generates the room loops', () => {
+    for (const part of ['bass', 'guitar', 'keys', 'lead'] as const)
+      for (const t of TONES[part]) expect(manifest.tones.filter((x) => x.part === part && x.tone === t), `${part}/${t}`).toHaveLength(1);
+    for (const kit of TONES.drums) expect(manifest.drums.filter((d) => d.tone === kit).map((d) => d.id).sort(), kit).toEqual(DRUM_PIECES.map((p) => drumSampleId(kit, p)).sort());
+    expect(manifest.generated.map((g) => g.tone).sort()).toEqual([...TONES.room].sort());
+    expect(manifest.soundfont.url).toMatch(/^https:\/\/ftp\.osuosl\.org\/pub\/musescore\//);
   });
 
-  it('has every drum and room sound as is, and a tuned sample at every note each pitched tone needs', () => {
+  it('has every drum and room sound, and a sample in tune at every note each pitched tone needs', () => {
     const ids = new Set(measured.sounds.map((s) => s.id));
-    for (const s of manifest.filter((s) => !s.note)) expect(ids.has(s.id), s.id).toBe(true);
+    for (const s of [...manifest.drums, ...manifest.generated]) expect(ids.has(s.id), s.id).toBe(true);
     for (const part of ['bass', 'guitar', 'keys', 'lead'] as const)
       for (const t of TONES[part]) {
         const got = measured.sounds.filter((s) => s.part === part && s.tone === t);
-        expect(got.length, `${part}/${t}`).toBe(sampleNotes(part, t).length);
-        // Each one measured within 15 cents of its note.
-        for (const s of got) expect(Math.abs(s.midi! - Math.round(s.midi!)) * 100, s.id).toBeLessThanOrEqual(15);
+        expect(got.map((s) => Math.round(s.midi!)), `${part}/${t}`).toEqual(sampleNotes(part, t));
+        // Rendered at the note, and measured within 25 cents of it.
+        for (const s of got) expect(Math.abs(s.midi! - Math.round(s.midi!)) * 100, s.id).toBeLessThanOrEqual(25);
       }
+  });
+
+  it('keeps the soundfont’s license beside the samples', () => {
+    const license = readFileSync('src/assets/jam/LICENSE-MuseScore_General.md', 'utf8');
+    expect(license).toContain('shared under the MIT license');
+    expect(license).toContain('Permission is hereby granted, free of charge');
+  });
+
+  it('rejects a tone twice over, an unknown tone, and a duplicate id', () => {
+    const base = parse(readFileSync('src/data/jam.yaml', 'utf8'));
+    expect(() => parseJamManifest({ ...base, tones: [...base.tones, base.tones[0]] })).toThrow(/listed twice/);
+    expect(() => parseJamManifest({ ...base, tones: [{ ...base.tones[0], tone: 'tuba' }] })).toThrow(/unknown/);
+    expect(() => parseJamManifest({ ...base, drums: [...base.drums, base.drums[0]] })).toThrow(/duplicate id/);
+  });
+
+  it('levels every note of a tone to within 3.5 dB, and the room loops to the same level', () => {
+    const byTone = new Map<string, number[]>();
+    for (const s of measured.sounds) if (s.part !== 'drums' && s.part !== 'room') byTone.set(s.tone, [...(byTone.get(s.tone) ?? []), s.db!]);
+    for (const [tone, dbs] of byTone) expect(Math.max(...dbs) - Math.min(...dbs), tone).toBeLessThanOrEqual(3.5);
+    for (const s of measured.sounds.filter((s) => s.part === 'room')) expect(Math.abs(s.db! + 26), s.id).toBeLessThanOrEqual(1);
   });
 
   it('has a sample for every drum piece in every kit', () => {
     const ids = new Set(measured.sounds.map((s) => s.id));
-    for (const kit of TONES.drums) for (const piece of ['kick', 'snare', 'hat', 'ride'] as const) expect(ids.has(drumSampleId(kit, piece))).toBe(true);
+    for (const kit of TONES.drums) for (const piece of ['kick', 'snare', 'hat', 'ride', 'crash', 'rim'] as const) expect(ids.has(drumSampleId(kit, piece))).toBe(true);
   });
 
   it('never bends a note more than a semitone and a half in the browser, in any key or feel', () => {
@@ -115,16 +154,11 @@ describe('the manifest and the measured sounds', () => {
       }
   });
 
-  it('rejects a pitched sound without a note, and an unknown tone', () => {
-    const base = { id: 'x', part: 'bass', tone: 'upright', prompt: 'a long enough prompt', seconds: 1 };
-    expect(() => parseJamManifest({ sounds: [base] })).toThrow(/needs a note/);
-    expect(() => parseJamManifest({ sounds: [{ ...base, note: 'E1', tone: 'tuba' }] })).toThrow(/unknown tone/);
-  });
 });
 
 describe('the song in the address bar', () => {
   it('round-trips', () => {
-    const song: Song = { key: 'Bb', feel: 'slow', bpm: 60, quick: true, parts: { drums: 'brushes', bass: 'electric', guitar: null, keys: 'organ', lead: 'sax', room: 'vinyl' } };
+    const song: Song = { key: 'Bb', feel: 'slow', bpm: 60, quick: true, intro: false, parts: { drums: 'brushes', bass: 'electric', guitar: null, keys: 'organ', lead: 'sax', room: 'vinyl' } };
     expect(parseSong(songToParams(song))).toEqual(song);
   });
 
@@ -171,7 +205,7 @@ describe('the 12-bar', () => {
 
   it('puts the backbeat on 2 and 4, and the kick on 1 and 3', () => {
     const ev = barEvents(DEFAULT_SONG, 0);
-    expect(ev.filter((e) => e.drum === 'snare').map((e) => e.at)).toEqual([1, 3]);
+    expect(ev.filter((e) => e.drum === 'snare' && e.gain > 0.5).map((e) => e.at)).toEqual([1, 3]);
     expect(ev.filter((e) => e.drum === 'kick').map((e) => e.at)).toEqual([0, 2]);
   });
 
@@ -192,9 +226,44 @@ describe('the 12-bar', () => {
       }
   });
 
-  it('leaves the fills out of the first two bars of each line (call and response)', () => {
-    const bars = Array.from({ length: 12 }, (_, i) => barEvents(DEFAULT_SONG, i).some((e) => e.part === 'lead'));
-    expect(bars).toEqual([false, false, true, true, false, false, true, true, false, false, true, true]);
+  it('leaves the fills out of the first two bars of each line (call and response), and bar 11 to the guitar', () => {
+    const bars = (song: Song) => Array.from({ length: 12 }, (_, i) => barEvents(song, i).some((e) => e.part === 'lead'));
+    expect(bars(DEFAULT_SONG)).toEqual([false, false, true, true, false, false, true, true, false, false, false, true]);
+    const noGuitar = { ...DEFAULT_SONG, parts: { ...DEFAULT_SONG.parts, guitar: null } };
+    expect(bars(noGuitar)).toEqual([false, false, true, true, false, false, true, true, false, false, true, true]);
+  });
+
+  it('answers differently the next time through the 12', () => {
+    const fills = (from: number) => Array.from({ length: 12 }, (_, i) => barEvents(DEFAULT_SONG, from + i).filter((e) => e.part === 'lead').map((e) => `${e.at}:${e.midi}`).join(' '));
+    expect(fills(12)).not.toEqual(fills(0));
+    // The rest of the band varies too (a different walk, a fill, a climb to the seventh), but on the same chords.
+    const all = (from: number) => Array.from({ length: 12 }, (_, i) => barEvents(DEFAULT_SONG, from + i).filter((e) => e.part !== 'lead'));
+    expect(all(12)).not.toEqual(all(0));
+    for (let i = 0; i < 12; i++) {
+      const downbeat = (bar: number) => barEvents(DEFAULT_SONG, bar).find((e) => e.part === 'bass' && e.at === 0)!.midi;
+      expect(downbeat(12 + i)).toBe(downbeat(i));
+    }
+  });
+
+  it('ghosts a snare note before 4, and fills on the snare at the end of the 12', () => {
+    const snares = (bar: number) => barEvents(DEFAULT_SONG, bar).filter((e) => e.drum === 'snare');
+    expect(snares(0).find((e) => e.gain < 0.3)!.at).toBeCloseTo(2 + 2 / 3);
+    const fill = snares(11).filter((e) => e.at >= 3);
+    expect(fill.map((e) => +e.at.toFixed(3))).toEqual([3, 3.333, 3.667]);
+    expect(fill.map((e) => e.gain)).toEqual([...fill.map((e) => e.gain)].sort());
+    expect(barEvents(DEFAULT_SONG, 11).some((e) => e.drum === 'ride' && e.at >= 3)).toBe(false);
+  });
+
+  it('plays the turnaround in bar 11: a pedal over a line walking down from the seventh to the fifth', () => {
+    for (const key of KEYS) {
+      const song = { ...DEFAULT_SONG, key };
+      const ev = barEvents(song, 10).filter((e) => e.part === 'guitar' && Number.isInteger(e.at));
+      const root = noteAtOrAbove(noteToMidi(`${key}4`) % 12, 40);
+      for (let b = 0; b < 4; b++) {
+        const onBeat = ev.filter((e) => e.at === b).map((e) => e.midi! - root).sort((x, y) => x - y);
+        expect(onBeat).toEqual([[10, 12], [9, 12], [8, 12], [7, 12]][b]);
+      }
+    }
   });
 
   it('keeps the fills in the key’s blues scale', () => {
@@ -210,6 +279,24 @@ describe('the 12-bar', () => {
   it('plays nothing for a part that’s off', () => {
     const ev = barEvents({ ...DEFAULT_SONG, parts: { drums: null, bass: null, guitar: null, keys: null, lead: null, room: null } }, 2);
     expect(ev).toEqual([]);
+  });
+});
+
+describe('the feel', () => {
+  it('moves each note a few milliseconds and changes its accent a little, the same way every time', () => {
+    for (let bar = 0; bar < 24; bar++)
+      for (let i = 0; i < 40; i++) {
+        const h = humanize(bar, i, i % 2 ? 'drums' : 'bass');
+        expect(Math.abs(h.seconds)).toBeLessThanOrEqual(i % 2 ? 0.004 : 0.012);
+        expect(h.gain).toBeGreaterThanOrEqual(0.92);
+        expect(h.gain).toBeLessThanOrEqual(1.08);
+        expect(humanize(bar, i, 'bass')).toEqual(humanize(bar, i, 'bass'));
+      }
+    // Not the same nudge on every note.
+    expect(new Set(Array.from({ length: 20 }, (_, i) => humanize(0, i, 'bass').seconds.toFixed(4))).size).toBeGreaterThan(15);
+  });
+  it('counts in four beats', () => {
+    expect(COUNT_IN).toEqual([-4, -3, -2, -1]);
   });
 });
 
@@ -249,5 +336,141 @@ describe('the bass line', () => {
             expect(Math.abs(bass.at(-1)!.midi! - next.midi!)).toBe(1);
           }
         }
+  });
+});
+
+describe('the chart', () => {
+  it('names each bar’s chord the way musicians count: I, IV, V', () => {
+    expect(Array.from({ length: 12 }, (_, i) => degreeName(DEFAULT_SONG, i)).join(' ')).toBe('I I I I IV IV I I V IV I V');
+    expect(degreeName({ ...DEFAULT_SONG, quick: true }, 1)).toBe('IV');
+    expect(degreeName(DEFAULT_SONG, 13)).toBe('I');
+  });
+});
+
+describe('legato', () => {
+  it('holds each bass and fill note until the next, and leaves chords and drums alone', () => {
+    for (const feel of FEELS)
+      for (let bar = 0; bar < 24; bar++) {
+        const ev = barEvents({ ...DEFAULT_SONG, feel }, bar);
+        for (const part of ['bass', 'lead'] as const) {
+          const line = ev.filter((e) => e.part === part).sort((a, b) => a.at - b.at);
+          line.forEach((e, i) => {
+            const until = i + 1 < line.length ? line[i + 1]!.at : 4;
+            expect(e.at + e.beats, `${feel} ${part} bar ${bar}`).toBeGreaterThanOrEqual(Math.min(until, e.at + 2) - 1e-9);
+          });
+        }
+      }
+    const plain = [
+      { at: 0, part: 'bass' as const, midi: 28, gain: 1, beats: 0.4 },
+      { at: 1, part: 'bass' as const, midi: 32, gain: 1, beats: 0.4 },
+      { at: 0, part: 'drums' as const, drum: 'kick' as const, gain: 1, beats: 1 },
+      { at: 0, part: 'keys' as const, midi: 60, gain: 1, beats: 0.4 },
+    ];
+    expect(legato(plain).map((e) => e.beats)).toEqual([1, 2, 1, 0.4]);
+  });
+});
+
+describe('the arrangement', () => {
+  const at = (song: Song, bar: number, section: Section) => barEvents(song, bar, section);
+  const parts = (ev: JamEvent[]) => new Set(ev.map((e) => e.part));
+
+  it('plays the tune twice, then a solo, a breakdown, stop time and the tune again, around and around', () => {
+    expect(Array.from({ length: 10 }, (_, c) => autoSection(c))).toEqual(['head', 'head', 'solo', 'quiet', 'stop', 'head', 'solo', 'quiet', 'stop', 'head']);
+  });
+
+  it('starts on the turnaround as an intro, unless asked not to', () => {
+    expect(startBar(DEFAULT_SONG)).toBe(8);
+    expect(startBar({ ...DEFAULT_SONG, intro: false })).toBe(0);
+    expect(parseSong(new URLSearchParams('intro=none')).intro).toBe(false);
+    expect(parseSong(new URLSearchParams()).intro).toBe(true);
+  });
+
+  it('crashes the cymbal at the top of the form, except when it’s broken down', () => {
+    for (const section of ['head', 'solo', 'stop', 'ending'] as const) expect(at(DEFAULT_SONG, 12, section).some((e) => e.drum === 'crash' && e.at === 0), section).toBe(true);
+    expect(at(DEFAULT_SONG, 12, 'quiet').some((e) => e.drum === 'crash')).toBe(false);
+    expect(at(DEFAULT_SONG, 13, 'head').some((e) => e.drum === 'crash')).toBe(false);
+  });
+
+  it('lets the fills take the whole chorus in a solo, ending on the fifth', () => {
+    for (let i = 0; i < 12; i++) expect(at(DEFAULT_SONG, 24 + i, 'solo').some((e) => e.part === 'lead'), `bar ${i + 1}`).toBe(true);
+    const last = at(DEFAULT_SONG, 35, 'solo').filter((e) => e.part === 'lead').at(-1)!;
+    expect((last.midi! - noteToMidi('E4')) % 12).toBe(7);
+  });
+
+  it('breaks it down: cross-stick instead of snare, no crash, half-note bass, quieter all round', () => {
+    const quiet = at(DEFAULT_SONG, 13, 'quiet');
+    const head = at(DEFAULT_SONG, 13, 'head');
+    expect(quiet.some((e) => e.drum === 'rim')).toBe(true);
+    expect(quiet.some((e) => e.drum === 'snare')).toBe(false);
+    expect(quiet.filter((e) => e.part === 'bass').map((e) => e.at)).toEqual([0, 2]);
+    const loudest = (ev: JamEvent[], part: string) => Math.max(...ev.filter((e) => e.part === part).map((e) => e.gain));
+    for (const part of ['drums', 'bass', 'guitar', 'keys']) expect(loudest(quiet, part), part).toBeLessThan(loudest(head, part));
+  });
+
+  it('in stop time the band hits one together for the first line, and the soloist plays into the gaps', () => {
+    for (let i = 0; i < 4; i++) {
+      const ev = at(DEFAULT_SONG, 36 + i, 'stop');
+      const band = ev.filter((e) => e.part === 'bass' || e.part === 'guitar' || e.part === 'keys');
+      expect(band.every((e) => e.at === 0), `bar ${i + 1}`).toBe(true);
+      expect(ev.filter((e) => e.part === 'lead').length).toBeGreaterThan(0);
+      expect(ev.filter((e) => e.part === 'lead').every((e) => e.at >= 1)).toBe(true);
+    }
+    // The second line swings again.
+    expect(at(DEFAULT_SONG, 40, 'stop').filter((e) => e.part === 'bass').length).toBeGreaterThan(1);
+  });
+
+  it('takes it home: the ending line in bar 11, then the stab a half step above sliding into the last chord', () => {
+    for (const key of KEYS) {
+      const song = { ...DEFAULT_SONG, key };
+      const line = at(song, 22, 'ending');
+      expect(line.some((e) => e.part === 'lead')).toBe(false);
+      const last = at(song, 23, 'ending');
+      const home = noteToMidi(`${key}4`) % 12;
+      const bass = last.filter((e) => e.part === 'bass');
+      expect(bass.map((e) => (((e.midi! - home) % 12) + 12) % 12)).toEqual([1, 0]);
+      expect(bass[1]!.beats).toBeGreaterThan(3);
+      expect(last.some((e) => e.drum === 'crash' && e.at === bass[1]!.at)).toBe(true);
+      // Nothing plays after the last chord lands.
+      expect(Math.max(...last.map((e) => e.at))).toBeLessThan(1);
+    }
+  });
+
+  it('scoops into some notes, a semitone or two, and only on the fills', () => {
+    const bends = Array.from({ length: 24 }, (_, i) => at(DEFAULT_SONG, 24 + i, 'solo')).flat().filter((e) => e.bend);
+    expect(bends.length).toBeGreaterThan(3);
+    for (const e of bends) {
+      expect(e.part).toBe('lead');
+      expect([-1, -2]).toContain(e.bend);
+    }
+  });
+
+  it('keeps every chorus kind inside each part’s samples, in every key and feel', () => {
+    const measured: { sounds: MeasuredSound[] } = JSON.parse(readFileSync('src/data/jam-sounds.json', 'utf8'));
+    for (let t = 0; t < 3; t++) {
+      // Each tone of each part, in turn.
+      const tones = Object.fromEntries(PARTS.map((p) => [p, TONES[p][t % TONES[p].length]])) as Song['parts'];
+      for (const section of SECTIONS)
+      for (const feel of FEELS)
+        for (const key of KEYS)
+          for (let bar = 12; bar < 24; bar++)
+            for (const e of at({ ...DEFAULT_SONG, key, feel, parts: tones }, bar, section)) {
+              if (e.part === 'drums' || e.part === 'room' || e.midi === undefined) continue;
+              const tone = tones[e.part]!;
+              const { rate } = pickSample(measured.sounds.filter((s) => s.part === e.part && s.tone === tone), e.midi)!;
+              expect(Math.abs(12 * Math.log2(rate)), `${section} ${feel} ${key} ${e.part}/${tone} ${e.midi}`).toBeLessThanOrEqual(SAMPLE_STEP / 2 + 0.15);
+            }
+    }
+  });
+
+  it('keeps every chorus kind inside its bar', () => {
+    for (const section of SECTIONS)
+      for (let bar = 0; bar < 24; bar++)
+        for (const e of at(DEFAULT_SONG, bar, section)) {
+          expect(e.at).toBeGreaterThanOrEqual(0);
+          expect(e.at).toBeLessThan(4);
+          expect(e.gain).toBeGreaterThan(0);
+          expect(e.gain).toBeLessThanOrEqual(1.1);
+        }
+    expect(parts(at(DEFAULT_SONG, 12, 'solo'))).toEqual(new Set(['drums', 'bass', 'guitar', 'keys', 'lead']));
   });
 });

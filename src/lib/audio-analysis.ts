@@ -125,3 +125,24 @@ export function notePitch(
   const clarity = found.reduce((s, r) => s + r.clarity, 0) / found.length;
   return { hz: mid.hz, clarity };
 }
+
+/** Loudness as RMS in dBFS over the first `window` samples (the whole sound if it's shorter). */
+export function loudness(x: Float32Array, window = x.length): number {
+  const n = Math.min(x.length, window);
+  let sum = 0;
+  for (let i = 0; i < n; i++) sum += x[i]! ** 2;
+  return n === 0 || sum === 0 ? -Infinity : 10 * Math.log10(sum / n);
+}
+
+/**
+ * Bring a sound to `targetDb` of loudness, measured over `window` samples,
+ * without letting its peak pass `ceilingDb`. Peak normalizing alone leaves
+ * a spiky sound (a snare, a crackle) much quieter than a smooth one (an organ).
+ */
+export function levelTo(x: Float32Array, targetDb: number, window: number, ceilingDb = -1): Float32Array {
+  const now = loudness(x, window);
+  if (!Number.isFinite(now)) return x.slice();
+  const p = peak(x);
+  const gain = Math.min(Math.pow(10, (targetDb - now) / 20), Math.pow(10, ceilingDb / 20) / p);
+  return x.map((v) => v * gain);
+}
