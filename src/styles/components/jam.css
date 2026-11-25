@@ -251,18 +251,27 @@
 .band-chip { padding: 3px 9px; border: 1.5px solid var(--line-strong); border-radius: 999px; background: var(--ink-2); color: var(--bone); font-size: .75rem; font-weight: 700; font-stretch: var(--stretch-label); text-transform: uppercase; letter-spacing: .08em; white-space: nowrap; }
 .band-act:hover .band-chip { border-color: var(--bone); }
 .band-piece:has(.band-act:hover) .band-svg { stroke: var(--bone); }
-.band-act[aria-pressed="true"] .band-chip { border-color: var(--red); background: var(--red); }
+.band-act[data-on] .band-chip { border-color: var(--red); background: var(--red); }
 
 /* In the game the band stands in one row, sized so that while a gig plays the panel, the band and
    the pads are all in view. On a phone the chips name the players' moves; the drawings name them. */
 .jam[data-mode="game"] .bandstand { grid-template-columns: repeat(5, minmax(0, 1fr)); max-width: 680px; margin: 0 auto; gap: 0; }
 .jam[data-live] .stage-valance { display: none; }
+/* The key to the band's moves, under the stage before a gig */
+.stage-key { max-width: 680px; margin: 14px auto 0; color: var(--bone-2); font-size: .9rem; }
+.stage-key ul { list-style: none; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 6px 20px; margin-top: 6px; }
+.stage-key strong { color: var(--bone); font-stretch: var(--stretch-label); text-transform: uppercase; letter-spacing: .08em; font-size: .8rem; }
+.jam[data-live] .stage-key { display: none; }
 .jam[data-live] .bandstand { max-width: 560px; }
 @media (max-width: 640px) {
-  .jam[data-mode="game"] .band-head { display: none; }
+  .jam[data-mode="game"] .band-head { justify-content: center; }
+  .jam[data-mode="game"] .band-name { font-size: .68rem; letter-spacing: .06em; }
+  .jam[data-live] .band-head { display: none; }
   .jam[data-mode="game"] .band-piece { padding: 0 2px; }
-  .jam[data-mode="game"] .band-piece { padding-bottom: 22px; }
-  .jam[data-mode="game"] .band-chip { padding: 2px 5px; font-size: .62rem; letter-spacing: .04em; }
+  /* two short lines if they need them, so every move reads in full */
+  .jam[data-mode="game"] .band-piece { padding-bottom: 30px; }
+  .jam[data-mode="game"] .band-chip { padding: 2px 5px; font-size: .62rem; letter-spacing: .04em; white-space: normal; text-align: center; line-height: 1.15; }
+  .jam[data-live] .gig-lane { height: 44px; }
   /* the panel tightens: the part names keep their bars, the values go to the screen reader's label */
   .jam[data-live] .gig-part-value { display: none; }
   .jam[data-live] .pad { min-height: 54px; padding: 6px 4px; }

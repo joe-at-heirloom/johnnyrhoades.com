@@ -56,8 +56,8 @@ export type GameHooks = {
   now(): number;
   /** Who's in the band now, and on what. */
   parts(): Song['parts'];
-  /** Play a little of what a player does, on their own (before a gig). */
-  preview(part: Player): void;
+  /** Play a little of what a player does, on their own (before a gig). Resolves with how long it plays, in seconds. */
+  preview(part: Player): Promise<number>;
   /** Bring a player who's sitting out into the band. */
   bringIn(part: Player): void;
   /** Put you on a different horn, on the pads and on the stage. */
@@ -199,43 +199,52 @@ export function initGame(root: HTMLElement, hooks: GameHooks): Game {
     for (const [part, btn] of acts) {
       if (!btn) continue;
       const name = nameOf(part, parts);
-      let text = 'Hear';
-      let label = `Hear the ${name}`;
-      let pressed: boolean | null = null;
+      // The chip says what a tap does, or what's happening now (lit red). The button's name starts with
+      // the chip's words and says the rest.
+      let text = 'Listen';
+      let label = `Listen to the ${name}`;
+      let on = false;
       if (gig) {
-        // A chip's words stay put and start its button's name; whether it's on is aria-pressed (and red).
         if (part === 'drums') {
-          [text, label, pressed] = ['Fill', 'Fill: the drummer fills into the next line', fillCued];
+          on = fillCued;
+          [text, label] = on ? ['Fill coming', 'Fill coming: the drummer fills into the next line'] : ['Drum fill', 'Drum fill: the drummer fills into the next line'];
         } else if (part === 'bass') {
-          [text, label, pressed] = ['Drop out', 'Drop out: the band lays out under your answers', dropped];
+          on = dropped;
+          [text, label] = on ? ['Band back', 'Band back: the band plays under your answers again'] : ['Play alone', 'Play alone: the band stops under your answers'];
         } else if (part === 'lead') {
           const other: SitInInstrument = instrument === 'harp' ? 'sax' : 'harp';
-          [text, label] = [`You: ${SIT_IN[instrument].label.toLowerCase()}`, `You: ${SIT_IN[instrument].label.toLowerCase()}. Switch to ${SIT_IN[other].full.toLowerCase()}`];
-        } else if (!parts[part]) {
-          [text, label] = ['Bring in', `Bring in the ${name} to trade lines with`];
+          [text, label] = [`You: ${SIT_IN[instrument].label.toLowerCase()}`, `You: ${SIT_IN[instrument].label.toLowerCase()}. Tap to switch to ${SIT_IN[other].full.toLowerCase()}`];
         } else {
-          [text, label, pressed] = ['Trade', `Trade lines with the ${name}`, caller === part];
+          on = caller === part;
+          [text, label] = on
+            ? ['Calling', `Calling: the ${name} plays the calls you answer`]
+            : ['Call next', `Call next: the ${name} ${parts[part] ? '' : 'joins the band and '}plays the next call`];
         }
       }
       const chip = btn.querySelector('[data-band-chip]');
       if (chip) chip.textContent = text;
       btn.setAttribute('aria-label', label);
-      if (pressed === null) btn.removeAttribute('aria-pressed');
-      else btn.setAttribute('aria-pressed', String(pressed));
+      btn.toggleAttribute('data-on', on);
     }
   }
 
   /** A tap on a player: before a gig, hear them; during one, lead them. */
   function act(part: Player) {
-    if (!gig) return hooks.preview(part);
+    if (!gig) {
+      // Lit while they play.
+      const btn = acts.get(part);
+      btn?.setAttribute('data-on', '');
+      void hooks.preview(part).then((seconds) => timers.push(window.setTimeout(() => !gig && btn?.removeAttribute('data-on'), seconds * 1000)));
+      return;
+    }
     const name = nameOf(part, hooks.parts());
     let news = '';
     if (part === 'drums') {
       fillCued = !fillCued;
-      news = fillCued ? 'The drummer fills into the next line.' : '';
+      news = fillCued ? 'The drummer fills into the end of this line.' : 'No fill.';
     } else if (part === 'bass') {
       dropped = !dropped;
-      news = dropped ? 'The band drops out under your answers: just a hit on one. Keep the time yourself.' : 'The band’s back in under your answers.';
+      news = dropped ? 'You’re playing alone: the band stops under your answers, with a hit on one. Keep the time yourself.' : 'The band’s back under your answers.';
     } else if (part === 'lead') {
       instrument = instrument === 'harp' ? 'sax' : 'harp';
       hooks.setInstrument(instrument);

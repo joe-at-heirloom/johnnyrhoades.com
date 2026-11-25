@@ -10,11 +10,13 @@ The blues maker had grown into a full set of controls: styles, a bandleader's cu
 
 - **It opens as a game: play a gig.** The game is call and response, the conversation a blues is built on, and the one the page's chart already explains. You sit in with the band on the fills' instrument (harp, or tenor sax on the hard gig) and trade lines with its guitarist (its piano player on the hard gig). In each line they play a two-bar call, and you answer in the next two bars on the pads, or on the keys A to K on a computer. The blues scale in the song's key means no wrong notes.
 - **The band is the other half of the game.** It stands on stage between the gig panel and the pads, and each player is a button whose chip says what a tap does (`act` in `src/scripts/game.ts`):
-  - before a gig, a tap plays a little of what that player does: a call, the bass's walk, the drummer's fill;
-  - during one, the guitar or the keys take the calls from the next line (a player sitting out joins the band first);
-  - the drummer throws a fill into the end of the line;
-  - the bass drops the band out under your answers, stop-time style, until you tap it again;
-  - the fills' spot is you ("You: harp"), and a tap switches your horn, on the pads and on the stage.
+  - "Listen", before a gig: a tap plays a little of what that player does (a call, the bass's walk, the drummer's fill), lit while it plays;
+  - "Call next" on the guitar or the keys: they take the calls from the next line ("Calling"), joining the band first if they're sitting out;
+  - "Drum fill" on the drums: the drummer fills into the end of the line ("Fill coming" until it does);
+  - "Play alone" on the bass: the band stops under your answers, stop-time style, until "Band back";
+  - "You: harp" on the fills' spot, which is you: a tap switches your horn, on the pads and on the stage.
+
+  The first playtest of the band found one-word chips ("Hear", "Trade", "Drop out") didn't say what they did. So each chip names its move, a key under the stage explains them before a gig, each button's name starts with its chip's words (WCAG 2.5.3), and the line under the prompt says what a tap just did.
 
   The band also plays to how it's going. It plays softer to a cool crowd and harder to a warm one, digs in when the crowd is on its feet or you're three good answers in (the ride, the bass's pickups, busier comping), and when your answer is good enough by the time it reaches the next line, it shouts it back with a crash on the downbeat. The player asks the game for these moves bar by bar (`BandMoves` and `barEvents` in `src/lib/jam.ts`, tested), so they land in time like everything else.
 - **Each answer is scored** (`scoreTurn` in `src/lib/game.ts`, tested) out of 100, in five named parts:

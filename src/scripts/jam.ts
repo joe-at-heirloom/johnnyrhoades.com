@@ -425,12 +425,14 @@ export function initJam(root: HTMLElement): void {
     parts: () => song.parts,
     async preview(part) {
       // A player on their own, for a bar: the drummer's fill into the top, the bass's walk, a call from the rest.
-      if (playing || part === 'room') return;
+      if (playing || part === 'room') return 0;
       const audio = await ensureAudio();
-      if (!audio || !desk) return;
-      const s: Song = { ...song, parts: { ...song.parts, [part]: song.parts[part] ?? TONES[part][0] } };
+      if (!audio || !desk) return 0;
+      // Just this player's sounds, so the first tap doesn't wait on the whole band's.
+      const alone = Object.fromEntries(Object.keys(song.parts).map((p) => [p, null])) as Song['parts'];
+      const s: Song = { ...song, parts: { ...alone, [part]: song.parts[part] ?? TONES[part][0] } };
       await load(s);
-      if (playing) return;
+      if (playing) return 0;
       const spb = secondsPerBeat(s.bpm);
       const t0 = audio.currentTime + 0.05;
       const events = part === 'drums' ? barEvents(s, 11, 'head') : part === 'bass' ? barEvents(s, 0, 'head') : barEvents(s, 0, 'call', { caller: part as Caller });
@@ -438,6 +440,7 @@ export function initJam(root: HTMLElement): void {
       for (const e of events) if (e.part === part) voice(e, t0 + e.at * spb, spb, 1, undefined, { out, song: s });
       previewUntil = t0 + 4 * spb;
       requestAnimationFrame(previewFrame);
+      return previewUntil - audio.currentTime;
     },
     bringIn(part) {
       if (song.parts[part]) return;

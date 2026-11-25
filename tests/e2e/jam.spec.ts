@@ -398,13 +398,19 @@ test.describe('the game', () => {
     // The band's on stage, and you lead it: the piano calls on Saturday; tap the guitar to trade with
     // it instead, and the drummer for a fill.
     const act = (part: string) => page.locator(`[data-band-act="${part}"]`);
-    await expect(act('keys')).toHaveAttribute('aria-pressed', 'true');
-    await expect(act('lead')).toHaveAccessibleName(/^You: sax\. Switch to harmonica$/);
+    // Each chip says what a tap does, and its button's name starts with the chip's words.
+    await expect(act('keys')).toHaveAccessibleName(/^Calling: the piano/);
+    await expect(act('keys')).toHaveAttribute('data-on', '');
+    await expect(act('guitar')).toHaveAccessibleName(/^Call next: the guitar plays the next call$/);
+    await expect(act('bass')).toHaveAccessibleName(/^Play alone:/);
+    await expect(act('lead')).toHaveAccessibleName(/^You: sax\. Tap to switch to harmonica$/);
     await act('guitar').click();
-    await expect(act('guitar')).toHaveAttribute('aria-pressed', 'true');
-    await expect(act('keys')).toHaveAttribute('aria-pressed', 'false');
+    await expect(act('guitar')).toHaveAccessibleName(/^Calling: the guitar/);
+    await expect(act('keys')).toHaveAccessibleName(/^Call next/);
+    await expect(page.locator('[data-gig-hint]')).toHaveText('The guitar takes the next call.');
+    await expect(act('drums')).toHaveAccessibleName(/^Drum fill:/);
     await act('drums').click();
-    await expect(act('drums')).toHaveAttribute('aria-pressed', 'true');
+    await expect(act('drums')).toHaveAccessibleName(/^Fill coming:/);
 
     // Three turns in a one-chorus gig, the last line too. Answer each with four notes, ending on the 1.
     for (let turn = 0; turn < 3; turn++) {
@@ -428,7 +434,7 @@ test.describe('the game', () => {
       await expect(page.locator('[data-gig-feedback]')).toHaveText(/^\+\d+/, { timeout: 10_000 });
       await expect(page.locator('[data-part="timing"] [data-part-value]')).toHaveText(/^\d+\/35$/);
       // The drummer's fill played at the end of the first line, and the chip let go.
-      if (turn === 0) await expect(act('drums')).toHaveAttribute('aria-pressed', 'false');
+      if (turn === 0) await expect(act('drums')).toHaveAccessibleName(/^Drum fill:/);
     }
     expect(Number(await page.locator('[data-gig-score]').textContent())).toBeGreaterThan(0);
 
@@ -450,10 +456,14 @@ test.describe('the game', () => {
   test('before a gig, tapping a player on stage plays a little of what they do', async ({ page }) => {
     await page.goto('/jam/');
     const guitar = page.locator('[data-band-act="guitar"]');
-    await expect(guitar).toHaveAccessibleName('Hear the guitar');
+    await expect(guitar).toHaveAccessibleName('Listen to the guitar');
+    await expect(page.getByText('In a gig, tap them to lead the band')).toBeVisible();
     await guitar.click();
+    // Lit while it plays, then it lets go.
+    await expect(guitar).toHaveAttribute('data-on', '');
     // The drawing plays along: a string lights as it sounds.
     await expect(page.locator('[data-band="guitar"] [data-hot]').first()).toBeAttached({ timeout: 10_000 });
+    await expect(guitar).not.toHaveAttribute('data-on', '', { timeout: 10_000 });
     // In advanced mode the drawings are the switches again.
     await page.getByRole('switch', { name: 'Advanced controls' }).click();
     await expect(guitar).toBeHidden();
