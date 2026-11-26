@@ -616,9 +616,15 @@ describe('leading the band, in the game', () => {
     expect(CALLERS).toEqual(['guitar', 'keys', 'lead']);
   });
 
-  it('keeps the band’s fills out when you’re on them', () => {
-    for (let bar = 12; bar < 24; bar++) expect(of(barEvents(band, bar, 'call', { sittingIn: true }), 'lead')).toEqual([]);
-    expect(of(barEvents(band, 23, 'ending', { sittingIn: true }), 'lead')).toEqual([]);
+  it('sits the band’s player out of whatever part you’re playing, and the rest play on', () => {
+    for (const you of ['lead', 'guitar', 'keys'] as const)
+      for (let bar = 12; bar < 24; bar++) {
+        expect(of(barEvents(band, bar, 'call', { you }), you), `${you} in bar ${bar}`).toEqual([]);
+        expect(of(barEvents(band, bar, 'call', { you }), 'drums')).toEqual(of(barEvents(band, bar, 'call'), 'drums'));
+      }
+    expect(of(barEvents(band, 23, 'ending', { you: 'lead' }), 'lead')).toEqual([]);
+    // With you on guitar, the harp can call you.
+    expect(of(barEvents(band, 12, 'call', { you: 'guitar', caller: 'lead' }), 'lead').length).toBeGreaterThan(0);
   });
 
   it('throws a fill on beat 4 when the drummer’s cued, at the end of a line', () => {

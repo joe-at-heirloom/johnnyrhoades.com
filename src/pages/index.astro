@@ -6,6 +6,7 @@ import TonightBar from '../components/TonightBar.astro';
 import ProofLine from '../components/ProofLine.astro';
 import ShowsSection from '../components/ShowsSection.astro';
 import MusicSection from '../components/MusicSection.astro';
+import JamFeature from '../components/JamFeature.astro';
 import VideoStage from '../components/VideoStage.astro';
 import AboutSection from '../components/AboutSection.astro';
 import PhotoGallery from '../components/PhotoGallery.astro';
@@ -44,6 +45,7 @@ const proof = proofLine(allShows, BUILD_NOW);
     {proof && <div class="wrap proof-wrap"><ProofLine text={proof} /></div>}
     <ShowsSection />
     <MusicSection />
+    <JamFeature />
     <VideoStage />
     <AboutSection />
     <PhotoGallery />

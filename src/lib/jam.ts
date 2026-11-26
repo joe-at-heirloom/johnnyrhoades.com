@@ -249,9 +249,9 @@ export type JamEvent = {
  * - hot: the band digs in, as under a solo: the ride, the bass's pickups;
  * - shout: the band answers a great answer back: a crash and a kick on the downbeat;
  * - level: how hard the band plays, for the crowd's mood (1 as written);
- * - sittingIn: you're playing the fills' instrument, so the band's own fills stay out.
+ * - you: the part you're playing on the pads, so the band's own player of it sits out.
  */
-export type BandMoves = { caller?: Caller; fill?: boolean; drop?: boolean; hot?: boolean; shout?: boolean; level?: number; sittingIn?: boolean };
+export type BandMoves = { caller?: Caller; fill?: boolean; drop?: boolean; hot?: boolean; shout?: boolean; level?: number; you?: Part };
 /** Who can play the call in the game. */
 export const CALLERS = ['guitar', 'keys', 'lead'] as const;
 export type Caller = (typeof CALLERS)[number];
@@ -567,7 +567,7 @@ function lead(b: Bar, tone: string, guitarPlaying: boolean): JamEvent[] {
   const play = (lick: Lick, gain: number, from = 0, until = 4) => phrase(b, 'lead', tonic, lick, gain, from, until);
   const pick = <T>(list: readonly T[], salt: number) => pickFor(b, list, salt);
 
-  if (endingLine(b) || b.moves.sittingIn) return []; // the band plays the ending line together; you're on the fills
+  if (endingLine(b)) return []; // the band plays the ending line together
   if (section === 'call') return calling(b, 'lead') ? callPhrase(b, 'lead', tonic) : []; // the rest is the player's
   if (lastChord(b)) return [{ at: swing, part: 'lead', midi: tonic + OCT, gain: 0.6, beats: 3.4, bend: -1 }];
   if (stopHit(b)) return play(pick(SOLO, 1), 0.65, 1); // into the gap after the band's hit
@@ -610,12 +610,14 @@ export function barEvents(song: Song, bar: number, section: Section = 'head', mo
     nextPc: (keyPc + prog[(inForm + 1) % 12]!) % 12,
   };
   const p = song.parts;
+  // A part you're playing yourself (the game) is yours alone: the band's player of it sits out.
+  const plays = (part: Part) => p[part] !== null && moves.you !== part;
   return strum(legato([
-    ...(p.drums ? drums(b) : []),
-    ...(p.bass ? bass(b) : []),
-    ...(p.guitar ? guitar(b) : []),
-    ...(p.keys ? keys(b, p.keys) : []),
-    ...(p.lead ? lead(b, p.lead, p.guitar !== null) : []),
+    ...(plays('drums') ? drums(b) : []),
+    ...(plays('bass') ? bass(b) : []),
+    ...(plays('guitar') ? guitar(b) : []),
+    ...(plays('keys') ? keys(b, p.keys!) : []),
+    ...(plays('lead') ? lead(b, p.lead!, plays('guitar')) : []),
   ]));
 }
 

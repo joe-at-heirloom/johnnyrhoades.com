@@ -1,15 +1,21 @@
 ---
 /*
-  The game (ADR 0033): play a gig. Pick one, and the band plays; in each
-  line its guitar (or piano) plays a call for two bars and you answer on the
-  pads in the next two, leading the band on stage as you go. Each answer is scored (src/lib/game.ts) and the crowd
-  reacts. While it plays, this panel sits right above the pads, so the
-  prompt, the line drawn as it goes and the score are in view while you
+  The game (ADR 0033): play a gig. Pick what you play and a gig, and the
+  band plays; in each line one of them plays a call for two bars and you
+  answer on the pads in the next two, leading the band on stage as you go.
+  Each answer is scored (src/lib/game.ts), and the crowd, drawn in their
+  seats, fills up, stands, or gets up and leaves. While it plays, this panel
+  sits right above the band and the pads, so it's all in view while you
   play. Run by src/scripts/game.ts.
 */
-import { GIGS, PART_NAMES, TURN_BEATS, WEIGHTS, type Part } from '../lib/game';
+import Fans from './Fans.astro';
+import Segmented from './Segmented.astro';
+import { GIGS, PART_NAMES, TURN_BEATS, WEIGHTS, YOU_PLAY, YOU_START, type Part } from '../lib/game';
+import { SIT_IN } from '../lib/sit-in';
 
 const parts = Object.keys(WEIGHTS) as Part[];
+/** The house: a row of seats, each with a fan in it or not. */
+const FANS = 12;
 ---
 
 <section class="gig" aria-labelledby="gig-title" data-gig data-game-only>
@@ -19,10 +25,14 @@ const parts = Object.keys(WEIGHTS) as Part[];
       Sit in with the band on stage. In each line one of them plays a call for two bars, and you answer in the next two on the pads<span class="hint-keys"> or the keys A to K</span>. Stay with the drums, end on the 1 or the 5, leave some space, borrow the call’s rhythm, and win the crowd. Lose them and they walk out. You can lead the band on stage as you go, too.
     </p>
     <p class="gig-sound">Turn your sound up. On an iPhone, check the ringer switch, too.</p>
+    <fieldset class="gig-you">
+      <legend class="jam-legend">You play</legend>
+      <Segmented name="you-play" options={YOU_PLAY.map((i) => ({ value: i, label: SIT_IN[i].label, full: SIT_IN[i].full }))} value={YOU_START} />
+    </fieldset>
     <div class="gig-list">
       {
         GIGS.map((g) => (
-          <button class="gig-card" type="button" data-gig-start={g.id}>
+          <button class="gig-card" type="button" id={`gig-${g.id}`} data-gig-start={g.id}>
             <span class="gig-level">{g.level}</span>
             <span class="gig-name">{g.label}</span>
             <span class="gig-blurb">{g.blurb}</span>
@@ -57,9 +67,12 @@ const parts = Object.keys(WEIGHTS) as Part[];
         <div class="gig-notes" data-gig-notes></div>
       </div>
     </div>
+    {/* The crowd, in their seats: they fill up, stand, cheer, or get up and go (src/scripts/game.ts). */}
     <div class="gig-crowd">
       <span class="gig-crowd-label" id="gig-crowd-label">Crowd</span>
-      <span class="gig-meter" role="meter" aria-labelledby="gig-crowd-label" aria-valuemin="0" aria-valuemax="100" aria-valuenow="40" data-gig-crowd><span></span></span>
+      <span class="gig-house" role="meter" aria-labelledby="gig-crowd-label" aria-valuemin="0" aria-valuemax="100" aria-valuenow="40" data-gig-crowd>
+        <Fans count={FANS} />
+      </span>
     </div>
     <div class="gig-result" data-gig-result>
       <p class="gig-feedback" data-gig-feedback aria-live="polite"></p>

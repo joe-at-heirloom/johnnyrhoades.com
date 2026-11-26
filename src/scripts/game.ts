@@ -38,17 +38,20 @@ import {
   streakBonus,
   timingScore,
   workOn,
+  callerFor,
+  YOU_PLAY,
+  YOU_START,
   type Breakdown,
   type Gig,
   type Part,
   type TurnNote,
 } from '../lib/game';
-import type { BandMoves, Caller, Part as Player, Section, Song } from '../lib/jam';
+import { PART_LABELS, type BandMoves, type Caller, type Part as Player, type Section, type Song } from '../lib/jam';
 import { SIT_IN, padFor, type SitInInstrument } from '../lib/sit-in';
 
 export type GameHooks = {
-  /** Set the band up for a gig and start it. */
-  play(gig: Gig): Promise<void>;
+  /** Set the band up for a gig, with you on an instrument, and start it. */
+  play(gig: Gig, instrument: SitInInstrument): Promise<void>;
   stop(): void;
   /** Play one of the crowd's reactions. */
   crowd(id: 'crowd-clap' | 'crowd-cheer' | 'crowd-ovation'): void;
@@ -60,7 +63,7 @@ export type GameHooks = {
   preview(part: Player): Promise<number>;
   /** Bring a player who's sitting out into the band. */
   bringIn(part: Player): void;
-  /** Put you on a different horn, on the pads and on the stage. */
+  /** Put you on an instrument, on the pads and on the stage. */
   setInstrument(instrument: SitInInstrument): void;
 };
 
@@ -82,7 +85,7 @@ export type Game = {
 /** A line of the blues: the band's call (two bars) and your turn (the next two). */
 type Line = {
   /** Who plays this line's call: chosen at its downbeat, so a tap mid-call waits for the next line. */
-  caller: Exclude<Caller, 'lead'>;
+  caller: Caller;
   chorus: number;
   inForm: number;
   start: number;
@@ -106,6 +109,13 @@ const STAGE: Player[] = ['drums', 'bass', 'guitar', 'keys', 'lead'];
 const nameOf = (part: Player, parts: Song['parts']) =>
   part === 'keys' ? (parts.keys === 'organ' ? 'organ' : 'piano') : part === 'lead' ? (parts.lead === 'sax' ? 'tenor sax' : 'harmonica') : part === 'drums' ? 'drummer' : part;
 
+/** The seats in the house, and the order fans take them (the middle first) and leave them (the edges first). */
+const SEATS = [5, 6, 4, 7, 3, 8, 2, 9, 1, 10, 0, 11];
+/** How long a fan who's had enough takes to walk out, in ms. */
+const LEAVING_MS = 1400;
+const CHEER_MS = 1500;
+
+const YOU_KEY = 'jam-you-play';
 const BEST_KEY = (id: string) => `jam-gig-best-${id}`;
 const readBest = (id: string) => {
   try {
@@ -146,6 +156,9 @@ export function initGame(root: HTMLElement, hooks: GameHooks): Game {
   };
   const say = (k: keyof typeof HINTS) => hint && (hint.textContent = HINTS[k]);
   const meter = $('[data-gig-crowd]');
+  const fans = [...root.querySelectorAll<SVGGElement>('.fan')];
+  const youPick = [...root.querySelectorAll<HTMLInputElement>('input[name="you-play"]')];
+  const gameNames = new Map([...root.querySelectorAll<HTMLElement>('[data-band-game-name]')].map((el) => [el.closest<HTMLElement>('[data-band]')?.dataset.band as Player, el]));
   const notesEl = $('[data-gig-notes]');
   const halves = [...root.querySelectorAll<HTMLElement>('.gig-half')];
   const beats = [...root.querySelectorAll<HTMLElement>('[data-gig-beats] li')];
@@ -170,8 +183,16 @@ export function initGame(root: HTMLElement, hooks: GameHooks): Game {
   let timers: number[] = [];
   let toldToWait: Line | null = null;
   // The band, as you lead it.
-  let caller: Exclude<Caller, 'lead'> = 'guitar';
-  let instrument: SitInInstrument = 'harp';
+  let caller: Caller = 'guitar';
+  // What you play: what you picked last time, if the browser remembers.
+  let instrument: SitInInstrument = YOU_START;
+  try {
+    const saved = localStorage.getItem(YOU_KEY) as SitInInstrument | null;
+    if (saved && YOU_PLAY.includes(saved)) instrument = saved;
+  } catch {
+    // storage blocked: start on the harp
+  }
+  const yours = () => SIT_IN[instrument].part;
   let dropped = false;
   let fillCued = false;
 
@@ -179,10 +200,33 @@ export function initGame(root: HTMLElement, hooks: GameHooks): Game {
   /** Run something at a time on the audio clock. */
   const at = (time: number, fn: () => void) => timers.push(window.setTimeout(fn, Math.max(0, (time - hooks.now()) * 1000)));
 
-  function setCrowd(v: number) {
+  /**
+   * The crowd, in their seats: as many as it's warm, from the middle out, and on their feet when it's
+   * hot. When it cools, a fan gets up and walks out, and the seat stays empty. `fresh` fills the house
+   * for a new gig without anyone walking out.
+   */
+  function setCrowd(v: number, fresh = false) {
     crowd = v;
-    meter?.style.setProperty('--crowd', v.toFixed(3));
+    const here = Math.round(v * SEATS.length);
+    const standing = v >= 0.6 ? Math.round(((v - 0.6) / 0.4) * here) : 0;
+    SEATS.forEach((seat, i) => {
+      const fan = fans[seat];
+      if (!fan) return;
+      const was = fan.dataset.state;
+      const now = i < standing ? 'up' : i < here ? 'in' : '';
+      if (now) fan.dataset.state = now;
+      else if (!fresh && (was === 'in' || was === 'up')) {
+        fan.dataset.state = 'going';
+        timers.push(window.setTimeout(() => fan.dataset.state === 'going' && delete fan.dataset.state, LEAVING_MS));
+      } else if (fresh || was !== 'going') delete fan.dataset.state;
+    });
     meter?.setAttribute('aria-valuenow', String(Math.round(v * 100)));
+    meter?.setAttribute('aria-valuetext', here ? `${here} of ${SEATS.length} seats full${standing ? `, ${standing} on their feet` : ''}` : 'Everyone’s gone');
+  }
+  /** A cheer: everyone in their seat is up for a moment. */
+  function cheer() {
+    meter?.setAttribute('data-cheer', '');
+    timers.push(window.setTimeout(() => meter?.removeAttribute('data-cheer'), CHEER_MS));
   }
 
   function bestLabels() {
@@ -193,27 +237,28 @@ export function initGame(root: HTMLElement, hooks: GameHooks): Game {
     }
   }
 
-  /** Each player's chip on stage: what a tap does now, and whether it's on. */
+  /** Each player's name and chip on stage: what a tap does now, and whether it's on. The part you play is "You". */
   function drawStage() {
     const parts = hooks.parts();
+    const you = yours();
+    for (const [part, el] of gameNames) el.textContent = part === you ? 'You' : part === 'lead' ? (parts.lead === 'sax' ? 'Sax' : 'Harp') : PART_LABELS[part];
     for (const [part, btn] of acts) {
       if (!btn) continue;
       const name = nameOf(part, parts);
       // The chip says what a tap does, or what's happening now (lit red). The button's name starts with
       // the chip's words and says the rest.
       let text = 'Listen';
-      let label = `Listen to the ${name}`;
+      let label = part === you ? `Listen to the ${name}: you` : `Listen to the ${name}`;
       let on = false;
       if (gig) {
-        if (part === 'drums') {
+        if (part === you) {
+          [text, label] = [`You: ${SIT_IN[instrument].label.toLowerCase()}`, `You: ${SIT_IN[instrument].label.toLowerCase()}. You answer on the pads`];
+        } else if (part === 'drums') {
           on = fillCued;
           [text, label] = on ? ['Fill coming', 'Fill coming: the drummer fills into the next line'] : ['Drum fill', 'Drum fill: the drummer fills into the next line'];
         } else if (part === 'bass') {
           on = dropped;
           [text, label] = on ? ['Band back', 'Band back: the band plays under your answers again'] : ['Play alone', 'Play alone: the band stops under your answers'];
-        } else if (part === 'lead') {
-          const other: SitInInstrument = instrument === 'harp' ? 'sax' : 'harp';
-          [text, label] = [`You: ${SIT_IN[instrument].label.toLowerCase()}`, `You: ${SIT_IN[instrument].label.toLowerCase()}. Tap to switch to ${SIT_IN[other].full.toLowerCase()}`];
         } else {
           on = caller === part;
           [text, label] = on
@@ -239,23 +284,37 @@ export function initGame(root: HTMLElement, hooks: GameHooks): Game {
     }
     const name = nameOf(part, hooks.parts());
     let news = '';
-    if (part === 'drums') {
+    if (part === yours()) {
+      news = 'That’s you: answer the calls on the pads.';
+    } else if (part === 'drums') {
       fillCued = !fillCued;
       news = fillCued ? 'The drummer fills into the end of this line.' : 'No fill.';
     } else if (part === 'bass') {
       dropped = !dropped;
       news = dropped ? 'You’re playing alone: the band stops under your answers, with a hit on one. Keep the time yourself.' : 'The band’s back under your answers.';
-    } else if (part === 'lead') {
-      instrument = instrument === 'harp' ? 'sax' : 'harp';
-      hooks.setInstrument(instrument);
-      news = `You’re on ${SIT_IN[instrument].full.toLowerCase()} now.`;
-    } else if (part === 'guitar' || part === 'keys') {
+    } else if (part === 'guitar' || part === 'keys' || part === 'lead') {
       if (!hooks.parts()[part]) hooks.bringIn(part);
       news = caller === part ? `You’re trading with the ${name}.` : `The ${name} takes the next call.`;
       caller = part;
     }
     if (news && hint) hint.textContent = news;
     drawStage();
+  }
+
+  // What you play: the pads, the stage, and who calls you all follow it.
+  for (const radio of youPick) {
+    radio.checked = radio.value === instrument;
+    radio.addEventListener('change', () => {
+      if (!radio.checked) return;
+      instrument = radio.value as SitInInstrument;
+      try {
+        localStorage.setItem(YOU_KEY, instrument);
+      } catch {
+        // storage blocked: it's remembered until the page closes
+      }
+      hooks.setInstrument(instrument);
+      drawStage();
+    });
   }
   for (const [part, btn] of acts) btn?.addEventListener('click', () => act(part));
 
@@ -348,11 +407,10 @@ export function initGame(root: HTMLElement, hooks: GameHooks): Game {
     answers = [];
     lastAnswer = [];
     walkedOut = false;
-    caller = gig.caller;
-    instrument = gig.instrument;
+    caller = callerFor(gig, instrument);
     dropped = false;
     fillCued = false;
-    setCrowd(CROWD_START);
+    setCrowd(CROWD_START, true);
     if (scoreEl) scoreEl.textContent = '0';
     if (streakEl) streakEl.textContent = '';
     if (feedback) feedback.textContent = '';
@@ -371,7 +429,8 @@ export function initGame(root: HTMLElement, hooks: GameHooks): Game {
     root.toggleAttribute('data-live', true);
     window.scrollTo({ top: 0, behavior: 'instant' });
     live?.focus({ preventScroll: true });
-    await hooks.play(gig);
+    await hooks.play(gig, instrument);
+    if (!hooks.parts()[caller] && caller !== yours()) hooks.bringIn(caller);
     drawStage();
     cancelAnimationFrame(frame);
     frame = requestAnimationFrame(draw);
@@ -396,6 +455,7 @@ export function initGame(root: HTMLElement, hooks: GameHooks): Game {
     if (feedback) feedback.textContent = s.points ? `+${s.points}${bonus ? `, and ${bonus} for the streak` : ''}. ${s.verdict}${notes}` : s.verdict;
     showParts(s.marks.length ? s.breakdown : null);
     if (s.cheer) hooks.crowd(s.cheer === 'cheer' ? 'crowd-cheer' : 'crowd-clap');
+    if (s.cheer === 'cheer') cheer();
     if (crowdGone(crowd) && !last) {
       walkedOut = true;
       if (prompt) prompt.textContent = 'They walked out.';
@@ -461,6 +521,8 @@ export function initGame(root: HTMLElement, hooks: GameHooks): Game {
   });
   bestLabels();
   drawStage();
+  // An instrument remembered from last time: put the pads and the stage on it once the page is set up.
+  if (root.dataset.mode !== 'advanced' && instrument !== YOU_START) window.setTimeout(() => hooks.setInstrument(instrument), 0);
 
   return {
     active: () => gig !== null,
@@ -512,7 +574,7 @@ export function initGame(root: HTMLElement, hooks: GameHooks): Game {
     },
     moves({ inForm, section, time }) {
       if (!gig) return {};
-      const base: BandMoves = { sittingIn: true, level: bandLevel(crowd) };
+      const base: BandMoves = { you: yours(), level: bandLevel(crowd) };
       if (section !== 'call') return base;
       const pos = inForm % 4;
       const m: BandMoves = { ...base, caller: pos === 0 ? caller : (lines.at(-1)?.caller ?? caller), hot: isHot(crowd, streak) };

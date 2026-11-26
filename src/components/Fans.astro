@@ -1,0 +1,35 @@
+---
+/*
+  The house (ADR 0033): a row of seats seen from the back of the room, each
+  with a fan in it or not. A fan sits ("in"), stands with their arms up
+  ("up"), or is on the way out ("going"); an empty seat has no state. In the
+  game the script sets the states as the crowd warms or cools
+  (src/scripts/game.ts); the home page draws a house as it might look
+  mid-gig. Styled in src/styles/components/jam.css.
+*/
+type State = 'in' | 'up' | 'going' | '';
+type Props = { count: number; states?: readonly State[]; class?: string };
+const { count, states = [], class: extra = '' } = Astro.props;
+---
+
+<svg class:list={['gig-fans', extra]} viewBox={`0 0 ${count * 20} 32`} aria-hidden="true">
+  {
+    Array.from({ length: count }, (_, i) => (
+      <g class="fan" data-fan={i} data-state={states[i] || undefined} transform={`translate(${i * 20} 0)`}>
+        <path class="fan-chair" d="M4 31 V19 H16 V31" />
+        <g class="fan-sit">
+          <circle cx="10" cy="12" r="3.6" />
+          <path d="M4.5 22.5 Q10 15 15.5 22.5" />
+        </g>
+        <g class="fan-up">
+          <circle cx="10" cy="5" r="3.6" />
+          <path d="M5 19 Q10 9.5 15 19 M5.6 13.5 L2.6 6.5 M14.4 13.5 L17.4 6.5" />
+        </g>
+        <g class="fan-going">
+          <circle cx="17" cy="9" r="3.6" />
+          <path d="M17 13 V22 M13.5 31 L17 22 L20.5 31 M14 17 L17 15 L20 18" />
+        </g>
+      </g>
+    ))
+  }
+</svg>

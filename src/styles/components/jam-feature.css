@@ -1,0 +1,26 @@
+/* ---------- The blues maker on the home page (src/components/JamFeature.astro) ----------
+   The stage from the game, as a picture: the band in one row with its chips, the house below. */
+.jam-feature-head .lede { max-width: 40rem; }
+.jam-feature-stage { max-width: 980px; margin: 0 auto clamp(28px, 4vw, 40px); }
+.jam-feature-stage .bandstand { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 0; }
+.jam-feature-stage .band-piece { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.jam-feature-stage .band-name { margin: 0; }
+.jam-feature-stage .band-piece:last-child .band-name { color: var(--red-hi); }
+.jam-feature-stage .band-chip[data-on] { border-color: var(--red); background: var(--red); }
+.jam-feature-house { max-width: 560px; margin: 18px auto 0; }
+
+.jam-feature-gigs { list-style: none; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+@media (max-width: 760px) { .jam-feature-gigs { grid-template-columns: 1fr; } }
+.jam-feature-gig { display: flex; flex-direction: column; gap: 4px; height: 100%; padding: 14px 16px; border: 1.5px solid var(--line-strong); border-radius: var(--radius); color: var(--bone); text-decoration: none; }
+.jam-feature-gig:hover { border-color: var(--bone); }
+.jam-feature-gig:focus-visible { outline: 2px solid var(--red-hi); outline-offset: 2px; }
+.jam-feature-gig-name { font-stretch: var(--stretch-display); font-weight: 900; text-transform: uppercase; font-size: 1.5rem; line-height: 1; }
+.jam-feature-gig-blurb { color: var(--bone-2); font-size: .9rem; }
+.jam-feature-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 24px; margin-top: 24px; }
+.jam-feature-note { max-width: 40rem; margin-top: 18px; color: var(--muted); font-size: .9rem; }
+
+@media (max-width: 640px) {
+  .jam-feature-stage .band-piece { padding: 0 2px; }
+  .jam-feature-stage .band-name { font-size: .68rem; letter-spacing: .06em; }
+  .jam-feature-stage .band-chip { padding: 2px 5px; font-size: .62rem; letter-spacing: .04em; white-space: normal; text-align: center; line-height: 1.15; }
+}

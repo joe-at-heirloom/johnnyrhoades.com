@@ -51,7 +51,7 @@ import { createDesk, type Desk } from './console';
 import { initMixerUI } from './mixer-ui';
 import { initRecorder } from './recorder';
 import { initSitIn } from './sit-in';
-import { SIT_IN } from '../lib/sit-in';
+import { SIT_IN, type SitInInstrument } from '../lib/sit-in';
 import { prefersReducedMotion } from './dom';
 import { track } from './track';
 
@@ -384,20 +384,16 @@ export function initJam(root: HTMLElement): void {
 
   const crowdSounds = ['crowd-clap', 'crowd-cheer', 'crowd-ovation'] as const;
   const game: Game = initGame(root, {
-    async play(gig) {
+    async play(gig, instrument) {
       if (playing) stop();
-      song = { ...gig.song, parts: { ...gig.song.parts } };
+      // The gig's band, with your instrument in your part's spot on stage.
+      song = { ...gig.song, parts: { ...gig.song.parts, [SIT_IN[instrument].part]: SIT_IN[instrument].tone } };
       mix = cloneMix(gig.mix);
       mixer.setMix(mix);
       desk?.apply(mix);
       desk?.setRoom(mix.master.room);
       writeForm(song);
-      // The gig's instrument on the pads.
-      const pick = root.querySelector<HTMLInputElement>(`input[name="sit-in"][value="${gig.instrument}"]`);
-      if (pick && !pick.checked) {
-        pick.checked = true;
-        pick.dispatchEvent(new Event('change', { bubbles: true }));
-      }
+      padsOn(instrument);
       // The gig's choruses of call and response. You answer the last line too, then the band tags
       // it with the ending.
       const first = Math.ceil(startBar(song) / 12);
@@ -449,20 +445,24 @@ export function initJam(root: HTMLElement): void {
       songChanged(before);
     },
     setInstrument(instrument) {
-      const radio = root.querySelector<HTMLInputElement>(`input[name="sit-in"][value="${instrument}"]`);
-      if (radio && !radio.checked) {
-        radio.checked = true;
-        radio.dispatchEvent(new Event('change', { bubbles: true }));
-      }
-      // The fills' spot on stage is you: it shows your horn.
-      const tone = SIT_IN[instrument].tone;
-      if (SIT_IN[instrument].part === 'lead' && song.parts.lead !== tone) {
+      padsOn(instrument);
+      // Your part's spot on stage shows your instrument.
+      const { part, tone } = SIT_IN[instrument];
+      if (song.parts[part] !== tone) {
         const before = song;
-        song = { ...song, parts: { ...song.parts, lead: tone } };
+        song = { ...song, parts: { ...song.parts, [part]: tone } };
         songChanged(before);
       }
     },
   });
+  /** Put the pads on an instrument. */
+  function padsOn(instrument: SitInInstrument) {
+    const radio = root.querySelector<HTMLInputElement>(`input[name="sit-in"][value="${instrument}"]`);
+    if (radio && !radio.checked) {
+      radio.checked = true;
+      radio.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+  }
   // Hearing a player on their own: the drawing plays along until they're done.
   let previewUntil = 0;
   function previewFrame() {

@@ -12,7 +12,7 @@
 import type { Caller, Key, Song } from './jam';
 import type { Mix } from './mixer';
 import { STYLES } from './styles';
-import type { SitInInstrument } from './sit-in';
+import { SIT_IN, type SitInInstrument } from './sit-in';
 
 /** Where your turns are: the last two bars of each line, the bars the fills answer in. */
 export const TURN_BARS: readonly number[] = [2, 6, 10];
@@ -220,8 +220,23 @@ export function workOn(breakdowns: readonly Breakdown[]): Part | null {
   return (Object.keys(WEIGHTS) as Part[]).reduce((w, k) => (lost(k) > lost(w) ? k : w));
 }
 
-/** A gig: a style's band, how many choruses, what you play on the pads, and who in the band calls first. */
-export type Gig = { id: string; label: string; blurb: string; level: string; choruses: number; instrument: SitInInstrument; caller: Exclude<Caller, 'lead'>; song: Song; mix: Mix };
+/** A gig: a style's band, how many choruses, and who in the band would rather call. */
+export type Gig = { id: string; label: string; blurb: string; level: string; choruses: number; caller: Caller; song: Song; mix: Mix };
+
+/** What you can play on the pads in a gig, and the one you start on. */
+export const YOU_PLAY: readonly SitInInstrument[] = ['harp', 'sax', 'guitar', 'piano'];
+export const YOU_START: SitInInstrument = 'harp';
+
+/**
+ * Who calls you in a gig: the gig's caller, unless that's the part you're playing, then whoever
+ * else is in the band, guitar first, then the keys, then the fills. If nobody else is, the first who
+ * isn't you (they'll join the band).
+ */
+export function callerFor(gig: Gig, you: SitInInstrument, parts: Song['parts'] = gig.song.parts): Caller {
+  const mine = SIT_IN[you].part;
+  const order = [gig.caller, 'guitar', 'keys', 'lead'].filter((c, i, all): c is Caller => c !== mine && all.indexOf(c) === i) as Caller[];
+  return order.find((c) => parts[c] !== null) ?? order[0]!;
+}
 
 const style = (id: string) => STYLES.find((s) => s.id === id)!;
 /** A gig starts straight in with the first call: no intro to wait through. */
@@ -232,9 +247,9 @@ const straightIn = (song: Song, bpm?: number): Song => ({ ...song, intro: false,
  * few choruses of call and response, then the ending.
  */
 export const GIGS: readonly Gig[] = [
-  { id: 'open-mic', label: 'Open mic', level: 'Easy', blurb: 'A slow porch shuffle in E. You’re on harmonica, trading with the acoustic guitar. Two choruses.', choruses: 2, instrument: 'harp', caller: 'guitar', song: straightIn(style('delta').song, 80), mix: style('delta').mix },
-  { id: 'friday', label: 'Friday night', level: 'Medium', blurb: 'A Chicago shuffle with the quick change. You’re on harmonica, trading with the guitar. Three choruses.', choruses: 3, instrument: 'harp', caller: 'guitar', song: straightIn(style('chicago').song), mix: style('chicago').mix },
-  { id: 'saturday', label: 'Saturday, late', level: 'Hard', blurb: 'A jump boogie at 150. You’re on tenor sax, trading with the piano. Four choruses.', choruses: 4, instrument: 'sax', caller: 'keys', song: straightIn(style('jump').song), mix: style('jump').mix },
+  { id: 'open-mic', label: 'Open mic', level: 'Easy', blurb: 'A slow porch shuffle in E, with an acoustic guitar and an upright bass. Two choruses.', choruses: 2, caller: 'guitar', song: straightIn(style('delta').song, 80), mix: style('delta').mix },
+  { id: 'friday', label: 'Friday night', level: 'Medium', blurb: 'A Chicago shuffle with the quick change, a guitar and a piano. Three choruses.', choruses: 3, caller: 'guitar', song: straightIn(style('chicago').song), mix: style('chicago').mix },
+  { id: 'saturday', label: 'Saturday, late', level: 'Hard', blurb: 'A jump boogie at 150, with the piano calling. Four choruses.', choruses: 4, caller: 'keys', song: straightIn(style('jump').song), mix: style('jump').mix },
 ];
 
 /** How many turns a gig has: three a chorus. The band takes it home after your last answer. */

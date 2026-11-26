@@ -7,9 +7,21 @@ test.beforeEach(async ({ page }) => {
   await blockThirdParties(page);
 });
 
-test('the home page links to it from under the strum', async ({ page }) => {
+test('the home page links to it from under the strum, and features it after the music', async ({ page }) => {
   await page.goto('/');
   await expect(page.locator('.strum').getByRole('link', { name: 'Play it with a band' })).toHaveAttribute('href', '/jam/');
+  const feature = page.locator('#sit-in');
+  await expect(feature.getByRole('heading', { name: 'Sit in with the band' })).toBeVisible();
+  await expect(feature.getByRole('link', { name: 'Play a gig' })).toHaveAttribute('href', '/jam/');
+  // Each gig is a link to its card in the game, which marks it.
+  await expect(feature.getByRole('link', { name: /Friday night/ })).toHaveAttribute('href', '/jam/#gig-friday');
+  await feature.getByRole('link', { name: /Friday night/ }).click();
+  await expect(page).toHaveURL(/\/jam\/#gig-friday$/);
+  // Once the page has gone to the fragment, the card is the target, marked, and in view below the header.
+  await expect.poll(() => page.locator('#gig-friday').evaluate((el) => el.matches(':target'))).toBe(true);
+  await expect(page.locator('#gig-friday')).toHaveCSS('border-top-color', 'rgb(192, 46, 40)');
+  await expect(page.locator('#gig-friday')).toBeInViewport();
+  expect((await page.locator('#gig-friday').boundingBox())!.y).toBeGreaterThan(60);
 });
 
 test('it plays the 12 bars, loading only the sounds the song uses, and stops', async ({ page }) => {
@@ -378,6 +390,8 @@ test.describe('the game', () => {
     test.setTimeout(90_000);
     const errors = collectConsoleErrors(page);
     await page.goto('/jam/?choruses=1');
+    // You pick what you play: sax tonight.
+    await page.locator('input[name="you-play"][value="sax"]').check();
     await page.getByRole('button', { name: /Saturday, late/ }).click();
     const prompt = page.locator('[data-gig-prompt]');
     const live = page.locator('[data-gig-live]');
@@ -403,7 +417,8 @@ test.describe('the game', () => {
     await expect(act('keys')).toHaveAttribute('data-on', '');
     await expect(act('guitar')).toHaveAccessibleName(/^Call next: the guitar plays the next call$/);
     await expect(act('bass')).toHaveAccessibleName(/^Play alone:/);
-    await expect(act('lead')).toHaveAccessibleName(/^You: sax\. Tap to switch to harmonica$/);
+    await expect(act('lead')).toHaveAccessibleName(/^You: sax\. You answer on the pads$/);
+    await expect(page.locator('[data-band="lead"] [data-band-game-name]')).toHaveText('You');
     await act('guitar').click();
     await expect(act('guitar')).toHaveAccessibleName(/^Calling: the guitar/);
     await expect(act('keys')).toHaveAccessibleName(/^Call next/);
@@ -469,11 +484,35 @@ test.describe('the game', () => {
     await expect(guitar).toBeHidden();
   });
 
+  test('you can play guitar: the guitar’s spot on stage is you, and the piano calls', async ({ page }) => {
+    await page.goto('/jam/?choruses=1');
+    await page.locator('input[name="you-play"][value="guitar"]').check();
+    await expect(page.locator('[data-band="guitar"] [data-band-game-name]')).toHaveText('You');
+    await page.getByRole('button', { name: /Friday night/ }).click();
+    await expect(page.locator('input[name="sit-in"][value="guitar"]')).toBeChecked();
+    const act = (part: string) => page.locator(`[data-band-act="${part}"]`);
+    await expect(act('keys')).toHaveAccessibleName(/^Calling: the piano/);
+    await expect(act('guitar')).toHaveAccessibleName(/^You: guitar/);
+    // The harp can call you too.
+    await expect(act('lead')).toHaveAccessibleName(/^Call next: the harmonica/);
+    await act('lead').click();
+    await expect(act('lead')).toHaveAccessibleName(/^Calling: the harmonica/);
+    await page.getByRole('button', { name: 'Leave the stage' }).click();
+    // It's remembered next time.
+    await page.reload();
+    await expect(page.locator('input[name="you-play"][value="guitar"]')).toBeChecked();
+  });
+
   test('miss three turns and the crowd walks out', async ({ page }) => {
     test.setTimeout(60_000);
     await page.goto('/jam/?choruses=2');
     await page.getByRole('button', { name: /Saturday, late/ }).click();
+    // The house starts lukewarm: some seats full, some empty.
+    await expect(page.locator('.gig-house .fan[data-state="in"]')).toHaveCount(5);
     await expect(page.locator('[data-gig-feedback]')).toHaveText(/missed your turn/, { timeout: 15_000 });
+    // A missed turn, and fans get up and walk out.
+    await expect(page.locator('.gig-house .fan[data-state="going"]').first()).toBeAttached();
+    await expect(page.locator('.gig-house .fan[data-state="in"]')).toHaveCount(3);
     await expect(page.locator('[data-gig-summary-title]')).toHaveText('They walked out', { timeout: 30_000 });
     await expect(page.locator('[data-gig-total]')).toContainText('walked out after 3 of 6 answers');
     await expect(page.locator('[data-gig-stars]')).toHaveAttribute('aria-label', '0 of 3 stars');

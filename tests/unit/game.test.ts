@@ -21,6 +21,9 @@ import {
   timingScore,
   workOn,
   TURN_BARS,
+  YOU_PLAY,
+  callerFor,
+  type Gig,
   type TurnNote,
 } from '../../src/lib/game';
 
@@ -205,6 +208,21 @@ describe('the game', () => {
     expect(score(good).points).toBeGreaterThanOrEqual(SHOUT_AT);
   });
 
+  it('lets you play any of four instruments, and finds someone else in the band to call you', () => {
+    expect(YOU_PLAY).toEqual(['harp', 'sax', 'guitar', 'piano']);
+    const [openMic, friday, saturday] = GIGS as [Gig, Gig, Gig];
+    // The gig's caller, unless that's you.
+    expect(callerFor(friday, 'harp')).toBe('guitar');
+    expect(callerFor(saturday, 'sax')).toBe('keys');
+    expect(callerFor(friday, 'guitar')).toBe('keys');
+    expect(callerFor(saturday, 'piano')).toBe('guitar');
+    // The open mic has no keys: with you on guitar, the harp player calls.
+    expect(openMic.song.parts.keys).toBeNull();
+    expect(callerFor(openMic, 'guitar')).toBe('lead');
+    // Never yourself.
+    for (const g of GIGS) for (const you of YOU_PLAY) expect(callerFor(g, you), `${g.id}, ${you}`).not.toBe(you === 'piano' ? 'keys' : you === 'guitar' ? 'guitar' : 'lead');
+  });
+
   it('has three gigs, easiest first, each straight in, in a key the pads play, a turn for every line', () => {
     expect(GIGS.map((g) => g.level)).toEqual(['Easy', 'Medium', 'Hard']);
     for (const g of GIGS) {
@@ -215,7 +233,6 @@ describe('the game', () => {
       expect(gigTurns(g)).toBe(g.choruses * 3);
       // Someone in the band to trade with, who's in the band.
       expect(g.song.parts[g.caller], g.id).not.toBeNull();
-      expect(g.song.parts.lead, g.id).toBe(g.instrument === 'sax' ? 'sax' : 'harp');
     }
     expect(GIGS.map((g) => g.song.bpm)).toEqual([...GIGS.map((g) => g.song.bpm)].sort((a, b) => a - b));
   });

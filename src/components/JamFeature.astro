@@ -1,0 +1,85 @@
+---
+/*
+  The blues maker on the home page (ADRs 0030, 0033): the way in to the
+  game at /jam/, big enough to find. No script, so the home page's budget is
+  untouched: the band drawn on stage as it looks mid-gig (BandArt, one tone
+  each), the chips showing what each player does when you tap them, a house
+  of fans, and the three gigs, each a link to its card on /jam/, which
+  marks it (:target). Home is in Johnny's voice; the note says plainly that
+  the band isn't his.
+*/
+import BandArt from './BandArt.astro';
+import Fans from './Fans.astro';
+import { GIGS } from '../lib/game';
+import type { Part } from '../lib/jam';
+
+/** The Friday night band, mid-gig: the guitar calling, you on harp. */
+const band: { part: Part; tone: string; name: string; chip: string; on?: boolean }[] = [
+  { part: 'drums', tone: 'sticks', name: 'Drums', chip: 'Drum fill' },
+  { part: 'bass', tone: 'electric', name: 'Bass', chip: 'Play alone' },
+  { part: 'guitar', tone: 'crunch', name: 'Guitar', chip: 'Calling', on: true },
+  { part: 'keys', tone: 'piano', name: 'Keys', chip: 'Call next' },
+  { part: 'lead', tone: 'harp', name: 'You', chip: 'You: harp' },
+];
+/** A house that's warming up: most seats full, a few on their feet, one on the way out. */
+const house = ['', 'in', 'in', 'up', 'in', 'in', 'up', 'up', 'in', 'in', 'going', 'in', 'in', ''] as const;
+---
+
+<section class="section jam-feature" id="sit-in" aria-labelledby="sit-in-title">
+  <div class="wrap">
+    <header class="section-head jam-feature-head">
+      <p class="epk-kicker">Blues maker</p>
+      <h2 class="display" id="sit-in-title">Sit in with <em>the band</em></h2>
+      <p class="lede">
+        Can’t make it out to a show? Get up on stage anyway. The band plays a 12-bar blues, one of them calls a line, and you answer it on harmonica, sax, guitar or piano. Stay with the drums, land on the 1 or the 5, and keep the crowd in their seats.
+      </p>
+    </header>
+
+    {/* The stage as it looks mid-gig: a picture of the game, so it's hidden from screen readers; the links below say it. */}
+    <div class="stage jam-feature-stage" aria-hidden="true">
+      <svg class="stage-valance" width="100%" height="28">
+        <defs>
+          <pattern id="feature-valance" width="48" height="28" patternUnits="userSpaceOnUse">
+            <path d="M0 0 H48 V12 A24 15 0 0 1 0 12 Z" />
+          </pattern>
+        </defs>
+        <rect width="100%" height="28" fill="url(#feature-valance)" />
+        <line x1="0" y1="1" x2="100%" y2="1" />
+      </svg>
+      <div class="bandstand">
+        {
+          band.map((b) => (
+            <div class="band-piece">
+              <span class="band-name">{b.name}</span>
+              <BandArt part={b.part} only={b.tone} />
+              <span class="band-chip" data-on={b.on ? '' : undefined}>{b.chip}</span>
+            </div>
+          ))
+        }
+      </div>
+      <Fans count={house.length} states={house} class="jam-feature-house" />
+    </div>
+
+    <ul class="jam-feature-gigs">
+      {
+        GIGS.map((g) => (
+          <li>
+            <a class="jam-feature-gig" href={`/jam/#gig-${g.id}`}>
+              <span class="gig-level">{g.level}</span>
+              <span class="jam-feature-gig-name">{g.label}</span>
+              <span class="jam-feature-gig-blurb">{g.blurb}</span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+
+    <div class="actions jam-feature-actions">
+      <a class="btn btn-red" href="/jam/">Play a gig</a>
+      <a class="text-link" href="/jam/?mode=advanced">Or build your own band and mix it</a>
+    </div>
+    <p class="jam-feature-note">
+      The band is sampled instruments, playing in your browser. It isn’t me or my band: for that, <a class="text-link" href="#shows">come to a show</a>.
+    </p>
+  </div>
+</section>
