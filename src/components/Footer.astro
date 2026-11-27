@@ -1,6 +1,7 @@
 ---
 import { BUILD_NOW } from '../lib/load-shows';
-import { SITE_SOURCE } from '../lib/site';
+import { SITE_CREDIT } from '../lib/site';
+import JoeLint from '../assets/brand/joe-lint-wordmark.svg';
 
 import { liveLinks } from '../lib/media';
 import { profiles } from '../lib/load-content';
@@ -15,6 +16,6 @@ const year = BUILD_NOW.year;
     <ul class="socials" aria-label="Johnny Rhoades elsewhere">
       {links.map((p) => <li><a href={p.url} target="_blank" rel="noopener">{p.name}</a></li>)}
     </ul>
-    <p class="fine">© {year} Johnny Rhoades · Detroit, Michigan · <a href={SITE_SOURCE} target="_blank" rel="noopener">Site by Joe</a></p>
+    <p class="fine">© {year} Johnny Rhoades · Detroit, Michigan · <a class="credit" href={SITE_CREDIT} target="_blank" rel="noopener">Site by <JoeLint role="img" aria-label="Joe Lint" /></a></p>
   </div>
 </footer>

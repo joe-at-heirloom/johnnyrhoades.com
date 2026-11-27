@@ -10,6 +10,11 @@
 .fine a { color: inherit; text-underline-offset: 3px; transition: color .2s; }
 .fine a:hover { color: var(--bone); }
 
+/* Joe's wordmark, outlined so no font loads (ADR 0035). It's set at 1.3× the fine print; in its own em,
+   the viewBox is 2.729 wide and .955 tall, and .225 of that hangs below the baseline (the J). */
+.credit { text-decoration: none; white-space: nowrap; }
+.credit svg { font-size: 1.3em; width: 2.729em; height: .955em; vertical-align: -.225em; }
+
 @media (max-width: 700px) {
   .footer-inner { grid-template-columns: 1fr; }
   .socials { justify-content: flex-start; }

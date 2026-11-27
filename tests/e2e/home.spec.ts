@@ -145,10 +145,16 @@ test('thanks and 404 pages are noindex', async ({ page }) => {
   }
 });
 
-test('the footer credits the site, with Johnny’s OK, and links to its source', async ({ page }) => {
+test('the footer credits the site, with Johnny’s OK, with Joe’s wordmark linking to his site', async ({ page }) => {
   await page.goto('/');
-  const credit = page.locator('footer').getByRole('link', { name: 'Site by Joe' });
-  await expect(credit).toHaveAttribute('href', 'https://github.com/joe-at-heirloom/johnnyrhoades.com');
+  const credit = page.locator('footer').getByRole('link', { name: 'Site by Joe Lint', exact: true });
+  await expect(credit).toHaveAttribute('href', 'https://joelint.com/');
+  const mark = credit.getByRole('img', { name: 'Joe Lint' });
+  await expect(mark).toBeVisible();
+  // The wordmark sits on the text's baseline at about 1.3× its size, not at the SVG's default 300 × 150.
+  const box = await mark.boundingBox();
+  expect(box!.height).toBeGreaterThan(15);
+  expect(box!.height).toBeLessThan(22);
 });
 
 test('no page scrolls sideways, from phone to desktop', async ({ page }) => {

@@ -37,3 +37,4 @@ Short notes on choices that shape the code, so the reasoning survives. One file 
 | [0032](0032-deeply-sampled-instruments.md) | Deeply sampled instruments, loudness layers, takes and strums | Accepted |
 | [0033](0033-blues-maker-game.md) | The blues maker opens as a game; the controls are an advanced mode | Accepted |
 | [0034](0034-strum-scrolls-on-touch.md) | On a touch screen the page scrolls through the strum until you tap it | Accepted |
+| [0035](0035-joe-lint-wordmark-in-the-credit.md) | The footer credit is Joe's wordmark, linking to joelint.com | Accepted |

@@ -400,7 +400,7 @@ The section order stays the same: hero, shows, music, videos, about, photos, boo
 | Photos | Keep. Add photographer credits to the lightbox captions. |
 | Booking | Keep the form and move it to the new backend (section 11). Add an Act select and an optional budget range. Add "Booking agent or festival? See the press kit" linking to `/epk/`. Add a response-time promise once Johnny confirms one he can keep. |
 | Mailing list | Keep the copy and the ZIP field. Move it to the email service. |
-| Footer | Links from `profiles.yaml`. A small "Site by Joe" credit, with Johnny's OK. |
+| Footer | Links from `profiles.yaml`. A small "Site by Joe Lint" credit, with Johnny's OK: Joe's wordmark, linking to joelint.com (ADR 0035). |
 
 ### 7.2 Show page `/shows/<slug>/`
 
@@ -712,7 +712,7 @@ Nothing below ships as fact until he answers.
 - [ ] Access to Spotify for Artists and Apple Music for Artists, and who distributed *Waiting on the Sun*. Answered 2026-10-05: he doesn't use Spotify; CD Baby distributed the album. Still open: Apple Music for Artists, and claiming both profiles through CD Baby.
 - [x] Registrar, Bandzoogle and Bandsintown logins, and any email currently running on the domain. Answered 2026-10-05: Joe owns the domain (DNS on Cloudflare); Bandsintown is connected; email is Johnny's Zoho (ADR 0013). Bandzoogle still matters for the exports before cutover.
 - [ ] Two or three venue owners or bookers who'd give a one-line quote. Answered 2026-10-05: Cal Stone and Lisa Boitel. Joe asks them for a line; quotes go on the press kit only once they've sent one.
-- [x] OK to make the repo public and to add a "Site by Joe" credit. Answered 2026-10-05: yes. The footer credit links to the repo.
+- [x] OK to make the repo public and to add a "Site by Joe" credit. Answered 2026-10-05: yes. The footer credit linked to the repo; since 2026-11-27 it's Joe's wordmark, linking to joelint.com (ADR 0035).
 
 ---
 
