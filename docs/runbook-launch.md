@@ -52,15 +52,17 @@ A public lookup can't see every record. The zone export in step 2 is the real li
 
 Pick a quiet weekday morning, not the day before a gig.
 
+**Done 2026-11-26** (Thanksgiving, no gigs that week), steps 11 to 15, by Claude in Joe's Cloudflare account in Chrome, with Joe's go-ahead. The zone just before, all ten records, for the record: apex `A 172.65.197.38` and `AAAA 2606:4700:90:0:3626:d0ff:6957:de1` (Bandzoogle), `www` CNAME to the apex, MX `mx.zoho.com` 10, `mx2.zoho.com` 20, `mx3.zoho.com` 50, TXT `google-site-verification=…`, `v=spf1 include:zoho.com ~all` and `zoho-verification=zb64527207.zmverify.zoho.com`, and staging's Worker record for `new`. All TTLs were Auto (5 minutes), so no lowering was needed. The deploy attached the apex and removed `new` by itself, and the apex served the new site about four minutes after the Bandzoogle records went.
+
 The headers, the redirect map (`/home`, the track pages, `/track/*`) and the caching all ship inside the deploy, in `dist/_headers` and `dist/_redirects` (ADR 0027). Nothing about them is set by hand.
 
-11. [ ] **In the repository, don't push yet:** in `wrangler.jsonc`, change the route's `pattern` from `new.johnnyrhoades.com` to `johnnyrhoades.com`. Then set the repository variable `SITE_HSTS_MAX_AGE` to `300`, and delete `SITE_NOINDEX`.
-12. [ ] **Cloudflare DNS.** Delete the Bandzoogle `A` and `AAAA` on the apex; their values are in the table above, for rollback. Replace the `www` CNAME with a proxied (orange cloud) `AAAA` record pointing to `100::`, a placeholder that only lets Cloudflare answer for `www`. **Leave MX and TXT alone.**
-13. [ ] **Push the `wrangler.jsonc` change.** The deploy attaches `johnnyrhoades.com` to the Worker, and Cloudflare creates its record and certificate within a few minutes. `curl -sI https://johnnyrhoades.com/` should show the security headers and no `x-robots-tag`.
-14. [ ] **Cloudflare, `www`:** Rules → Redirect Rules → a Single Redirect from `https://www.johnnyrhoades.com/*` to `https://johnnyrhoades.com/${1}`, 301, keeping the query string. Then SSL/TLS → Always Use HTTPS: on.
-15. [ ] **Retire staging:** Workers & Pages → `johnnyrhoades` → Settings → Domains & Routes. Remove `new.johnnyrhoades.com` if it's still listed, which also removes its DNS record.
+11. [x] **In the repository, don't push yet:** in `wrangler.jsonc`, change the route's `pattern` from `new.johnnyrhoades.com` to `johnnyrhoades.com`. Then set the repository variable `SITE_HSTS_MAX_AGE` to `300`, and delete `SITE_NOINDEX`.
+12. [x] **Cloudflare DNS.** Delete the Bandzoogle `A` and `AAAA` on the apex; their values are in the table above, for rollback. Replace the `www` CNAME with a proxied (orange cloud) `AAAA` record pointing to `100::`, a placeholder that only lets Cloudflare answer for `www`. **Leave MX and TXT alone.**
+13. [x] **Push the `wrangler.jsonc` change.** The deploy attaches `johnnyrhoades.com` to the Worker, and Cloudflare creates its record and certificate within a few minutes. `curl -sI https://johnnyrhoades.com/` should show the security headers and no `x-robots-tag`.
+14. [x] **Cloudflare, `www`:** Rules → Redirect Rules → a Single Redirect from `https://www.johnnyrhoades.com/*` to `https://johnnyrhoades.com/${1}`, 301, keeping the query string. Then SSL/TLS → Always Use HTTPS: on.
+15. [x] **Retire staging:** *The deploy removed it.* Workers & Pages → `johnnyrhoades` → Settings → Domains & Routes. Remove `new.johnnyrhoades.com` if it's still listed, which also removes its DNS record.
 16. [ ] **The next day,** with HTTPS working on the apex and `www`: delete `SITE_HSTS_MAX_AGE` and run the Site workflow. HSTS goes back to a year.
-17. [ ] Search Console and Bing: submit `https://johnnyrhoades.com/sitemap-index.xml`, and remove Bandzoogle's old `https://johnnyrhoades.com/sitemap.xml` (submitted 2022), which stops existing at cutover. Then build locally and send everything to IndexNow once (the deploy's own diff is empty on launch day, ADR 0012):
+17. [ ] *IndexNow done 2026-11-26 (4 URLs, 200: the sitemap has no show pages because Bandsintown lists no upcoming shows).* Search Console and Bing: submit `https://johnnyrhoades.com/sitemap-index.xml`, and remove Bandzoogle's old `https://johnnyrhoades.com/sitemap.xml` (submitted 2022), which stops existing at cutover. Then build locally and send everything to IndexNow once (the deploy's own diff is empty on launch day, ADR 0012):
 
     ```bash
     npm run build && npm run -s indexnow -- plan --all | npm run -s indexnow -- submit
@@ -68,8 +70,8 @@ The headers, the redirect map (`/home`, the track pages, `/track/*`) and the cac
 
 ## After launch
 
-18. [ ] `npm run check:redirects`: every row of the redirect map answers 301 to its target, and the target loads.
-19. [ ] `curl -sI https://johnnyrhoades.com/ | grep -iE "content-security|strict-transport|permissions"`: headers present (they come from `dist/_headers`; `docs/security-headers.md`).
+18. [x] *2026-11-26: all 7 correct.* `npm run check:redirects`: every row of the redirect map answers 301 to its target, and the target loads.
+19. [x] *2026-11-26: present, with HSTS at 300 for the first day.* `curl -sI https://johnnyrhoades.com/ | grep -iE "content-security|strict-transport|permissions"`: headers present (they come from `dist/_headers`; `docs/security-headers.md`).
 20. [ ] The rest of `docs/manual-checks.md`: Rich Results Test on two show pages, calendar subscriptions, a test booking (should arrive at `hello@`), an email to `hello@` from an outside address (mail still flows), a test signup with its region tag, Google Analytics events.
 21. [ ] **Johnny:** keep Bandzoogle paid for 30 days as the rollback. Cancel it only after the exports are safe and email has worked for a month. Make sure cancelling Bandzoogle doesn't touch the domain registration (it's at Squarespace).
 22. [ ] Day 28: Core Web Vitals in Search Console; first AI answer audit after launch (`docs/geo-audit-log.md`); verify the site in Ahrefs Webmaster Tools and rerun the Ahrefs baseline (`docs/search-baseline.md`). Rerun the baseline again on day 90.

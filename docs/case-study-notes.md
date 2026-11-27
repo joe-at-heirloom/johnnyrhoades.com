@@ -4,6 +4,20 @@ A running log for the portfolio write-up (PLAN.md section 16): numbers, screensh
 
 ---
 
+## 2026-11-26: Launch
+
+**johnnyrhoades.com moved from Bandzoogle to this site** on Thanksgiving, with no gigs that week, following `docs/runbook-launch.md` steps 11 to 15. Claude made the Cloudflare changes in Joe's dashboard, with his go-ahead:
+- deleted Bandzoogle's two apex records;
+- put a proxied placeholder on `www`;
+- pushed the Worker's domain change;
+- added the `www` → apex 301 and turned on Always Use HTTPS.
+
+The three Zoho MX and three TXT records were never touched. The apex served the new site about four minutes after the old records went. All seven old Bandzoogle URLs answer 301 to the right place, and IndexNow took the four sitemap URLs.
+
+**A launch-day surprise:** Bandsintown lists no upcoming shows (its API says 0 upcoming, 93 past), so the site opens with an empty calendar and a sitemap without show pages. The data is right; the calendar fills as Johnny adds dates.
+
+---
+
 ## 2026-11-26: The home page wouldn't scroll on a phone
 
 **What happened.** Joe reported that the home page "won't stay up and down" on a phone. It wasn't anything new: the strum neck, a 132 px band across the whole page, had `touch-action: none` so it could catch every swipe. A strum is a swipe up or down, the same gesture as scrolling, so a thumb that landed on the neck stopped the page.
