@@ -163,3 +163,36 @@ test('no page scrolls sideways, from phone to desktop', async ({ page }) => {
   }
   expect(wide).toEqual([]);
 });
+
+test.describe('on a touch screen', () => {
+  test.use({ viewport: { width: 375, height: 667 }, hasTouch: true, isMobile: true });
+
+  test('a swipe that starts on the strum scrolls the page; a tap plays it, and scrolling away lets it go (ADR 0034)', async ({ page }) => {
+    await page.goto('/');
+    const neck = page.locator('[data-neck]');
+    await neck.scrollIntoViewIfNeeded();
+    await expect(neck.locator('path.neck-string')).toHaveCount(6);
+    await expect(neck).toHaveCSS('touch-action', 'pan-y');
+
+    // A finger swipes up from the middle of the neck: the page scrolls on.
+    const box = (await neck.boundingBox())!;
+    const before = await page.evaluate(() => scrollY);
+    const cdp = await page.context().newCDPSession(page);
+    await cdp.send('Input.synthesizeScrollGesture', { x: box.x + box.width / 2, y: box.y + box.height / 2, yDistance: -300, gestureSourceType: 'touch', speed: 800 });
+    await expect.poll(() => page.evaluate(() => scrollY)).toBeGreaterThan(before + 150);
+    await expect(page.locator('[data-chord]')).toBeHidden(); // scrolling past plays nothing
+
+    // A tap strums and arms it: now a swipe on the neck strums instead of scrolling.
+    await neck.scrollIntoViewIfNeeded();
+    const tapAt = (await neck.boundingBox())!;
+    await page.touchscreen.tap(tapAt.x + tapAt.width / 2, tapAt.y + tapAt.height / 2);
+    await expect(neck).toHaveAttribute('data-armed', '');
+    await expect(neck).toHaveCSS('touch-action', 'none');
+    await expect(page.locator('[data-chord]')).toBeVisible();
+
+    // Scrolling the page from elsewhere lets it scroll through the neck again.
+    await page.evaluate(() => window.scrollBy({ top: 400, behavior: 'instant' }));
+    await expect(neck).not.toHaveAttribute('data-armed', '');
+    await expect(neck).toHaveCSS('touch-action', 'pan-y');
+  });
+});

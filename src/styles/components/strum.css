@@ -20,11 +20,13 @@
   border-bottom: 1px solid rgba(0, 0, 0, .6);
   box-shadow: inset 0 10px 24px -12px #000, inset 0 -10px 24px -12px #000;
   cursor: crosshair;
-  touch-action: none;
+  /* A swipe up or down scrolls the page through the neck until a tap arms it (ADR 0034). */
+  touch-action: pan-y;
   user-select: none;
   -webkit-user-select: none;
 }
 .neck:focus-visible { outline-offset: -3px; }
+.neck[data-armed] { touch-action: none; }
 .neck-svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
 .neck-fret { stroke: #6f675b; stroke-width: 2.5; opacity: .55; }
 .neck-inlay { fill: var(--bone); opacity: .14; }

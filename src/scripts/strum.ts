@@ -17,6 +17,13 @@
   strings plays at once. Until then a hover strum moves the strings silently.
   The little speaker switch under the neck mutes it, and a mute is remembered.
   Loaded on demand by the StrumNeck component when the neck nears the viewport.
+
+  On a touch screen the neck is as wide as the page, and a strum is a swipe
+  up or down, the same as scrolling, so the page scrolls through it until you
+  tap it (ADR 0034). The tap strums the next chord and arms the neck: while
+  it's armed, a swipe strums and a held string bends, as with a mouse.
+  Scrolling the page anywhere else, or leaving the neck alone for a few
+  seconds, lets the page scroll through it again.
 */
 import {
   BLUES_IN_E,
@@ -38,6 +45,9 @@ const GAUGE = [3.6, 2.9, 2.3, 1.7, 1.3, 1];
 const WOUND = [true, true, true, true, false, false];
 const SUSTAIN = [4.2, 3.8, 3.5, 3.1, 2.8, 2.5]; // seconds to fade out
 const STRUM_GAP_MS = 220; // a pause this long ends one strum
+const ARMED_MS = 5000; // a touch screen's neck stays playable this long after you last touch it
+const TAP_PX = 12; // a touch that moves less than this, and ends within TAP_MS, is a tap
+const TAP_MS = 500;
 const RESET_MS = 8000; // the 12-bar starts over after this long without a strum
 const BEND_HOLD_MS = 110; // hold a pressed string this long and it bends instead of strumming
 const KEY_BEND_STRING = 4; // the B string, where B.B. King did his bending
@@ -411,7 +421,30 @@ export function initStrum(root: HTMLElement): void {
 
   let last: Point | null = null;
 
+  /* ---------- Touch: scroll through, or tap to play (ADR 0034) ---------- */
+
+  let armedTimer = 0;
+  let touching = false;
+  const armed = () => neck.hasAttribute('data-armed');
+  /** Arm the neck for swipes (CSS turns off scrolling on it), for a few seconds from now. */
+  const disarm = () => {
+    window.clearTimeout(armedTimer);
+    neck.removeAttribute('data-armed');
+  };
+  const arm = () => {
+    neck.setAttribute('data-armed', '');
+    window.clearTimeout(armedTimer);
+    armedTimer = window.setTimeout(disarm, ARMED_MS);
+  };
+  // Scrolling the page from anywhere else lets it scroll through the neck again.
+  window.addEventListener('scroll', () => armed() && !touching && disarm(), { passive: true });
+  /** A touch on the neck before it's armed: a tap if it ends where it began, soon. */
+  let tap: (Point & { id: number }) | null = null;
+  const unarmedTouch = (e: PointerEvent) => e.pointerType === 'touch' && !armed();
+
   neck.addEventListener('pointermove', (e) => {
+    if (unarmedTouch(e)) return; // the page is scrolling, or it's a tap: no strings until it's armed
+    if (e.pointerType === 'touch') arm();
     const p = point(e);
     if (hold && e.pointerId === hold.id) {
       const s = strings[hold.i];
@@ -443,6 +476,12 @@ export function initStrum(root: HTMLElement): void {
 
   neck.addEventListener('pointerdown', (e) => {
     const p = point(e);
+    if (e.pointerType === 'touch') touching = true;
+    if (unarmedTouch(e)) {
+      tap = { ...p, id: e.pointerId };
+      return;
+    }
+    if (e.pointerType === 'touch') arm();
     last = p;
     // a tap right on a string plucks it; holding on and pushing bends it
     const hit = strings.find((s) => Math.abs(s.y - p.y) < 9);
@@ -457,8 +496,28 @@ export function initStrum(root: HTMLElement): void {
     if (hold.bending) letGo(hold.i);
     hold = null;
   };
-  neck.addEventListener('pointerup', (e) => { release(e); if (e.pointerType !== 'mouse') last = null; });
-  neck.addEventListener('pointercancel', (e) => { release(e); last = null; });
+  neck.addEventListener('pointerup', (e) => {
+    if (e.pointerType === 'touch') touching = false;
+    // A tap on the unarmed neck strums the next chord and arms it.
+    if (tap && e.pointerId === tap.id) {
+      const p = point(e);
+      if (Math.hypot(p.x - tap.x, p.y - tap.y) < TAP_PX && p.t - tap.t < TAP_MS) {
+        arm();
+        strum(1, p.x, 0.8);
+      }
+      tap = null;
+      return;
+    }
+    release(e);
+    if (e.pointerType !== 'mouse') last = null;
+  });
+  // The browser took the touch to scroll the page.
+  neck.addEventListener('pointercancel', (e) => {
+    if (e.pointerType === 'touch') touching = false;
+    tap = null;
+    release(e);
+    last = null;
+  });
   neck.addEventListener('lostpointercapture', release);
   neck.addEventListener('pointerleave', () => { if (!hold) last = null; });
 

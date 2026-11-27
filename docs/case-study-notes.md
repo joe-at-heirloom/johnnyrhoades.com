@@ -4,6 +4,16 @@ A running log for the portfolio write-up (PLAN.md section 16): numbers, screensh
 
 ---
 
+## 2026-11-26: The home page wouldn't scroll on a phone
+
+**What happened.** Joe reported that the home page "won't stay up and down" on a phone. It wasn't anything new: the strum neck, a 132 px band across the whole page, had `touch-action: none` so it could catch every swipe. A strum is a swipe up or down, the same gesture as scrolling, so a thumb that landed on the neck stopped the page.
+
+**How it was found.** Ruling things out, with numbers: scrolling the home page down and back up in steps showed no layout shifts at all, and a mouse wheel went straight past the neck. Searching the code for anything that blocks touch left one candidate on the home page.
+
+**The fix (ADR 0034).** A swipe that starts on the neck scrolls the page, and a tap strums and arms it for swiping. Five seconds idle, or scrolling the page elsewhere, lets it go. An end-to-end test on a touch-screen phone drives a real touch scroll gesture through Chrome's DevTools protocol.
+
+---
+
 ## 2026-11-24: The blues maker becomes a game, and two blind playtests make it one
 
 **What changed.** The blues maker opens as a game (ADR 0033): pick a gig, the band's harp plays a two-bar call, you answer on the pads, and the crowd decides. The controls from before are an advanced mode behind a switch.
